@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Utente</title>
+    <title>Dashboard</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
@@ -16,81 +16,121 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-        
+
         // Inizializza Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Funzione per ottenere l'email e il saldo dell'utente
+        function getUserData() {
+            const user = auth.currentUser;
+            if (user) {
+                // Recupera l'email
+                document.getElementById('user-email').innerText = "Email: " + user.email;
+                
+                // Recupera il saldo dal Firestore
+                db.collection("users").doc(user.uid).get()
+                    .then(doc => {
+                        if (doc.exists) {
+                            const saldo = doc.data().saldo;
+                            document.getElementById('user-saldo').innerText = "Saldo: " + saldo + "€";
+                        } else {
+                            console.log("Documento non trovato");
+                        }
+                    })
+                    .catch(error => {
+                        console.log("Errore nel recupero dei dati:", error);
+                    });
+            } else {
+                console.log("Utente non autenticato");
+            }
+        }
+
+        // Chiama la funzione quando la pagina è pronta
+        window.onload = getUserData;
     </script>
+
+    <!-- CSS -->
     <style>
-        body {
+        /* Reset base */
+        body, h2, h3, p {
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
+        }
+
+        /* Corpo della pagina */
+        body {
+            background-color: #f4f4f9;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            margin-top: 50px;
-        }
-
-        .widget {
-            background-color: #f4f4f4;
-            border-radius: 10px;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
             padding: 20px;
-            margin: 20px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
+        /* Titolo della pagina */
+        h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Stile per i widget */
+        .widget {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            width: 300px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Titoli dei widget */
         .widget h3 {
+            font-size: 1.5rem;
+            color: #333;
             margin-bottom: 10px;
         }
 
+        /* Paragrafo dei widget */
         .widget p {
-            font-size: 16px;
-            color: #333;
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        /* Stile di caricamento */
+        .widget p {
+            font-style: italic;
+            color: #888;
+        }
+
+        /* Layout per la pagina */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
     </style>
+
 </head>
 <body>
 
+    <h2>Benvenuto nella tua Dashboard</h2>
+
     <div class="widget">
-        <h3>Email dell'Utente</h3>
+        <h3>Il mio account Aura</h3>
         <p id="user-email">Caricamento...</p>
     </div>
 
     <div class="widget">
-        <h3>Saldo dell'Utente</h3>
+        <h3>Saldo</h3>
         <p id="user-saldo">Caricamento...</p>
     </div>
-
-    <script>
-        // Verifica se l'utente è loggato
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                // Recupera l'email dell'utente
-                document.getElementById('user-email').innerText = user.email;
-
-                // Recupera il saldo dell'utente dal Firestore
-                const userId = user.uid;
-                db.collection("users").doc(userId).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            const saldo = doc.data().saldo;
-                            document.getElementById('user-saldo').innerText = saldo + " €";
-                        } else {
-                            document.getElementById('user-saldo').innerText = "Saldo non disponibile";
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Errore nel recupero del saldo: ", error);
-                        document.getElementById('user-saldo').innerText = "Errore nel recupero del saldo";
-                    });
-            } else {
-                window.location.href = "index.html"; // Se l'utente non è loggato, torna alla pagina di login
-            }
-        });
-    </script>
 
 </body>
 </html>
