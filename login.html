@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Signup</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+    <!-- Caricamento delle versioni compatibili di Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
+        // Configurazione di Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -17,91 +19,111 @@
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
         
-        // Inizializza Firebase
+        // Inizializzazione di Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
     </script>
     <style>
-        /* Stile di base per la pagina */
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-direction: column;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
         }
 
         h2 {
-            color: #333;
-        }
-
-        /* Modulo generico */
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            text-align: center;
             margin-bottom: 20px;
         }
 
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
         input {
-            width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+            border-radius: 5px;
+            font-size: 14px;
         }
 
         button {
-            width: 100%;
-            padding: 10px;
             background-color: #4CAF50;
             color: white;
+            padding: 10px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
+            font-size: 14px;
             cursor: pointer;
-            font-size: 16px;
         }
 
         button:hover {
             background-color: #45a049;
         }
 
-        /* Styling del modulo di login e registrazione separati */
-        #login-form, #signup-form {
-            display: flex;
-            flex-direction: column;
+        .form-section {
+            margin-bottom: 30px;
         }
 
-        h2 {
-            margin-bottom: 15px;
+        .alert {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .login-link a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <!-- Modulo di Login -->
-    <h2>Login</h2>
-    <form id="login-form">
-        <input type="email" id="login-email" placeholder="Email" required>
-        <input type="password" id="login-password" placeholder="Password" required>
-        <button type="submit">Accedi</button>
-    </form>
+    <div class="container">
+        <!-- Modulo di Login -->
+        <h2>Login</h2>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button type="submit">Accedi</button>
+        </form>
 
-    <!-- Modulo di Registrazione -->
-    <h2>Registrati</h2>
-    <form id="signup-form">
-        <input type="email" id="signup-email" placeholder="Email" required>
-        <input type="password" id="signup-password" placeholder="Password" required>
-        <button type="submit">Registrati</button>
-    </form>
+        <!-- Modulo di Registrazione -->
+        <h2>Registrati</h2>
+        <form id="signup-form">
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button type="submit">Registrati</button>
+        </form>
+
+        <div class="login-link">
+            <p>Hai già un account? <a href="login.html">Accedi</a></p>
+        </div>
+    </div>
 
     <script>
         // Funzione per il login
@@ -112,11 +134,13 @@
 
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
+                    console.log("Login avvenuto con successo", userCredential);
                     alert("Benvenuto, " + userCredential.user.email);
-                    // Redirigi alla pagina successiva
-                    window.location.href = "dashboard.html"; // Puoi cambiare il nome della pagina
+                    // Redirigi alla dashboard
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
+                    console.error("Errore nel login", error.message);
                     alert("Errore: " + error.message);
                 });
         });
@@ -127,28 +151,19 @@
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
 
-            // Log dei valori email e password
-            console.log("Registrazione in corso con", email, password);
-
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    // Log dei dati dell'utente registrato
-                    console.log("Utente registrato:", userCredential);
-
+                    console.log("Registrazione avvenuta con successo", userCredential);
                     alert("Registrato con successo, " + userCredential.user.email);
-                    
-                    // Salva il saldo nel database Firestore
+                    // Salva saldo iniziale nel Firestore
                     db.collection("users").doc(userCredential.user.uid).set({
                         saldo: 0 // saldo iniziale
                     });
-
-                    // Redirigi alla pagina di dashboard
-                    window.location.href = "user_dashboard.html"; // Puoi cambiare il nome della pagina
+                    // Redirigi alla dashboard
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
-                    // Log degli errori
-                    console.error("Errore di registrazione:", error.message);
-
+                    console.error("Errore nella registrazione", error.message);
                     alert("Errore: " + error.message);
                 });
         });
