@@ -136,8 +136,8 @@
                 .then((userCredential) => {
                     console.log("Login avvenuto con successo", userCredential);
                     alert("Benvenuto, " + userCredential.user.email);
-                    // Redirigi alla dashboard
-                    window.location.href = "user_dashboard.html";
+                    // Redirigi alla dashboard e passa il saldo
+                    window.location.href = "user_dashboard.html?uid=" + userCredential.user.uid;
                 })
                 .catch((error) => {
                     console.error("Errore nel login", error.message);
@@ -160,7 +160,7 @@
                         saldo: 0 // saldo iniziale
                     });
                     // Redirigi alla dashboard
-                    window.location.href = "user_dashboard.html";
+                    window.location.href = "user_dashboard.html?uid=" + userCredential.user.uid;
                 })
                 .catch((error) => {
                     console.error("Errore nella registrazione", error.message);
