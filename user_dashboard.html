@@ -18,7 +18,7 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-        
+
         // Inizializzazione di Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -104,7 +104,7 @@
         // Funzione per verificare se l'utente è loggato
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                // Se l'utente è loggato, mostra i dettagli dell'utente
+                // L'utente è loggato
                 document.getElementById('user-email').textContent = "Ciao, " + user.email;
 
                 // Recupera il saldo da Firestore
@@ -122,11 +122,10 @@
                         document.getElementById('saldo').textContent = "Errore nel caricamento";
                     });
             } else {
-                // Se l'utente non è loggato, redirigi alla pagina di login
+                // Se l'utente non è loggato, reindirizza alla pagina di login
                 window.location.href = "login.html";
             }
         });
-
         // Funzione per logout
         document.getElementById('logout-btn').addEventListener('click', function() {
             firebase.auth().signOut()
