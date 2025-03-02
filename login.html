@@ -22,13 +22,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
     </script>
-
-    <!-- Stili CSS -->
     <style>
         /* Stile di base per la pagina */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 0;
             display: flex;
@@ -38,37 +36,27 @@
             flex-direction: column;
         }
 
-        /* Contenitore principale */
         h2 {
-            font-size: 24px;
             color: #333;
-            margin-bottom: 20px;
         }
 
-        /* Form di Login e Registrazione */
+        /* Modulo generico */
         form {
-            background-color: #fff;
+            background-color: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 40px;
-            width: 100%;
-            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 20px;
         }
 
         input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        input:focus {
-            border-color: #4CAF50;
-            outline: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
 
         button {
@@ -77,35 +65,23 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
 
         button:hover {
             background-color: #45a049;
         }
 
-        /* Layout per il titolo dei moduli */
-        h2 {
-            color: #4CAF50;
-        }
-
-        /* Stile per il modulo di registrazione */
-        #signup-form {
-            margin-top: 30px;
-        }
-
-        /* Stile per il contenitore di entrambi i moduli */
-        div.form-container {
+        /* Styling del modulo di login e registrazione separati */
+        #login-form, #signup-form {
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        /* Aggiunta di margine tra i moduli */
-        div.form-container form {
-            margin-bottom: 20px;
+        h2 {
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -151,17 +127,28 @@
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
 
+            // Log dei valori email e password
+            console.log("Registrazione in corso con", email, password);
+
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
+                    // Log dei dati dell'utente registrato
+                    console.log("Utente registrato:", userCredential);
+
                     alert("Registrato con successo, " + userCredential.user.email);
-                    // Salva altre informazioni nel Firestore (ad esempio saldo iniziale)
+                    
+                    // Salva il saldo nel database Firestore
                     db.collection("users").doc(userCredential.user.uid).set({
                         saldo: 0 // saldo iniziale
                     });
-                    // Redirigi alla pagina successiva
+
+                    // Redirigi alla pagina di dashboard
                     window.location.href = "user_dashboard.html"; // Puoi cambiare il nome della pagina
                 })
                 .catch((error) => {
+                    // Log degli errori
+                    console.error("Errore di registrazione:", error.message);
+
                     alert("Errore: " + error.message);
                 });
         });
