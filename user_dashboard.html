@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Utente</title>
-    <!-- Caricamento delle versioni compatibili di Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
-        // Configurazione di Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -19,7 +17,6 @@
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
 
-        // Inizializzazione di Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -42,20 +39,11 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 600px;
+            text-align: center;
         }
 
         h2 {
-            text-align: center;
             margin-bottom: 20px;
-        }
-
-        .user-info {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .user-info p {
-            font-size: 18px;
         }
 
         .saldo {
@@ -63,26 +51,10 @@
             color: #4CAF50;
         }
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
+        .error {
+            color: red;
             font-size: 14px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-        
-        .logout-btn {
-            background-color: #f44336;
-        }
-
-        .logout-btn:hover {
-            background-color: #e53935;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -90,53 +62,48 @@
 
     <div class="container">
         <h2>Benvenuto nella tua Dashboard!</h2>
-
-        <!-- Sezione con informazioni sull'utente -->
-        <div class="user-info">
-            <p id="user-email"></p>
-            <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
-        </div>
-
-        <button id="logout-btn" class="logout-btn">Esci</button>
+        <p id="user-email"></p>
+        <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
+        <p id="error-message" class="error"></p>
     </div>
 
     <script>
-        // Funzione per verificare se l'utente è loggato
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                // L'utente è loggato
                 document.getElementById('user-email').textContent = "Ciao, " + user.email;
 
-                // Recupera il saldo da Firestore
+                // Recupero saldo da Firestore
                 db.collection("users").doc(user.uid).get()
                     .then((doc) => {
                         if (doc.exists) {
                             const userData = doc.data();
-                            document.getElementById('saldo').textContent = userData.saldo + "€";
+                            if (userData.saldo !== undefined) {
+                                document.getElementById('saldo').textContent = userData.saldo + "€";
+                            } else {
+                                document.getElementById('saldo').textContent = "0€";
+                            }
                         } else {
-                            console.log("Nessun documento trovato per questo utente");
+                            document.getElementById('saldo').textContent = "0€";
+                            console.log("Nessun documento trovato per l'utente, creando uno nuovo...");
+                            
+                            // Creazione automatica del documento utente se non esiste
+                            db.collection("users").doc(user.uid).set({
+                                saldo: 0
+                            }).then(() => {
+                                console.log("Documento utente creato con saldo 0.");
+                            }).catch((error) => {
+                                document.getElementById('error-message').textContent = "Errore nel salvataggio dei dati.";
+                                console.error("Errore nella creazione del documento:", error);
+                            });
                         }
                     })
                     .catch((error) => {
-                        console.error("Errore nel recupero dei dati: ", error);
-                        document.getElementById('saldo').textContent = "Errore nel caricamento";
+                        console.error("Errore nel recupero dati:", error);
+                        document.getElementById('error-message').textContent = "Errore nel caricamento del saldo.";
                     });
-            } else {
-                // Se l'utente non è loggato, reindirizza alla pagina di login
+                } else {
                 window.location.href = "login.html";
             }
-        });
-        // Funzione per logout
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            firebase.auth().signOut()
-                .then(() => {
-                    alert("Sei uscito con successo!");
-                    window.location.href = "login.html";
-                })
-                .catch((error) => {
-                    console.error("Errore nel logout", error.message);
-                    alert("Errore nel logout");
-                });
         });
     </script>
 
