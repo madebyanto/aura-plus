@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
-    <script>
+
+    <!-- Aggiungi script come modulo -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -18,36 +21,38 @@
         };
 
         // Inizializza Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Funzione per ottenere l'email e il saldo dell'utente
+        // Funzione per ottenere i dati dell'utente
         function getUserData() {
-            const user = auth.currentUser;
-            if (user) {
-                // Recupera l'email
-                document.getElementById('user-email').innerText = "Email: " + user.email;
-                
-                // Recupera il saldo dal Firestore
-                db.collection("users").doc(user.uid).get()
-                    .then(doc => {
-                        if (doc.exists) {
-                            const saldo = doc.data().saldo;
-                            document.getElementById('user-saldo').innerText = "Saldo: " + saldo + "€";
-                        } else {
-                            console.log("Documento non trovato");
-                        }
-                    })
-                    .catch(error => {
-                        console.log("Errore nel recupero dei dati:", error);
-                    });
-            } else {
-                console.log("Utente non autenticato");
-            }
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // Ottieni email
+                    document.getElementById('user-email').innerText = "Email: " + user.email;
+
+                    // Ottieni saldo dal Firestore
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef)
+                        .then((docSnap) => {
+                            if (docSnap.exists()) {
+                                const saldo = docSnap.data().saldo;
+                                document.getElementById('user-saldo').innerText = "Saldo: " + saldo + "€";
+                            } else {
+                                console.log("Documento non trovato");
+                            }
+                        })
+                        .catch((error) => {
+                            console.log("Errore nel recupero dei dati:", error);
+                        });
+                } else {
+                    console.log("Utente non autenticato");
+                }
+            });
         }
 
-        // Chiama la funzione quando la pagina è pronta
+        // Chiama la funzione al caricamento della pagina
         window.onload = getUserData;
     </script>
 
@@ -123,7 +128,7 @@
     <h2>Benvenuto nella tua Dashboard</h2>
 
     <div class="widget">
-        <h3>Il mio account Aura</h3>
+        <h3>Indirizzo Email</h3>
         <p id="user-email">Caricamento...</p>
     </div>
 
