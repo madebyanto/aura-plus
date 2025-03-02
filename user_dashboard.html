@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-
-    <!-- Aggiungi script come modulo -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+    <title>Dashboard Utente</title>
+    <!-- Caricamento delle versioni compatibili di Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // Configurazione di Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -19,123 +18,128 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-
-        // Inizializza Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Funzione per ottenere i dati dell'utente
-        function getUserData() {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // Ottieni email
-                    document.getElementById('user-email').innerText = "Email: " + user.email;
-
-                    // Ottieni saldo dal Firestore
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef)
-                        .then((docSnap) => {
-                            if (docSnap.exists()) {
-                                const saldo = docSnap.data().saldo;
-                                document.getElementById('user-saldo').innerText = "Saldo: " + saldo + "€";
-                            } else {
-                                console.log("Documento non trovato");
-                            }
-                        })
-                        .catch((error) => {
-                            console.log("Errore nel recupero dei dati:", error);
-                        });
-                } else {
-                    console.log("Utente non autenticato");
-                }
-            });
-        }
-
-        // Chiama la funzione al caricamento della pagina
-        window.onload = getUserData;
+        
+        // Inizializzazione di Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
     </script>
-
-    <!-- CSS -->
     <style>
-        /* Reset base */
-        body, h2, h3, p {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Corpo della pagina */
         body {
-            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-direction: column;
-            padding: 20px;
+            margin: 0;
         }
 
-        /* Titolo della pagina */
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
         h2 {
-            font-size: 2rem;
-            color: #333;
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        /* Stile per i widget */
-        .widget {
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 10px;
-            width: 300px;
-            border-radius: 8px;
+        .user-info {
+            margin-bottom: 30px;
             text-align: center;
         }
 
-        /* Titoli dei widget */
-        .widget h3 {
-            font-size: 1.5rem;
-            color: #333;
-            margin-bottom: 10px;
+        .user-info p {
+            font-size: 18px;
         }
 
-        /* Paragrafo dei widget */
-        .widget p {
-            font-size: 1.2rem;
-            color: #555;
-            margin-top: 10px;
+        .saldo {
+            font-weight: bold;
+            color: #4CAF50;
         }
 
-        /* Stile di caricamento */
-        .widget p {
-            font-style: italic;
-            color: #888;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
         }
 
-        /* Layout per la pagina */
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .logout-btn {
+            background-color: #f44336;
+        }
+
+        .logout-btn:hover {
+            background-color: #e53935;
         }
     </style>
-
 </head>
 <body>
 
-    <h2>Benvenuto nella tua Dashboard</h2>
+    <div class="container">
+        <h2>Benvenuto nella tua Dashboard!</h2>
 
-    <div class="widget">
-        <h3>Indirizzo Email</h3>
-        <p id="user-email">Caricamento...</p>
+        <!-- Sezione con informazioni sull'utente -->
+        <div class="user-info">
+            <p id="user-email"></p>
+            <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
+        </div>
+
+        <button id="logout-btn" class="logout-btn">Esci</button>
     </div>
 
-    <div class="widget">
-        <h3>Saldo</h3>
-        <p id="user-saldo">Caricamento...</p>
-    </div>
+    <script>
+        // Funzione per ottenere i dettagli dell'utente
+        const user = auth.currentUser;
+
+        if (user) {
+            // Mostra l'email dell'utente
+            document.getElementById('user-email').textContent = "Ciao, " + user.email;
+
+            // Recupera il saldo da Firestore
+            db.collection("users").doc(user.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById('saldo').textContent = userData.saldo + "€";
+                    } else {
+                        console.log("Nessun documento trovato per questo utente");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Errore nel recupero dei dati: ", error);
+                    document.getElementById('saldo').textContent = "Errore nel caricamento";
+                });
+        } else {
+            // Se l'utente non è loggato, redirigi al login
+            window.location.href = "login.html";
+        }
+
+        // Funzione per logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            auth.signOut()
+                .then(() => {
+                    alert("Sei uscito con successo!");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    console.error("Errore nel logout", error.message);
+                    alert("Errore nel logout");
+                });
+        });
+    </script>
 
 </body>
 </html>
