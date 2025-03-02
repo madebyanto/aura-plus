@@ -101,35 +101,35 @@
     </div>
 
     <script>
-        // Funzione per ottenere i dettagli dell'utente
-        const user = auth.currentUser;
+        // Funzione per verificare se l'utente è loggato
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // Se l'utente è loggato, mostra i dettagli dell'utente
+                document.getElementById('user-email').textContent = "Ciao, " + user.email;
 
-        if (user) {
-            // Mostra l'email dell'utente
-            document.getElementById('user-email').textContent = "Ciao, " + user.email;
-
-            // Recupera il saldo da Firestore
-            db.collection("users").doc(user.uid).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        document.getElementById('saldo').textContent = userData.saldo + "€";
-                    } else {
-                        console.log("Nessun documento trovato per questo utente");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Errore nel recupero dei dati: ", error);
-                    document.getElementById('saldo').textContent = "Errore nel caricamento";
-                });
-        } else {
-            // Se l'utente non è loggato, redirigi al login
-            window.location.href = "login.html";
-        }
+                // Recupera il saldo da Firestore
+                db.collection("users").doc(user.uid).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            document.getElementById('saldo').textContent = userData.saldo + "€";
+                        } else {
+                            console.log("Nessun documento trovato per questo utente");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Errore nel recupero dei dati: ", error);
+                        document.getElementById('saldo').textContent = "Errore nel caricamento";
+                    });
+            } else {
+                // Se l'utente non è loggato, redirigi alla pagina di login
+                window.location.href = "login.html";
+            }
+        });
 
         // Funzione per logout
         document.getElementById('logout-btn').addEventListener('click', function() {
-            auth.signOut()
+            firebase.auth().signOut()
                 .then(() => {
                     alert("Sei uscito con successo!");
                     window.location.href = "login.html";
