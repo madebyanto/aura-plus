@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Plus - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: #E30AF5; /* Magenta */
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .widget {
+            background-color: #ffffff; /* Bianco */
+            color: #333;
+            padding: 20px;
+            border-radius: 15px; /* Bordi arrotondati */
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            position: relative;
+            z-index: 1;
+            border: 3px solid transparent; /* Necessario per il bordo gradiente */
+        }
+
+        /* Effetto bordo gradiente */
+        .widget::before {
+            content: "";
+            position: absolute;
+            inset: 0; /* Occupa l'intero spazio */
+            border-radius: 15px;
+            padding: 3px; /* Spessore del bordo */
+            background: linear-gradient(45deg, #E30AF5, #F174FF);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+        }
+
+        /* Effetto hover corretto */
+        .widget:hover {
+            transform: scale(1.05);
+            background-color: #f8f8f8; /* Grigio chiarissimo */
+        }
+
+        .widget h2 {
+            font-size: 1.5em;
+            color: #E30AF5; /* Magenta */
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .widget p {
+            font-size: 1em;
+            color: #555;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Benvenuto su Aura+</h1>
+            <p>Esplora le nostre opzioni e servizi esclusivi!</p>
+        </header>
+        <div class="buttons">
+            <div class="widget" onclick="location.href='https://www.aurastudioitalia.it/aura-store/'">
+                <h2>Aura Store</h2>
+                <p>Scopri tutti i nostri prodotti digitali e fisici.</p>
+            </div>
+            <div class="widget" onclick="location.href='https://www.aurastudioitalia.it/lo-staff/'">
+                <h2>Lo Staff</h2>
+                <p>Conosci il team di Aura Studio e scopri chi ci lavora.</p>
+            </div>
+            <div class="widget" onclick="location.href='https://https://bit.ly/merchaurastoreit'">
+                <h2>Merchandise</h2>
+                <p>Acquista prodotti ufficiali di Aura Studio.</p>
+            </div>
+            <!-- Bottone Supporto -->
+            <div class="widget" onclick="location.href='https://wa.me/13177699431'">
+                <h2>Supporto</h2>
+                <p>Ricevi assistenza per qualsiasi problema o domanda.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
