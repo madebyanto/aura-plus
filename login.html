@@ -22,6 +22,92 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
     </script>
+
+    <!-- Stili CSS -->
+    <style>
+        /* Stile di base per la pagina */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Contenitore principale */
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Form di Login e Registrazione */
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Layout per il titolo dei moduli */
+        h2 {
+            color: #4CAF50;
+        }
+
+        /* Stile per il modulo di registrazione */
+        #signup-form {
+            margin-top: 30px;
+        }
+
+        /* Stile per il contenitore di entrambi i moduli */
+        div.form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Aggiunta di margine tra i moduli */
+        div.form-container form {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
