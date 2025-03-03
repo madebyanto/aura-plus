@@ -124,11 +124,11 @@
                             }
 
                             // Carica immagine profilo
-                            const profileImageURL = userData.profileImage || 'default-profile.png'; // Se non c'è immagine, usa quella di default
+                            const profileImageURL = userData.profileImage || 'aurastudio.png'; // Se non c'è immagine, usa quella di default
                             document.getElementById('profile-img').src = profileImageURL;
 
-                            // Carica e mostra il badge
-                            const badge = userData.role === 'admin' ? 'Admin' : 'Utente'; // Se il ruolo è admin, mostra "Admin", altrimenti "Utente"
+                            // Carica e mostra il badge basato sul campo 'admin'
+                            const badge = userData.admin === true ? 'Admin' : 'Utente'; // Se il campo 'admin' è true, mostra "Admin"
                             document.getElementById('badge').textContent = "Badge: " + badge;
                             document.getElementById('badge').classList.add('badge');
                         } else {
@@ -139,7 +139,7 @@
                             db.collection("users").doc(user.uid).set({
                                 saldo: 0,
                                 profileImage: 'aurastudio.png', // Immagine profilo di default
-                                role: 'user' // Aggiungi ruolo "user" di default
+                                admin: false // Imposta 'admin' su false di default
                             }).then(() => {
                                 console.log("Documento utente creato con saldo 0.");
                             }).catch((error) => {
