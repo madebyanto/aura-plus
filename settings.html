@@ -222,9 +222,10 @@ function uploadProfileImage() {
          <hr>
         <h3>Personalizza la tua immagine</h3>
         <p>Rendi il tuo profilo unico caricando un'immagine profilo!</p>
-         <input type="file" id="file-input" accept="image/*">
-<button class="btn-upload" onclick="uploadProfileImage()">Carica Immagine</button>
-<p id="error-message" class="error"></p>
+         <input type="file" id="profileImageInput" accept="image/*">
+<button onclick="uploadProfileImage()">Carica Immagine Profilo</button>
+<img id="profileImage" src="default-profile.png" width="100">
+
     </div>
     <hr>
     <h2>Privacy e Sicurezza</h2>
