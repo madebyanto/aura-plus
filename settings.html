@@ -33,17 +33,15 @@
         });
 
 
-        // Bottone di logout
-const logoutButton = document.getElementById('logoutButton');
-
-logoutButton.addEventListener('click', () => {
+        // Funzione di logout
+function logoutButton() {
   // Disconnessione da Firebase
   firebase.auth().signOut()
     .then(() => {
       // Rimuove la persistenza dei dati di sessione (cookie)
       firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
         .then(() => {
-          console.log("Logout effettuato.");
+          console.log("Logout effettuato e cookie rimossi.");
           // Redirigi l'utente alla pagina di login (o fai altre operazioni)
           window.location.href = '/login.html';
         })
@@ -54,7 +52,7 @@ logoutButton.addEventListener('click', () => {
     .catch((error) => {
       console.error("Errore nel logout:", error);
     });
-});
+}
     
     </script>
 
@@ -109,7 +107,7 @@ logoutButton.addEventListener('click', () => {
         }
 
         .btn:hover {
-            background-color: #45a049;
+            background-color: #fe0000;
         }
     </style>
 </head>
