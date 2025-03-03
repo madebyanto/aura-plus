@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostazioni - Io e Aura</title>
+    <title>Impostazioni</title>
+    <!-- Caricamento di Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
+        // Configurazione Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -17,69 +19,86 @@
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
 
+        // Inizializzazione Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        function salvaPIN() {
-            const pin = document.getElementById('pin').value;
-            const user = firebase.auth().currentUser;
+        // Funzione per richiedere il PIN all'utente
+        function richiediPIN() {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const userId = user.uid;
+                    db.collection("users").doc(userId).get()
+                        .then((doc) => {
+                            if (doc.exists && doc.data().pin) {
+                                const pinSalvato = doc.data().pin;
+                                const pinInserito = prompt("Inserisci il PIN per accedere alle impostazioni:");
 
-            if (pin.length !== 6 || isNaN(pin)) {
-                alert("Il PIN deve essere di 6 cifre numeriche!");
-                return;
-            }
-
-            if (user) {
-                db.collection("users").doc(user.uid).update({
-                    pin: pin
-                }).then(() => {
-                    alert("PIN impostato correttamente!");
-                }).catch((error) => {
-                    console.error("Errore nel salvataggio del PIN:", error);
-                });
-            } else {
-                alert("Devi essere loggato per impostare il PIN.");
-            }
+                                if (pinInserito !== pinSalvato) {
+                                    alert("PIN errato! Accesso negato.");
+                                    window.location.href = "login.html"; // Reindirizza alla login
+                                }
+                            } else {
+                                alert("Nessun PIN trovato. Impostane uno nelle impostazioni.");
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Errore nel recupero del PIN:", error);
+                            alert("Errore nel recupero del PIN.");
+                        });
+                } else {
+                    window.location.href = "login.html"; // Se non autenticato, reindirizza al login
+                }
+            });
         }
+
+        // Chiede il PIN al caricamento della pagina
+        window.onload = richiediPIN;
     </script>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
         }
 
-        .container {
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .widget {
             background-color: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
             text-align: center;
-        }
-
-        h1, h3 {
-            margin-bottom: 10px;
-        }
-
-        input {
+            max-width: 400px;
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
         }
 
-        button {
-            padding: 10px;
-            background-color: #007bff;
+        .widget h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .widget p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
             color: white;
+            padding: 10px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
@@ -87,19 +106,19 @@
             width: 100%;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Io e Aura</h1>
-        <h3>Proteggi il tuo account</h3>
-        <p>Imposta un PIN a 6 cifre</p>
-        <input type="password" id="pin" placeholder="Inserisci il tuo PIN (6 cifre)">
-        <button onclick="salvaPIN()">Salva PIN</button>
+    <h1>Io e Aura</h1>
+
+    <div class="widget">
+        <h2>Proteggi il tuo account</h2>
+        <p>Proteggi il tuo account con codice a 6 cifre</p>
+        <button class="btn">Inizia</button>
     </div>
 
 </body>
