@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Impostazioni</title>
-    <!-- Caricamento di Firebase -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
     <script>
         // Configurazione Firebase
         const firebaseConfig = {
@@ -24,38 +25,58 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Funzione per richiedere il PIN all'utente
-        function richiediPIN() {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    const userId = user.uid;
-                    db.collection("users").doc(userId).get()
-                        .then((doc) => {
-                            if (doc.exists && doc.data().pin) {
-                                const pinSalvato = doc.data().pin;
-                                const pinInserito = prompt("Inserisci il PIN per accedere alle impostazioni:");
+        // Controlla se l'utente è loggato
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = "login.html"; // Se non è loggato, reindirizza
+            }
+        });
 
-                                if (pinInserito !== pinSalvato) {
-                                    alert("PIN errato! Accesso negato.");
-                                    window.location.href = "login.html"; // Reindirizza alla login
-                                }
-                            } else {
-                                alert("Nessun PIN trovato. Impostane uno nelle impostazioni.");
-                            }
+        // Funzione per impostare o aggiornare il PIN
+        function impostaPIN() {
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("Devi essere loggato per impostare un PIN.");
+                return;
+            }
+
+            const userId = user.uid;
+            db.collection("users").doc(userId).get()
+                .then((doc) => {
+                    let nuovoPin;
+
+                    if (doc.exists && doc.data().pin) {
+                        // L'utente ha già un PIN, chiede se vuole cambiarlo
+                        const conferma = confirm("Hai già un PIN impostato. Vuoi cambiarlo?");
+                        if (!conferma) return;
+                    }
+
+                    // Chiede il nuovo PIN
+                    while (true) {
+                        nuovoPin = prompt("Inserisci un nuovo PIN a 6 cifre:");
+                        if (nuovoPin && nuovoPin.length === 6 && !isNaN(nuovoPin)) {
+                            break;
+                        }
+                        alert("Il PIN deve essere di 6 cifre numeriche.");
+                    }
+
+                    // Salva il nuovo PIN
+                    db.collection("users").doc(userId).set({ pin: nuovoPin }, { merge: true })
+                        .then(() => {
+                            alert("PIN impostato con successo!");
                         })
                         .catch((error) => {
-                            console.error("Errore nel recupero del PIN:", error);
-                            alert("Errore nel recupero del PIN.");
+                            console.error("Errore nel salvataggio del PIN:", error);
+                            alert("Errore nel salvataggio del PIN.");
                         });
-                } else {
-                    window.location.href = "login.html"; // Se non autenticato, reindirizza al login
-                }
-            });
+                })
+                .catch((error) => {
+                    console.error("Errore nel recupero del PIN:", error);
+                });
         }
-
-        // Chiede il PIN al caricamento della pagina
-        window.onload = richiediPIN;
     </script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -118,7 +139,7 @@
     <div class="widget">
         <h2>Proteggi il tuo account</h2>
         <p>Proteggi il tuo account con codice a 6 cifre</p>
-        <button class="btn">Inizia</button>
+        <button class="btn" onclick="impostaPIN()">Inizia</button>
     </div>
 
 </body>
