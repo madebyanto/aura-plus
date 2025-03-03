@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Signup</title>
+    <!-- Caricamento delle versioni compatibili di Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
+        // Configurazione di Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -17,41 +19,27 @@
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
         
+        // Inizializzazione di Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Abilita la persistenza dell'autenticazione
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .then(() => console.log("Persistenza dell'autenticazione attivata."))
-            .catch((error) => console.error("Errore nella persistenza dell'autenticazione:", error.message));
+            .then(() => {
+                console.log("Persistenza dell'autenticazione attivata.");
+            })
+            .catch((error) => {
+                console.error("Errore nella persistenza dell'autenticazione:", error.message);
+            });
 
+        // Controlla se l'utente è già autenticato
         auth.onAuthStateChanged((user) => {
             if (user) {
-                verificaPIN(user.uid);
+                console.log("Utente già loggato:", user.email);
+                window.location.href = "user_dashboard.html";
             }
         });
-
-        function verificaPIN(uid) {
-            db.collection("users").doc(uid).get().then((doc) => {
-                if (doc.exists && doc.data().pin) {
-                    let tentativi = 3;
-                    while (tentativi > 0) {
-                        let pinInserito = prompt("Inserisci il PIN a 6 cifre:");
-                        if (pinInserito === doc.data().pin) {
-                            window.location.href = "user_dashboard.html";
-                            return;
-                        } else {
-                            tentativi--;
-                            alert(`PIN errato. Tentativi rimasti: ${tentativi}`);
-                        }
-                    }
-                    auth.signOut();
-                    alert("Troppi tentativi sbagliati. Riprova più tardi.");
-                } else {
-                    window.location.href = "user_dashboard.html";
-                }
-            }).catch((error) => console.error("Errore nel recupero del PIN:", error));
-        }
     </script>
     <style>
         body {
@@ -123,6 +111,7 @@
 <body>
 
     <div class="container">
+        <!-- Modulo di Login -->
         <h2>Login</h2>
         <form id="login-form">
             <input type="email" id="login-email" placeholder="Email" required>
@@ -130,6 +119,7 @@
             <button type="submit">Accedi</button>
         </form>
 
+        <!-- Modulo di Registrazione -->
         <h2>Registrati</h2>
         <form id="signup-form">
             <input type="email" id="signup-email" placeholder="Email" required>
@@ -143,6 +133,7 @@
     </div>
 
     <script>
+        // Funzione per il login
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -151,7 +142,9 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     console.log("Login avvenuto con successo", userCredential);
-                    verificaPIN(userCredential.user.uid);
+                    alert("Benvenuto, " + userCredential.user.email);
+                    // Redirige alla dashboard
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nel login", error.message);
@@ -159,6 +152,7 @@
                 });
         });
 
+        // Funzione per la registrazione
         document.getElementById('signup-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const email = document.getElementById('signup-email').value;
@@ -167,10 +161,13 @@
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     console.log("Registrazione avvenuta con successo", userCredential);
+                    alert("Registrato con successo, " + userCredential.user.email);
+                    // Salva saldo iniziale nel Firestore
                     db.collection("users").doc(userCredential.user.uid).set({
-                        saldo: 0
+                        saldo: 0 // saldo iniziale
                     });
-                    verificaPIN(userCredential.user.uid);
+                    // Redirige alla dashboard
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nella registrazione", error.message);
@@ -180,4 +177,4 @@
     </script>
 
 </body>
-</html>
+</html> 
