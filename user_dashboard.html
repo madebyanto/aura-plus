@@ -94,7 +94,7 @@
 <body>
 
     <div class="container">
-        <img id="profile-img" src="aurastudio.png" alt="Aura Studio Logo">
+        <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
         <h2>Benvenuto nella tua Dashboard!</h2>
         <p id="user-email"></p>
         <p id="user-uid"></p>
@@ -123,6 +123,10 @@
                                 document.getElementById('saldo').textContent = "0€";
                             }
 
+                            // Carica immagine profilo
+                            const profileImageURL = userData.profileImage || 'default-profile.png'; // Se non c'è immagine, usa quella di default
+                            document.getElementById('profile-img').src = profileImageURL;
+
                             // Carica e mostra il badge
                             const badge = userData.role === 'admin' ? 'Admin' : 'Utente'; // Se il ruolo è admin, mostra "Admin", altrimenti "Utente"
                             document.getElementById('badge').textContent = "Badge: " + badge;
@@ -134,7 +138,7 @@
                             // Creazione automatica del documento utente se non esiste
                             db.collection("users").doc(user.uid).set({
                                 saldo: 0,
-                                profileImage: 'default-profile.png', // Immagine profilo di default
+                                profileImage: 'aurastudio.png', // Immagine profilo di default
                                 role: 'user' // Aggiungi ruolo "user" di default
                             }).then(() => {
                                 console.log("Documento utente creato con saldo 0.");
