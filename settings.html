@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-    
     <script>
         // Configurazione Firebase
         const firebaseConfig = {
@@ -21,12 +20,12 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-        
+
         // Inizializzazione Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore
-        const storage = firebase.storage();
+        const db = firebase.firestore();
+        const storage = app.storage(); // Corretto il riferimento
 
         // Controlla se l'utente è loggato
         auth.onAuthStateChanged((user) => {
@@ -35,94 +34,87 @@
             }
         });
 
-
         // Funzione di logout
-function logoutButton() {
-  // Disconnessione da Firebase
-  firebase.auth().signOut()
-    .then(() => {
-      // Rimuove la persistenza dei dati di sessione (cookie)
-      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
-        .then(() => {
-          console.log("Logout effettuato e cookie rimossi.");
-          // Redirigi l'utente alla pagina di login (o fai altre operazioni)
-          window.location.href = 'login.html';
-        })
-        .catch((error) => {
-          console.error("Errore nel rimuovere la persistenza:", error);
-        });
-    })
-    .catch((error) => {
-      console.error("Errore nel logout:", error);
-    });
-}
+        function logoutButton() {
+            firebase.auth().signOut()
+            .then(() => {
+                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
+                .then(() => {
+                    console.log("Logout effettuato e cookie rimossi.");
+                    window.location.href = 'login.html';
+                })
+                .catch((error) => {
+                    console.error("Errore nel rimuovere la persistenza:", error);
+                });
+            })
+            .catch((error) => {
+                console.error("Errore nel logout:", error);
+            });
+        }
 
+        // Funzione di reset della password
+        function resetPassword() {
+            const user = firebase.auth().currentUser;
 
-// Funzione di reset della password
-function resetPassword() {
-  const user = firebase.auth().currentUser;
+            if (user) {
+                const email = user.email;
+                firebase.auth().sendPasswordResetEmail(email)
+                .then(() => {
+                    alert("Email di reset password inviata all'indirizzo: " + email);
+                })
+                .catch((error) => {
+                    let errorMessage = "Errore: " + error.message;
+                    alert(errorMessage);
+                });
+            } else {
+                alert("Nessun utente autenticato. Effettua il login per resettare la password.");
+            }
+        }
 
-  if (user) {
-    const email = user.email;
+        function uploadProfileImage() {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert("Devi essere loggato per cambiare l'immagine profilo.");
+                return;
+            }
 
-    // Invia l'email di reset password tramite Firebase
-    firebase.auth().sendPasswordResetEmail(email)
-      .then(() => {
-        alert("Email di reset password inviata all'indirizzo: " + email);
-      })
-      .catch((error) => {
-        let errorMessage = "Errore: " + error.message;
-        alert(errorMessage);
-      });
-  } else {
-    alert("Nessun utente autenticato. Effettua il login per resettare la password.");
-  }
-}
+            const fileInput = document.getElementById("profileImageInput");
+            const file = fileInput.files[0];
 
-function uploadProfileImage() {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Devi essere loggato per cambiare l'immagine profilo.");
-        return;
-    }
+            if (!file) {
+                alert("Seleziona un'immagine da caricare.");
+                return;
+            }
 
-    const fileInput = document.getElementById("profileImageInput");
-    const file = fileInput.files[0];
+            // Controlla che il file sia sotto i 5MB
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Il file è troppo grande. Il limite è di 5MB.");
+                return;
+            }
 
-    if (!file) {
-        alert("Seleziona un'immagine da caricare.");
-        return;
-    }
+            const storageRef = storage.ref();
+            const profileImageRef = storageRef.child(`profile_images/${user.uid}.png`); // Corretto il riferimento
 
-    // Controlla che il file sia sotto i 5MB
-    if (file.size > 5 * 1024 * 1024) {
-        alert("Il file è troppo grande. Il limite è di 5MB.");
-        return;
-    }
+            profileImageRef.put(file).then(() => {
+                return profileImageRef.getDownloadURL();
+            }).then((url) => {
+                // Salva l'URL nel Firestore
+                return firebase.firestore().collection("users").doc(user.uid).update({
+                    profileImage: url
+                });
+            }).then(() => {
+                alert("Immagine profilo aggiornata con successo!");
+                document.getElementById("profileImage").src = url; // Aggiorna l'anteprima
+            }).catch((error) => {
+                console.error("Errore nell'upload:", error);
+                alert("Errore nell'upload dell'immagine.");
+            });
+        }
 
-    const storageRef = firebase.storage().ref();
-    const profileImageRef = storageRef.child(profile_images/${user.uid}.png);
-
-    profileImageRef.put(file).then(() => {
-        return profileImageRef.getDownloadURL();
-    }).then((url) => {
-        // Salva l'URL nel Firestore
-        return firebase.firestore().collection("users").doc(user.uid).update({
-            profileImage: url
-        });
-    }).then(() => {
-        alert("Immagine profilo aggiornata con successo!");
-        document.getElementById("profileImage").src = url; // Aggiorna l'anteprima
-    }).catch((error) => {
-        console.error("Errore nell'upload:", error);
-        alert("Errore nell'upload dell'immagine.");
-    });
-}
-
-        
     </script>
 
     <style>
+        /* Stile */
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
@@ -161,7 +153,6 @@ function uploadProfileImage() {
             margin-bottom: 20px;
         }
 
-        
         .btn {
             background-color: #fe3b36;
             color: white;
@@ -181,18 +172,17 @@ function uploadProfileImage() {
 <body>
 
     <h1>Io e Aura</h1>
-     <div class="widgetImg">
-         <hr>
+    <div class="widgetImg">
+        <hr>
         <h3>Personalizza la tua immagine</h3>
         <p>Rendi il tuo profilo unico caricando un'immagine profilo!</p>
-         <input type="file" id="profileImageInput" accept="image/*">
-<button onclick="uploadProfileImage()">Carica Immagine Profilo</button>
-<img id="profileImage" src="default-profile.png" width="100">
-
+        <input type="file" id="profileImageInput" accept="image/*">
+        <button onclick="uploadProfileImage()">Carica Immagine Profilo</button>
+        <img id="profileImage" src="default-profile.png" width="100">
     </div>
     <hr>
     <h2>Privacy e Sicurezza</h2>
- <div class="widgetPrivacy">
+    <div class="widgetPrivacy">
         <h3>Cambia password</h3>
         <p>Invia una email per reimpostare la password del tuo account Aura</p>
         <button class="btn" onclick="resetPassword()">Invia</button>
