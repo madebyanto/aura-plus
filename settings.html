@@ -72,44 +72,6 @@
             }
         }
 
-        // Funzione per caricare l'immagine profilo
-        function uploadProfileImage() {
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                alert("Devi essere loggato per cambiare l'immagine profilo.");
-                return;
-            }
-
-            const fileInput = document.getElementById("profileImageInput");
-            const file = fileInput.files[0];
-
-            if (!file) {
-                alert("Seleziona un'immagine da caricare.");
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                alert("Il file è troppo grande. Il limite è di 5MB.");
-                return;
-            }
-
-            const storageRef = storage.ref();
-            const profileImageRef = storageRef.child(`profile_images/${user.uid}.png`); // Corretto il percorso
-
-            profileImageRef.put(file).then(() => {
-                return profileImageRef.getDownloadURL();
-            }).then((url) => {
-                return db.collection("users").doc(user.uid).update({
-                    profileImage: url
-                });
-            }).then(() => {
-                alert("Immagine profilo aggiornata con successo!");
-                document.getElementById("profileImage").src = url; // Aggiorna l'anteprima
-            }).catch((error) => {
-                console.error("Errore nell'upload:", error);
-                alert("Errore nell'upload dell'immagine.");
-            });
-        }
     </script>
 
     <style>
@@ -170,14 +132,6 @@
 <body>
 
     <h1>Io e Aura</h1>
-    <div class="widgetImg">
-        <hr>
-        <h3>Personalizza la tua immagine</h3>
-        <p>Rendi il tuo profilo unico caricando un'immagine profilo!</p>
-        <input type="file" id="profileImageInput" accept="image/*">
-        <button onclick="uploadProfileImage()">Carica Immagine Profilo</button>
-        <img id="profileImage" src="default-profile.png" width="100">
-    </div>
     <hr>
     <h2>Privacy e Sicurezza</h2>
     <div class="widgetPrivacy">
