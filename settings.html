@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostazioni - Io e Aura</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // Configurazione di Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+            authDomain: "myauraid-f03c6.firebaseapp.com",
+            projectId: "myauraid-f03c6",
+            storageBucket: "myauraid-f03c6.firebasestorage.app",
+            messagingSenderId: "190478237725",
+            appId: "1:190478237725:web:0d39907473f511b85a06f4"
+        };
+        
+        // Inizializzazione di Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Controlla se l'utente è loggato e recupera il PIN
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                const userRef = db.collection("users").doc(user.uid);
+                userRef.get().then((doc) => {
+                    if (doc.exists && doc.data().pin) {
+                        document.getElementById("pin-status").innerHTML = "Hai già impostato un PIN.";
+                    }
+                });
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // Funzione per impostare il PIN
+        function setPin() {
+            const user = firebase.auth().currentUser;
+            const pin = prompt("Inserisci un PIN a 6 cifre:");
+            
+            if (pin && pin.length === 6 && /^\d+$/.test(pin)) {
+                db.collection("users").doc(user.uid).set({ pin: pin }, { merge: true })
+                    .then(() => {
+                        alert("PIN impostato con successo!");
+                        document.getElementById("pin-status").innerHTML = "Hai già impostato un PIN.";
+                    })
+                    .catch((error) => {
+                        alert("Errore durante il salvataggio del PIN.");
+                        console.error("Errore:", error);
+                    });
+            } else {
+                alert("Il PIN deve essere di 6 cifre numeriche.");
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Io e Aura</h1>
+        <h3>Proteggi il tuo account</h3>
+        <p>Imposta un PIN a 6 cifre</p>
+        <p id="pin-status">Non hai ancora impostato un PIN.</p>
+        <button class="btn" onclick="setPin()">Inizia</button>
+    </div>
+
+</body>
+</html>
