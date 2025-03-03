@@ -63,6 +63,7 @@
     <div class="container">
         <h2>Benvenuto nella tua Dashboard!</h2>
         <p id="user-email"></p>
+        <p id="user-uid"></p>
         <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
         <p id="error-message" class="error"></p>
     </div>
@@ -70,7 +71,8 @@
     <script>
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                document.getElementById('user-email').textContent = "Ciao, " + user.email;
+                document.getElementById('user-email').textContent = "Email: " + user.email;
+                document.getElementById('user-uid').textContent = "UID: " + user.uid;
 
                 // Recupero saldo da Firestore
                 db.collection("users").doc(user.uid).get()
