@@ -72,11 +72,20 @@
         .btn-settings:hover {
             background-color: #0056b3;
         }
+
+        #profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
         <h2>Benvenuto nella tua Dashboard!</h2>
         <p id="user-email"></p>
         <p id="user-uid"></p>
@@ -103,13 +112,18 @@
                             } else {
                                 document.getElementById('saldo').textContent = "0€";
                             }
+
+                            // Carica immagine profilo
+                            const profileImageURL = userData.profileImage || 'default-profile.png'; // Se non c'è immagine, usa quella di default
+                            document.getElementById('profile-img').src = profileImageURL;
                         } else {
                             document.getElementById('saldo').textContent = "0€";
                             console.log("Nessun documento trovato per l'utente, creando uno nuovo...");
                             
                             // Creazione automatica del documento utente se non esiste
                             db.collection("users").doc(user.uid).set({
-                                saldo: 0
+                                saldo: 0,
+                                profileImage: 'default-profile.png' // Immagine profilo di default
                             }).then(() => {
                                 console.log("Documento utente creato con saldo 0.");
                             }).catch((error) => {
@@ -122,7 +136,7 @@
                         console.error("Errore nel recupero dati:", error);
                         document.getElementById('error-message').textContent = "Errore nel caricamento del saldo.";
                     });
-                } else {
+            } else {
                 window.location.href = "login.html";
             }
         });
