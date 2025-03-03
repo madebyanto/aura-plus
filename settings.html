@@ -53,7 +53,30 @@ function logoutButton() {
       console.error("Errore nel logout:", error);
     });
 }
-    
+
+
+// Funzione di reset della password
+function resetPassword() {
+  const user = firebase.auth().currentUser;
+
+  if (user) {
+    const email = user.email;
+
+    // Invia l'email di reset password tramite Firebase
+    firebase.auth().sendPasswordResetEmail(email)
+      .then(() => {
+        alert("Email di reset password inviata all'indirizzo: " + email);
+      })
+      .catch((error) => {
+        let errorMessage = "Errore: " + error.message;
+        alert(errorMessage);
+      });
+  } else {
+    alert("Nessun utente autenticato. Effettua il login per resettare la password.");
+  }
+}
+
+        
     </script>
 
     <style>
@@ -114,9 +137,17 @@ function logoutButton() {
 <body>
 
     <h1>Io e Aura</h1>
-
-    <div class="widget">
-        <h2>Esci dal tuo account Aura</h2>
+    <hr>
+    <h2>Privacy e Sicurezza</h2>
+ <div class="widgetPrivacy">
+        <h3>Cambia password</h3>
+        <p>Invia una email per reimpostare la password del tuo account Aura</p>
+        <button class="btn" onclick="resetPassword()">Invia</button>
+    </div>
+    <hr>
+    <h2>Altro</h2>
+    <div class="widgetOther">
+        <h3>Esci dal tuo account Aura</h3>
         <p>Esci dal tuo account Aura e non loggarti automaticamente le prossime volte</p>
         <button class="btn" onclick="logoutButton()">Esci</button>
     </div>
