@@ -76,6 +76,60 @@ function resetPassword() {
   }
 }
 
+
+        // Funzione per caricare l'immagine del profilo
+function uploadProfileImage() {
+    const fileInput = document.getElementById('file-input');
+    const file = fileInput.files[0];
+
+    if (file) {
+        // Verifica che il file non superi i 5 MB
+        if (file.size > 5 * 1024 * 1024) {
+            document.getElementById('error-message').textContent = "Il file è troppo grande. Il limite è di 5 MB.";
+            return;
+        }
+
+        // Verifica che il file sia un'immagine
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        if (!['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+            document.getElementById('error-message').textContent = "Formato non valido. Accettiamo solo immagini JPEG e PNG.";
+            return;
+        }
+
+        // Ottieni l'utente loggato
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const storageRef = firebase.storage().ref('profile_images/' + user.uid + '/' + file.name);
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed', function(snapshot) {
+                // Puoi aggiungere qui una barra di progresso se vuoi
+            }, function(error) {
+                // Gestione errori
+                document.getElementById('error-message').textContent = "Errore nel caricamento dell'immagine.";
+                console.error(error);
+            }, function() {
+                // Una volta completato l'upload, recupera l'URL dell'immagine e salvalo nel Firestore
+                uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    // Salva l'URL dell'immagine nel Firestore per l'utente
+                    firebase.firestore().collection("users").doc(user.uid).update({
+                        profileImage: downloadURL
+                    }).then(() => {
+                        // Aggiorna l'immagine profilo nella pagina
+                        document.getElementById('profile-img').src = downloadURL;
+                        document.getElementById('error-message').textContent = "Immagine aggiornata con successo!";
+                    }).catch((error) => {
+                        console.error("Errore nel salvataggio dell'URL:", error);
+                        document.getElementById('error-message').textContent = "Errore nel salvataggio dell'URL dell'immagine.";
+                    });
+                });
+            });
+        }
+    } else {
+        document.getElementById('error-message').textContent = "Per favore, seleziona un file.";
+    }
+}
+
         
     </script>
 
@@ -137,6 +191,14 @@ function resetPassword() {
 <body>
 
     <h1>Io e Aura</h1>
+     <div class="widgetPrivacy">
+         <hr>
+        <h3>Personalizza la tua immagine</h3>
+        <p>Rendi il tuo profilo unico caricando un'immagine profilo!</p>
+         <input type="file" id="file-input" accept="image/*">
+<button class="btn-upload" onclick="uploadProfileImage()">Carica Immagine</button>
+<p id="error-message" class="error"></p>
+    </div>
     <hr>
     <h2>Privacy e Sicurezza</h2>
  <div class="widgetPrivacy">
