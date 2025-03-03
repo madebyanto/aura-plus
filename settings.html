@@ -20,12 +20,12 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-
+        
         // Inizializzazione Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = app.storage(); // Corretto il riferimento
+        const storage = firebase.storage();
 
         // Controlla se l'utente è loggato
         auth.onAuthStateChanged((user) => {
@@ -37,19 +37,19 @@
         // Funzione di logout
         function logoutButton() {
             firebase.auth().signOut()
-            .then(() => {
-                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
                 .then(() => {
-                    console.log("Logout effettuato e cookie rimossi.");
-                    window.location.href = 'login.html';
+                    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
+                        .then(() => {
+                            console.log("Logout effettuato e cookie rimossi.");
+                            window.location.href = 'login.html';
+                        })
+                        .catch((error) => {
+                            console.error("Errore nel rimuovere la persistenza:", error);
+                        });
                 })
                 .catch((error) => {
-                    console.error("Errore nel rimuovere la persistenza:", error);
+                    console.error("Errore nel logout:", error);
                 });
-            })
-            .catch((error) => {
-                console.error("Errore nel logout:", error);
-            });
         }
 
         // Funzione di reset della password
@@ -58,19 +58,21 @@
 
             if (user) {
                 const email = user.email;
+
                 firebase.auth().sendPasswordResetEmail(email)
-                .then(() => {
-                    alert("Email di reset password inviata all'indirizzo: " + email);
-                })
-                .catch((error) => {
-                    let errorMessage = "Errore: " + error.message;
-                    alert(errorMessage);
-                });
+                    .then(() => {
+                        alert("Email di reset password inviata all'indirizzo: " + email);
+                    })
+                    .catch((error) => {
+                        let errorMessage = "Errore: " + error.message;
+                        alert(errorMessage);
+                    });
             } else {
                 alert("Nessun utente autenticato. Effettua il login per resettare la password.");
             }
         }
 
+        // Funzione per caricare l'immagine profilo
         function uploadProfileImage() {
             const user = firebase.auth().currentUser;
             if (!user) {
@@ -86,20 +88,18 @@
                 return;
             }
 
-            // Controlla che il file sia sotto i 5MB
             if (file.size > 5 * 1024 * 1024) {
                 alert("Il file è troppo grande. Il limite è di 5MB.");
                 return;
             }
 
             const storageRef = storage.ref();
-            const profileImageRef = storageRef.child(`profile_images/${user.uid}.png`); // Corretto il riferimento
+            const profileImageRef = storageRef.child(`profile_images/${user.uid}.png`); // Corretto il percorso
 
             profileImageRef.put(file).then(() => {
                 return profileImageRef.getDownloadURL();
             }).then((url) => {
-                // Salva l'URL nel Firestore
-                return firebase.firestore().collection("users").doc(user.uid).update({
+                return db.collection("users").doc(user.uid).update({
                     profileImage: url
                 });
             }).then(() => {
@@ -110,11 +110,9 @@
                 alert("Errore nell'upload dell'immagine.");
             });
         }
-
     </script>
 
     <style>
-        /* Stile */
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
