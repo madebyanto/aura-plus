@@ -123,10 +123,6 @@
                                 document.getElementById('saldo').textContent = "0€";
                             }
 
-                            // Carica immagine profilo
-                            const profileImageURL = userData.profileImage || 'default-profile.png'; // Se non c'è immagine, usa quella di default
-                            document.getElementById('profile-img').src = profileImageURL;
-
                             // Carica e mostra il badge
                             const badge = userData.role === 'admin' ? 'Admin' : 'Utente'; // Se il ruolo è admin, mostra "Admin", altrimenti "Utente"
                             document.getElementById('badge').textContent = "Badge: " + badge;
