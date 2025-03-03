@@ -23,6 +23,23 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Abilita la persistenza dell'autenticazione
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => {
+                console.log("Persistenza dell'autenticazione attivata.");
+            })
+            .catch((error) => {
+                console.error("Errore nella persistenza dell'autenticazione:", error.message);
+            });
+
+        // Controlla se l'utente è già autenticato
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("Utente già loggato:", user.email);
+                window.location.href = "user_dashboard.html";
+            }
+        });
     </script>
     <style>
         body {
@@ -76,16 +93,6 @@
             background-color: #45a049;
         }
 
-        .form-section {
-            margin-bottom: 30px;
-        }
-
-        .alert {
-            color: red;
-            font-size: 14px;
-            text-align: center;
-        }
-
         .login-link {
             text-align: center;
             margin-top: 10px;
@@ -136,8 +143,8 @@
                 .then((userCredential) => {
                     console.log("Login avvenuto con successo", userCredential);
                     alert("Benvenuto, " + userCredential.user.email);
-                    // Redirigi alla dashboard e passa il saldo
-                    window.location.href = "user_dashboard.html?uid=" + userCredential.user.uid;
+                    // Redirige alla dashboard
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nel login", error.message);
@@ -159,8 +166,8 @@
                     db.collection("users").doc(userCredential.user.uid).set({
                         saldo: 0 // saldo iniziale
                     });
-                    // Redirigi alla dashboard
-                    window.location.href = "user_dashboard.html?uid=" + userCredential.user.uid;
+                    // Redirige alla dashboard
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nella registrazione", error.message);
