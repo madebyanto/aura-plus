@@ -32,6 +32,29 @@
             }
         });
 
+
+        // Bottone di logout
+const logoutButton = document.getElementById('logoutButton');
+
+logoutButton.addEventListener('click', () => {
+  // Disconnessione da Firebase
+  firebase.auth().signOut()
+    .then(() => {
+      // Rimuove la persistenza dei dati di sessione (cookie)
+      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
+        .then(() => {
+          console.log("Logout effettuato.");
+          // Redirigi l'utente alla pagina di login (o fai altre operazioni)
+          window.location.href = '/login.html';
+        })
+        .catch((error) => {
+          console.error("Errore nel rimuovere la persistenza:", error);
+        });
+    })
+    .catch((error) => {
+      console.error("Errore nel logout:", error);
+    });
+});
     
     </script>
 
@@ -75,7 +98,7 @@
         }
 
         .btn {
-            background-color: #4CAF50;
+            background-color: #fe3b36;
             color: white;
             padding: 10px;
             border: none;
@@ -97,7 +120,7 @@
     <div class="widget">
         <h2>Esci dal tuo account Aura</h2>
         <p>Esci dal tuo account Aura e non loggarti automaticamente le prossime volte</p>
-        <button class="btn" onclick="esci()">Esci (In sviluppo)</button>
+        <button class="btn" onclick="logoutButton()">Esci</button>
     </div>
 
 </body>
