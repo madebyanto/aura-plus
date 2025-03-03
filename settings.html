@@ -21,11 +21,12 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-
+        
         // Inizializzazione Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore();
+        const db = firebase.firestore
+        const storage = firebase.storage();
 
         // Controlla se l'utente è loggato
         auth.onAuthStateChanged((user) => {
