@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
-        // Configurazione di Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -17,43 +16,30 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-        
-        // Inizializzazione di Firebase
-        firebase.initializeApp(firebaseConfig);
+
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Controlla se l'utente è loggato e recupera il PIN
-        firebase.auth().onAuthStateChanged((user) => {
+        function salvaPIN() {
+            const pin = document.getElementById('pin').value;
+            const user = firebase.auth().currentUser;
+
+            if (pin.length !== 6 || isNaN(pin)) {
+                alert("Il PIN deve essere di 6 cifre numeriche!");
+                return;
+            }
+
             if (user) {
-                const userRef = db.collection("users").doc(user.uid);
-                userRef.get().then((doc) => {
-                    if (doc.exists && doc.data().pin) {
-                        document.getElementById("pin-status").innerHTML = "Hai già impostato un PIN.";
-                    }
+                db.collection("users").doc(user.uid).update({
+                    pin: pin
+                }).then(() => {
+                    alert("PIN impostato correttamente!");
+                }).catch((error) => {
+                    console.error("Errore nel salvataggio del PIN:", error);
                 });
             } else {
-                window.location.href = "login.html";
-            }
-        });
-
-        // Funzione per impostare il PIN
-        function setPin() {
-            const user = firebase.auth().currentUser;
-            const pin = prompt("Inserisci un PIN a 6 cifre:");
-            
-            if (pin && pin.length === 6 && /^\d+$/.test(pin)) {
-                db.collection("users").doc(user.uid).set({ pin: pin }, { merge: true })
-                    .then(() => {
-                        alert("PIN impostato con successo!");
-                        document.getElementById("pin-status").innerHTML = "Hai già impostato un PIN.";
-                    })
-                    .catch((error) => {
-                        alert("Errore durante il salvataggio del PIN.");
-                        console.error("Errore:", error);
-                    });
-            } else {
-                alert("Il PIN deve essere di 6 cifre numeriche.");
+                alert("Devi essere loggato per impostare il PIN.");
             }
         }
     </script>
@@ -67,7 +53,7 @@
             height: 100vh;
             margin: 0;
         }
-        
+
         .container {
             background-color: white;
             padding: 20px;
@@ -78,36 +64,31 @@
             text-align: center;
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        h3 {
-            font-size: 18px;
-            color: #333;
+        h1, h3 {
             margin-bottom: 10px;
         }
 
-        p {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 20px;
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
-        .btn {
-            background-color: #4CAF50;
-            color: white;
+        button {
             padding: 10px;
+            background-color: #007bff;
+            color: white;
             border: none;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             width: 100%;
         }
 
-        .btn:hover {
-            background-color: #45a049;
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -117,8 +98,8 @@
         <h1>Io e Aura</h1>
         <h3>Proteggi il tuo account</h3>
         <p>Imposta un PIN a 6 cifre</p>
-        <p id="pin-status">Non hai ancora impostato un PIN.</p>
-        <button class="btn" onclick="setPin()">Inizia</button>
+        <input type="password" id="pin" placeholder="Inserisci il tuo PIN (6 cifre)">
+        <button onclick="salvaPIN()">Salva PIN</button>
     </div>
 
 </body>
