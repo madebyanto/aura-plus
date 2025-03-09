@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Plus - Staff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        header p {
+            font-size: 1.2em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        .staff {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .member {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .member::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.4s ease;
+        }
+
+        .member:hover::after {
+            left: 100%;
+        }
+
+        .member img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin-bottom: 10px;
+        }
+
+        .member h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .member p {
+            font-size: 1em;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Il Team di Aura+</h1>
+            <p>Scopri chi lavora dietro le quinte!</p>
+        </header>
+        <div class="staff">
+            <div class="member">
+                <img src="anto.png" alt="Anto">
+                <h2>Anto</h2>
+                <p>Owner | Developer | Editor | Designer</p>
+            </div>
+            <div class="member">
+                <img src="giuse.png" alt="Giuse">
+                <h2>Giuse</h2>
+                <p>Co-Owner | Beta-Tester</p>
+            </div>
+            <div class="member">
+                <img src="diego.jpg" alt="Diego">
+                <h2>Diego</h2>
+                <p>Editor</p>
+            </div>
+            <div class="member">
+                <img src="met.png" alt="Met">
+                <h2>Met</h2>
+                <p>Staffer Aura Community</p>
+            </div>
+            <div class="member">
+                <img src="francesco.jpg" alt="Francesco">
+                <h2>Francesco</h2>
+                <p>Developer</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
