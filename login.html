@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -6,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Signup</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Caricamento delle versioni compatibili di Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -45,46 +43,47 @@
         });
     </script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-
-        
         body {
-            font-family: Poppins, sans-serif;
-            background-color: #f7f7f7;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            text-align: center;
         }
 
         .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
             width: 100%;
             max-width: 400px;
         }
 
-
-      .logo {
-            width: 100%;
-            max-width: 250px;
-            height: auto;
-            display: block;
-            margin: 0 auto 20px;
-        }
-
-        h2 {
-            text-align: center;
+        .logo {
+            width: 150px;
             margin-bottom: 20px;
-
         }
 
         h1 {
-            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        h2 {
             margin-bottom: 20px;
+            font-weight: 300;
         }
 
         form {
@@ -93,21 +92,29 @@
         }
 
         input {
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #F174FF;
         }
 
         button {
-            background-color: #f174ff;
+            background-color: #F174FF;
             color: white;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 14px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
@@ -115,12 +122,12 @@
         }
 
         .login-link {
-            text-align: center;
-            margin-top: 10px;
+            margin-top: 20px;
+            font-size: 14px;
         }
 
         .login-link a {
-            color: #f174ff;
+            color: #F174FF;
             text-decoration: none;
         }
 
@@ -132,9 +139,9 @@
 <body>
 
     <div class="container">
-        <!-- Modulo di Login -->
         <img src="auraaccount.png" alt="Aura Account" class="logo">
-        <h1>Il tuo profilo Aura</h1>
+        <h1>Benvenuto nel tuo profilo Aura</h1>
+
         <h2>Accedi</h2>
         <form id="login-form">
             <input type="email" id="login-email" placeholder="Email" required>
@@ -142,7 +149,6 @@
             <button type="submit">Accedi</button>
         </form>
 
-        <!-- Modulo di Registrazione -->
         <h2>Registrati</h2>
         <form id="signup-form">
             <input type="email" id="signup-email" placeholder="Email" required>
@@ -200,4 +206,4 @@
     </script>
 
 </body>
-</html> 
+</html>
