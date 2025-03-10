@@ -43,6 +43,14 @@
             text-align: center;
         }
 
+        .logo {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
         h2 {
             margin-bottom: 20px;
         }
@@ -95,7 +103,7 @@
 <body>
 
     <div class="container">
-        <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
+        <img id="profile-img" src="default-profile.png" alt="Immagine del profilo" class="logo">
         <h2>Benvenuto nella tua Dashboard!</h2>
         <p id="user-email"></p>
         <p id="user-uid"></p>
@@ -105,7 +113,7 @@
         
         <!-- Bottone Impostazioni -->
         <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
-         <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Cosa puoi fare con il saldo</button>
+        <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Cosa puoi fare con il saldo</button>
     </div>
 
     <script>
