@@ -58,11 +58,11 @@
         // Configurazione Firebase
         const firebaseConfig = {
            apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-  authDomain: "myauraid-f03c6.firebaseapp.com",
-  projectId: "myauraid-f03c6",
-  storageBucket: "myauraid-f03c6.firebasestorage.app",
-  messagingSenderId: "190478237725",
-  appId: "1:190478237725:web:0d39907473f511b85a06f4"
+           authDomain: "myauraid-f03c6.firebaseapp.com",
+           projectId: "myauraid-f03c6",
+           storageBucket: "myauraid-f03c6.firebasestorage.app",
+           messagingSenderId: "190478237725",
+           appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -117,10 +117,10 @@
                 }
 
                 const userData = userSnap.data();
-                const newBalance = (userData.balance || 0) + codeData.amount;
+                const newBalance = (userSnap.data().saldo || 0) + codeData.amount;
 
-                // Aggiorna saldo utente
-                await updateDoc(userRef, { balance: newBalance });
+                // Aggiorna saldo utente (Modificato da "balance" a "saldo")
+                await updateDoc(userRef, { saldo: newBalance });
 
                 // Segna il codice come usato
                 await updateDoc(codeRef, { redeemed: true });
