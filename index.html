@@ -46,6 +46,41 @@
             gap: 20px;
         }
 
+
+ .btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.4s ease;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+        
         .widget {
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
@@ -63,6 +98,7 @@
             transform: translateY(-5px);
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
         }
+
 
         .widget::after {
             content: '';
@@ -102,6 +138,9 @@
             <h1>Benvenuto su Aura+</h1>
             <p>Esplora le nostre opzioni e servizi esclusivi!</p>
         </header>
+
+<button class="btn" onclick="location.href='aboutus.html'">Conosci Aura Studio</button>
+        
         <div class="buttons">
              <div class="widget" onclick="location.href='login.html'">
                 <h2>Il mio account Aura</h2>
