@@ -6,38 +6,95 @@
     <title>Aura+ - Come Ottenere Saldo</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Poppins, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
             text-align: center;
             padding: 20px;
         }
+
         .container {
             max-width: 800px;
-            margin: auto;
+            margin: 0 auto;
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h1, h2 {
             color: #333;
+            margin-bottom: 20px;
         }
+
         .widget {
-            background: #ddd;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
             padding: 15px;
             margin: 10px 0;
-            border-radius: 5px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        .widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.4s ease;
+        }
+
+        .widget:hover::after {
+            left: 100%;
+        }
+
         .widget h3 {
-            margin: 0;
             font-size: 18px;
-            color: #222;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
+
         .widget p {
-            margin: 5px 0 0;
             font-size: 14px;
-            color: #555;
+            font-weight: 300;
+        }
+
+        h6 {
+            font-size: 14px;
+            color: #e0e0e0;
+            margin-top: 5px;
+        }
+
+        a {
+            color: #F174FF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -45,11 +102,11 @@
     <div class="container">
         <h1>Saldo</h1>
         <p>Puoi guadagnare saldo virtuale completando le sfide giornaliere o partecipando ad attività speciali.</p>
-        
+
         <h2>Cosa puoi fare con il saldo?</h2>
         <div class="widget">
             <h3>Accesso alla VIP Chat</h3>
-            <p>Entra in una chat esclusivasu Aura Community con altri membri VIP.</p>
+            <p>Entra in una chat esclusiva su Aura Community con altri membri VIP.</p>
             <h6>Prezzo: 2500 di Saldo</h6>
         </div>
         <div class="widget">
@@ -74,7 +131,7 @@
             <h3>Ecco come puoi fare</h3>
             <p>Ogni Sabato faremo un drop di 10 di Saldo a tutti gli utenti, mentre la prima Domenica del mese faremo un drop di 20 di Saldo a tutti gli utenti.</p>
             <h3>Se vuoi del saldo immediato...</h3>
-            <p>Abbiamo dei pachetti a pagamento contenenti tot di Saldo. Ecco come acquistare: <br>1. Contatta il numero di supporto su WhatsApp <br>2. <a href="packets.html">Visualizza i pacchetti</a><br>3. Dici il pacchetto che vuoi acquistare includendo il tuo UID <br>4. Ti risponderemo il prima possibile per effettuare l'acquisto</p>
+            <p>Abbiamo dei pacchetti a pagamento contenenti tot di Saldo. Ecco come acquistare: <br>1. Contatta il numero di supporto su WhatsApp <br>2. <a href="packets.html">Visualizza i pacchetti</a><br>3. Dici il pacchetto che vuoi acquistare includendo il tuo UID <br>4. Ti risponderemo il prima possibile per effettuare l'acquisto</p>
         </div>
     </div>
 </body>
