@@ -3,85 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostazioni</title>
+    <title>Impostazioni - Aura+</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
-        body {
-            font-family: Poppins, sans-serif;
-            background-color: #f7f7f7;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        .widget {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
             text-align: center;
-            max-width: 400px;
-            width: 100%;
-            margin-bottom: 20px;
+            padding: 20px;
         }
-        .widget h3 {
-            font-size: 20px;
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: 2.5em;
             margin-bottom: 10px;
-            color: #333;
+            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
         }
-        .widget p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 20px;
+
+        header p {
+            font-size: 1.2em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            animation: fadeIn 1.2s ease-in-out;
         }
-        .btn {
-            background-color: #fe3b36;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .widget {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: left;
             cursor: pointer;
-            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
         }
-        .btn:hover {
-            background-color: #fe0000;
+
+        .widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.4s ease;
+        }
+
+        .widget:hover::after {
+            left: 100%;
+        }
+
+        .widget h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .widget p {
+            font-size: 1em;
+            font-weight: 300;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <h1>Io e Aura</h1>
-    <hr>
-    <section>
-        <h2>Privacy e Sicurezza</h2>
-        <div class="widget">
-            <h3>Cambia password</h3>
-            <p>Invia una email per reimpostare la password del tuo account Aura.</p>
-            <button class="btn" onclick="resetPassword()">Invia</button>
+    <div class="container">
+        <header>
+            <h1>Impostazioni Account</h1>
+            <p>Gestisci la tua sicurezza e le opzioni di privacy.</p>
+        </header>
+
+        <div class="buttons">
+            <!-- Reset Password -->
+            <div class="widget" onclick="resetPassword()">
+                <h2>Cambia Password</h2>
+                <p>Invia una email per reimpostare la tua password.</p>
+            </div>
+            
+            <!-- Logout -->
+            <div class="widget" onclick="logoutButton()">
+                <h2>Esci dal tuo account</h2>
+                <p>Esci dal tuo account e cancella la sessione.</p>
+            </div>
         </div>
-    </section>
-    <hr>
-    <section>
-        <h2>Altro</h2>
-        <div class="widget">
-            <h3>Esci dal tuo account Aura</h3>
-            <p>Esci dal tuo account Aura e non loggarti automaticamente le prossime volte.</p>
-            <button class="btn" onclick="logoutButton()">Esci</button>
-        </div>
-    </section>
-    
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
