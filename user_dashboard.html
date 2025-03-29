@@ -100,12 +100,12 @@
             animation: fadeIn 1.5s ease-in-out;
         }
 
-       .banner {
+       .widget {
         text-align: center;
         margin: 20px;
     }
     
-    .banmer-header {
+    .widget-header {
         background-color: #ff4d4d; /* Rosso acceso */
         color: white;
         padding: 10px 20px;
@@ -117,10 +117,14 @@
         transition: background-color 0.3s ease;
     }
     
-    .banmer-header:hover {
+    .widget-header:hover {
         background-color: #e04444;
     }
-    
+
+    .special-offer {
+        color: red; /* Colore rosso per "Offerta Speciale" */
+    }
+
     .banner {
         display: none;
         background-color: #ff4d4d; /* Rosso acceso */
@@ -133,16 +137,17 @@
         max-width: 600px;
         margin: 20px auto;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transform: scale(0);
-        transform-origin: top;
-        transition: transform 0.3s ease-in-out;
+        transform: translateY(-20px);
+        opacity: 0;
+        transition: transform 0.5s ease, opacity 0.5s ease;
     }
-    
+
     .banner.show {
         display: block;
-        transform: scale(1);
+        transform: translateY(0);
+        opacity: 1;
     }
-    
+
     .banner a {
         color: yellow;
         text-decoration: underline;
@@ -150,16 +155,13 @@
 </style>
 
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="banner-header" onclick="toggleBanner()">💥 Offerta Speciale!</div>
+        <div class="widget-header" onclick="toggleBanner()">💥 Offerta Speciale!</div>
     <div class="banner">
         Stiamo regalando a tutti gli utenti iscritti dopo il 26 Marzo <b>15 di Saldo di benvenuto</b>.  
         <br>Contattaci su <a href="https://wa.me/tuonumero" target="_blank">WhatsApp</a> per riscattare il premio!
@@ -228,7 +230,6 @@
                 window.location.href = "login.html";
             }
         });
-
 function toggleBanner() {
         const banner = document.querySelector('.banner');
         banner.classList.toggle('show');
