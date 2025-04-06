@@ -106,6 +106,13 @@
         return;
       }
 
+      // Verifica se l'utente è autenticato
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        statusMessage.textContent = "Devi essere loggato per riscattare il codice!";
+        return;
+      }
+
       console.log("Codice inserito:", code);
 
       // Recupera il codice da Firestore
@@ -127,13 +134,13 @@
             // Segna il codice come usato
             redeemCodeRef.update({
               used: true,
-              usedBy: firebase.auth().currentUser.uid // Usa l'ID dell'utente autenticato
+              usedBy: user.uid // Usa l'ID dell'utente autenticato
             })
             .then(() => {
               console.log("Codice segnato come usato");
 
               // Aggiungi il saldo dell'utente basato sul valore di redeemCode
-              const userRef = db.collection("users").doc(firebase.auth().currentUser.uid); // Usa l'ID dell'utente autenticato
+              const userRef = db.collection("users").doc(user.uid); // Usa l'ID dell'utente autenticato
               userRef.get().then((userDoc) => {
                 if (!userDoc.exists) {
                   console.log("Utente non trovato");
@@ -143,9 +150,15 @@
                   let valueToAdd = codeData.value || 0; // Prende il valore di redeemCode, se esiste
                   userRef.update({
                     saldo: currentBalance + valueToAdd
+                  })
+                  .then(() => {
+                    console.log(`Saldo aggiornato, aggiunti ${valueToAdd}`);
+                    statusMessage.textContent = `Codice riscattato con successo! Hai ricevuto ${valueToAdd} al saldo.`;
+                  })
+                  .catch((error) => {
+                    console.error("Errore nell'aggiornare il saldo: ", error);
+                    statusMessage.textContent = "Errore nell'aggiornare il saldo.";
                   });
-                  console.log(`Saldo aggiornato, aggiunti ${valueToAdd}`);
-                  statusMessage.textContent = `Codice riscattato con successo! Hai ricevuto ${valueToAdd} al saldo.`;
                 }
               });
             })
