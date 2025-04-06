@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aura Plus - Riscatta Codice</title>
+  <title>Riscatta il Codice</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
   <style>
     * {
       margin: 0;
@@ -60,6 +60,21 @@
       box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
     }
 
+    .widget::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: left 0.4s ease;
+    }
+
+    .widget:hover::after {
+      left: 100%;
+    }
+
     .widget h2 {
       font-size: 1.5em;
       margin-bottom: 5px;
@@ -69,13 +84,6 @@
     .widget p {
       font-size: 1em;
       font-weight: 300;
-    }
-
-    #redeemStatus {
-      margin-top: 20px;
-      font-size: 1.2em;
-      font-weight: 500;
-      color: #fff;
     }
 
     @keyframes fadeIn {
@@ -88,81 +96,77 @@
   <div class="container">
     <header>
       <h1>Riscatta il tuo Codice</h1>
-      <p>Inserisci il codice di riscatto per guadagnare crediti!</p>
+      <p>Inserisci il codice per ricevere il saldo!</p>
     </header>
 
-    <div class="widget">
-      <h2>Codice di Riscatto</h2>
-      <input type="text" id="redeemCode" placeholder="Inserisci il tuo codice" />
-      <button onclick="redeemCode()">Riscatta</button>
-    </div>
+    <input type="text" id="redeemCode" placeholder="Inserisci il codice di riscatto" />
+    <button onclick="redeemCode()">Riscatta</button>
 
-    <div id="redeemStatus"></div>
+    <p id="statusMessage"></p>
   </div>
 
   <script>
-    // Configura Firebase
+    // Configurazione Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
       authDomain: "myauraid-f03c6.firebaseapp.com",
       projectId: "myauraid-f03c6",
       storageBucket: "myauraid-f03c6.firebasestorage.app",
       messagingSenderId: "190478237725",
-      appId: "1:190478237725:web:0d39907473f511b85a06f4",
+      appId: "1:190478237725:web:0d39907473f511b85a06f4"
     };
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     // Funzione per riscattare il codice
     function redeemCode() {
-      const code = document.getElementById('redeemCode').value;
-      const userUID = "USER_UID"; // Sostituisci con l'UID dell'utente (prendi dal login o sessione)
+      const codeInput = document.getElementById("redeemCode");
+      const code = codeInput.value.trim();
+      const statusMessage = document.getElementById("statusMessage");
 
       if (code === "") {
-        document.getElementById('redeemStatus').innerHTML = "Per favore inserisci un codice valido.";
+        statusMessage.textContent = "Inserisci un codice di riscatto!";
         return;
       }
 
-      const codeRef = db.collection('redeemCodes').doc(code); // Riferimento al codice
+      // Recupera il codice da Firestore
+      const redeemCodeRef = db.collection("redeemCodes").doc(code);
 
-      codeRef.get().then((doc) => {
-        if (doc.exists) {
-          // Controlla se il codice è già stato utilizzato
-          if (doc.data().used) {
-            document.getElementById('redeemStatus').innerHTML = "Questo codice è già stato utilizzato!";
+      redeemCodeRef.get().then((doc) => {
+        if (!doc.exists) {
+          statusMessage.textContent = "Codice non valido!";
+        } else {
+          const codeData = doc.data();
+
+          // Verifica se il codice è già stato utilizzato
+          if (codeData.used) {
+            statusMessage.textContent = "Questo codice è già stato utilizzato.";
           } else {
-            // Il codice non è stato ancora usato, lo marca come utilizzato
-            codeRef.update({
-              used: true,           // Imposta 'used' a true
-              usedBy: userUID      // Aggiungi l'UID dell'utente che ha riscattato il codice
+            // Segna il codice come usato
+            redeemCodeRef.update({
+              used: true,
+              usedBy: "testUserID" // Usa l'ID dell'utente autenticato
             })
             .then(() => {
-              // Aggiungi il saldo all'utente
-              addCreditsToUser(userUID, doc.data().value);
+              // Aggiungi il saldo dell'utente basato sul valore di redeemCode
+              const userRef = db.collection("users").doc("testUserID"); // Usa l'ID dell'utente autenticato
+              userRef.get().then((userDoc) => {
+                let currentBalance = userDoc.exists ? userDoc.data().saldo : 0;
+                let valueToAdd = codeData.value || 0; // Prende il valore di redeemCode, se esiste
+                userRef.update({
+                  saldo: currentBalance + valueToAdd
+                });
+                statusMessage.textContent = `Codice riscattato con successo! Hai ricevuto ${valueToAdd} al saldo.`;
+              });
+            })
+            .catch((error) => {
+              statusMessage.textContent = "Errore nel riscatto del codice: " + error.message;
             });
           }
-        } else {
-          document.getElementById('redeemStatus').innerHTML = "Codice non valido!";
         }
       }).catch((error) => {
-        document.getElementById('redeemStatus').innerHTML = "Errore nel riscatto del codice.";
-        console.error("Errore nel riscatto del codice: ", error);
-      });
-    }
-
-    // Funzione per aggiungere crediti all'utente
-    function addCreditsToUser(userUID, value) {
-      const userRef = db.collection('users').doc(userUID); // Riferimento all'utente
-
-      userRef.update({
-        saldo: firebase.firestore.FieldValue.increment(value) // Incrementa il saldo dell'utente
-      })
-      .then(() => {
-        document.getElementById('redeemStatus').innerHTML = "Codice riscattato con successo! Saldo aggiornato.";
-      })
-      .catch((error) => {
-        document.getElementById('redeemStatus').innerHTML = "Errore nell'aggiornamento del saldo.";
-        console.error("Errore nell'aggiornamento del saldo: ", error);
+        console.error("Errore nel recuperare il codice: ", error);
+        statusMessage.textContent = "Errore nel recuperare il codice.";
       });
     }
   </script>
