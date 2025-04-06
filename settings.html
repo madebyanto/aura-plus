@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riscatta Codice - Aura+</title>
+    <title>Impostazioni - Aura+</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #E30AF5, #F174FF);
@@ -21,20 +24,32 @@
             text-align: center;
             padding: 20px;
         }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
         }
+
         header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
             font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
         }
+
         header p {
             font-size: 1.2em;
             font-weight: 300;
             margin-bottom: 30px;
+            animation: fadeIn 1.2s ease-in-out;
         }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
         .widget {
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
@@ -47,28 +62,68 @@
             overflow: hidden;
             border: none;
         }
+
         .widget:hover {
             transform: translateY(-5px);
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.4s ease;
+        }
+
+        .widget:hover::after {
+            left: 100%;
+        }
+
+        .widget h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .widget p {
+            font-size: 1em;
+            font-weight: 300;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Riscatta il Codice</h1>
-            <p>Inserisci il codice per aggiungere saldo al tuo account</p>
+            <h1>Impostazioni Account</h1>
+            <p>Gestisci la tua sicurezza e le opzioni di privacy.</p>
         </header>
 
-        <input type="text" id="redeemCode" placeholder="Inserisci il codice" />
-        <button class="widget" onclick="redeemCode()">Riscatta</button>
-
-        <div id="message"></div>
+        <div class="buttons">
+            <!-- Reset Password -->
+            <div class="widget" onclick="resetPassword()">
+                <h2>Cambia Password</h2>
+                <p>Invia una email per reimpostare la tua password.</p>
+            </div>
+            
+            <!-- Logout -->
+            <div class="widget" onclick="logoutButton()">
+                <h2>Esci dal tuo account</h2>
+                <p>Esci dal tuo account e cancella la sessione.</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Configurazione di Firebase
-        var firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
             projectId: "myauraid-f03c6",
@@ -77,74 +132,47 @@
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
         
-        // Inizializza Firebase
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.firestore();
-        var auth = firebase.auth();
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-        // Funzione per riscattare il codice
-        function redeemCode() {
-            var code = document.getElementById("redeemCode").value;
-            var user = auth.currentUser;
+        auth.onAuthStateChanged((user) => {
             if (!user) {
-                document.getElementById("message").innerText = "Devi essere loggato per riscattare un codice.";
-                return;
+                window.location.href = "login.html";
             }
-            if (!code) {
-                document.getElementById("message").innerText = "Per favore, inserisci un codice valido.";
-                return;
-            }
+        });
 
-            // Controlla se il codice esiste e non è stato ancora utilizzato
-            var codeRef = db.collection('redeemCodes').doc(code);
-            codeRef.get().then(function(doc) {
-                if (!doc.exists) {
-                    document.getElementById("message").innerText = "Codice non valido.";
-                    return;
-                }
-                
-                var codeData = doc.data();
-                if (codeData.used) {
-                    document.getElementById("message").innerText = "Questo codice è già stato utilizzato.";
-                    return;
-                }
-
-                // Aggiorna il saldo dell'utente
-                var userRef = db.collection('users').doc(user.uid);
-                userRef.get().then(function(userDoc) {
-                    if (!userDoc.exists) {
-                        document.getElementById("message").innerText = "Utente non trovato.";
-                        return;
-                    }
-
-                    var userData = userDoc.data();
-                    var newSaldo = userData.saldo + codeData.value;
-                    userRef.update({ saldo: newSaldo })
-                    .then(function() {
-                        // Imposta il codice come utilizzato
-                        codeRef.update({ used: true })
-                        .then(function() {
-                            document.getElementById("message").innerText = "Codice riscattato con successo! Saldo aggiornato.";
+        function logoutButton() {
+            auth.signOut()
+                .then(() => {
+                    auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+                        .then(() => {
+                            console.log("Logout effettuato e cookie rimossi.");
+                            window.location.href = 'login.html';
                         })
-                        .catch(function(error) {
-                            console.error("Errore durante l'aggiornamento del codice:", error);
-                            document.getElementById("message").innerText = "Si è verificato un errore durante l'aggiornamento del codice.";
+                        .catch((error) => {
+                            console.error("Errore nel rimuovere la persistenza:", error);
                         });
-                    })
-                    .catch(function(error) {
-                        console.error("Errore durante l'aggiornamento del saldo:", error);
-                        document.getElementById("message").innerText = "Si è verificato un errore durante l'aggiornamento del saldo.";
-                    });
                 })
-                .catch(function(error) {
-                    console.error("Errore durante il recupero dell'utente:", error);
-                    document.getElementById("message").innerText = "Si è verificato un errore durante il recupero dell'utente.";
+                .catch((error) => {
+                    console.error("Errore nel logout:", error);
                 });
-            })
-            .catch(function(error) {
-                console.error("Errore durante il recupero del codice:", error);
-                document.getElementById("message").innerText = "Si è verificato un errore durante il recupero del codice.";
-            });
+        }
+
+        function resetPassword() {
+            const user = auth.currentUser;
+            if (user) {
+                auth.sendPasswordResetEmail(user.email)
+                    .then(() => {
+                        alert("Email di reset password inviata all'indirizzo: " + user.email);
+                    })
+                    .catch((error) => {
+                        alert("Errore: " + error.message);
+                    });
+            } else {
+                alert("Nessun utente autenticato. Effettua il login per resettare la password.");
+            }
         }
     </script>
 </body>
