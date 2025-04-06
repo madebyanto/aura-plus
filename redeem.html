@@ -1,137 +1,170 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riscatta Codice - Aura+</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #121212;
-            color: white;
-        }
-        .menu-container {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-        }
-        input {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            background: #ff6600;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background: #cc5500;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Plus - Riscatta Codice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #E30AF5, #F174FF);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 600;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    header p {
+      font-size: 1.2em;
+      font-weight: 300;
+      margin-bottom: 30px;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .widget {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      border: none;
+    }
+
+    .widget:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .widget h2 {
+      font-size: 1.5em;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .widget p {
+      font-size: 1em;
+      font-weight: 300;
+    }
+
+    #redeemStatus {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div class="menu-container">
-        <h2>Riscatta un codice</h2>
-        <input type="text" id="codeInput" placeholder="Inserisci il codice">
-        <button id="redeemButton">Riscatta</button>
-        <p id="message"></p>
+  <div class="container">
+    <header>
+      <h1>Riscatta il tuo Codice</h1>
+      <p>Inserisci il codice di riscatto per guadagnare crediti!</p>
+    </header>
+
+    <div class="widget">
+      <h2>Codice di Riscatto</h2>
+      <input type="text" id="redeemCode" placeholder="Inserisci il tuo codice" />
+      <button onclick="redeemCode()">Riscatta</button>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+    <div id="redeemStatus"></div>
+  </div>
 
-        // Configurazione Firebase
-        const firebaseConfig = {
-           apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-           authDomain: "myauraid-f03c6.firebaseapp.com",
-           projectId: "myauraid-f03c6",
-           storageBucket: "myauraid-f03c6.firebasestorage.app",
-           messagingSenderId: "190478237725",
-           appId: "1:190478237725:web:0d39907473f511b85a06f4"
-        };
+  <script>
+    // Configura Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+      authDomain: "myauraid-f03c6.firebaseapp.com",
+      projectId: "myauraid-f03c6",
+      storageBucket: "myauraid-f03c6.firebasestorage.app",
+      messagingSenderId: "190478237725",
+      appId: "1:190478237725:web:0d39907473f511b85a06f4",
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    // Funzione per riscattare il codice
+    function redeemCode() {
+      const code = document.getElementById('redeemCode').value;
+      const userUID = "USER_UID"; // Sostituisci con l'UID dell'utente (prendi dal login o sessione)
 
-        // Elementi della pagina
-        const codeInput = document.getElementById("codeInput");
-        const redeemButton = document.getElementById("redeemButton");
-        const message = document.getElementById("message");
+      if (code === "") {
+        document.getElementById('redeemStatus').innerHTML = "Per favore inserisci un codice valido.";
+        return;
+      }
 
-        // Controlla se l'utente è loggato
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                message.innerText = "Devi essere loggato per riscattare un codice.";
-                redeemButton.disabled = true;
-            } else {
-                redeemButton.addEventListener("click", () => redeemCode(user.uid));
-            }
-        });
+      const codeRef = db.collection('redeemCodes').doc(code); // Riferimento al codice
 
-        // Funzione per riscattare il codice
-        async function redeemCode(userId) {
-            const code = codeInput.value.trim();
-            if (!code) {
-                message.innerText = "Inserisci un codice valido.";
-                return;
-            }
-
-            try {
-                const codeRef = doc(db, "codes", code);
-                const codeSnap = await getDoc(codeRef);
-
-                if (!codeSnap.exists()) {
-                    message.innerText = "Codice non valido.";
-                    return;
-                }
-
-                const codeData = codeSnap.data();
-                if (codeData.redeemed) {
-                    message.innerText = "Questo codice è già stato usato.";
-                    return;
-                }
-
-                // Ottieni saldo utente
-                const userRef = doc(db, "users", userId);
-                const userSnap = await getDoc(userRef);
-
-                if (!userSnap.exists()) {
-                    message.innerText = "Errore: utente non trovato.";
-                    return;
-                }
-
-                const userData = userSnap.data();
-                const newBalance = (userSnap.data().saldo || 0) + codeData.amount;
-
-                // Aggiorna saldo utente (Modificato da "balance" a "saldo")
-                await updateDoc(userRef, { saldo: newBalance });
-
-                // Segna il codice come usato
-                await updateDoc(codeRef, { redeemed: true });
-
-                message.innerText = `Codice riscattato! Saldo aggiornato: ${newBalance}`;
-                codeInput.value = "";
-            } catch (error) {
-                message.innerText = "Errore durante il riscatto.";
-                console.error(error);
-            }
+      codeRef.get().then((doc) => {
+        if (doc.exists) {
+          // Controlla se il codice è già stato utilizzato
+          if (doc.data().used) {
+            document.getElementById('redeemStatus').innerHTML = "Questo codice è già stato utilizzato!";
+          } else {
+            // Il codice non è stato ancora usato, lo marca come utilizzato
+            codeRef.update({
+              used: true,           // Imposta 'used' a true
+              usedBy: userUID      // Aggiungi l'UID dell'utente che ha riscattato il codice
+            })
+            .then(() => {
+              // Aggiungi il saldo all'utente
+              addCreditsToUser(userUID, doc.data().value);
+            });
+          }
+        } else {
+          document.getElementById('redeemStatus').innerHTML = "Codice non valido!";
         }
-    </script>
+      }).catch((error) => {
+        document.getElementById('redeemStatus').innerHTML = "Errore nel riscatto del codice.";
+        console.error("Errore nel riscatto del codice: ", error);
+      });
+    }
+
+    // Funzione per aggiungere crediti all'utente
+    function addCreditsToUser(userUID, value) {
+      const userRef = db.collection('users').doc(userUID); // Riferimento all'utente
+
+      userRef.update({
+        saldo: firebase.firestore.FieldValue.increment(value) // Incrementa il saldo dell'utente
+      })
+      .then(() => {
+        document.getElementById('redeemStatus').innerHTML = "Codice riscattato con successo! Saldo aggiornato.";
+      })
+      .catch((error) => {
+        document.getElementById('redeemStatus').innerHTML = "Errore nell'aggiornamento del saldo.";
+        console.error("Errore nell'aggiornamento del saldo: ", error);
+      });
+    }
+  </script>
 </body>
 </html>
