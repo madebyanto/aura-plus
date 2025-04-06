@@ -4,126 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riscatta Codice - Aura+</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Riscatta Codice</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #E30AF5, #F174FF);
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        header p {
-            font-size: 1.2em;
-            font-weight: 300;
-            margin-bottom: 30px;
-            animation: fadeIn 1.2s ease-in-out;
-        }
-
-        .buttons {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .widget {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: left;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            border: none;
-        }
-
-        .widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .widget::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: left 0.4s ease;
-        }
-
-        .widget:hover::after {
-            left: 100%;
-        }
-
-        .widget h2 {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .widget p {
-            font-size: 1em;
-            font-weight: 300;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <header>
-            <h1>Riscatta il tuo codice</h1>
-            <p>Inserisci il codice di riscatto per aggiungere saldo al tuo account</p>
-        </header>
-
-        <div class="widget">
-            <h2>Riscatta Codice</h2>
-            <input type="text" id="redeemCode" placeholder="Inserisci il codice" />
-            <button onclick="redeemCode()">Riscatta</button>
-        </div>
-    </div>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script>
         // Configurazione di Firebase
-        const firebaseConfig = {
+        var firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
             authDomain: "myauraid-f03c6.firebaseapp.com",
             projectId: "myauraid-f03c6",
@@ -134,43 +21,58 @@
 
         // Inizializzazione di Firebase
         firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+    </script>
+</head>
 
-        // Inizializzazione di Firestore e Auth
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+<body>
 
-        // Funzione per riscattare il codice
+    <div>
+        <h2>Riscatta Codice</h2>
+        <input type="text" id="redeemCode" placeholder="Inserisci il codice di riscatto">
+        <button onclick="redeemCode()">Riscatta</button>
+    </div>
+
+    <script>
+        // Funzione per riscattare un codice
         function redeemCode() {
-            const code = document.getElementById('redeemCode').value.trim();
-            if (code === "") {
-                alert("Inserisci un codice!");
+            var userCode = document.getElementById('redeemCode').value;  // Ottieni il codice inserito
+
+            if (!userCode) {
+                alert('Per favore, inserisci un codice valido!');
                 return;
             }
 
-            // Controlla se il codice è valido e non è stato già utilizzato
-            db.collection('redeemCodes').doc(code).get().then(doc => {
-                if (doc.exists && !doc.data().used) {
-                    // Aggiorna il codice come utilizzato
-                    db.collection('redeemCodes').doc(code).update({
-                        used: true
-                    });
-
-                    // Aggiungi il saldo all'utente
-                    const user = auth.currentUser;
-                    if (user) {
-                        const userRef = db.collection('users').doc(user.uid);
-                        userRef.update({
-                            saldo: firebase.firestore.FieldValue.increment(doc.data().value)
-                        }).then(() => {
-                            alert("Saldo aggiunto con successo!");
-                        }).catch((error) => {
-                            console.error("Errore nell'aggiornamento del saldo: ", error);
-                        });
+            // Controlla se il codice è valido in Firestore
+            db.collection("redeemCodes").doc(userCode).get().then((doc) => {
+                if (doc.exists) {
+                    // Verifica se il codice è già stato utilizzato
+                    if (doc.data().used) {
+                        alert('Questo codice è già stato utilizzato.');
                     } else {
-                        alert("Devi essere loggato per riscattare il codice.");
+                        // Aggiungi saldo all'utente
+                        var userId = firebase.auth().currentUser.uid;
+                        var saldoAggiunto = doc.data().value;  // Il valore da aggiungere al saldo dell'utente
+
+                        // Aggiungi il saldo all'utente nel database
+                        var userRef = db.collection("users").doc(userId);
+                        userRef.update({
+                            saldo: firebase.firestore.FieldValue.increment(saldoAggiunto)
+                        }).then(() => {
+                            // Imposta 'used' su true per il codice, così non può essere usato di nuovo
+                            db.collection("redeemCodes").doc(userCode).update({
+                                used: true
+                            }).then(() => {
+                                alert('Codice riscattato con successo! Il tuo saldo è stato aggiornato.');
+                            }).catch((error) => {
+                                alert('Errore nel riscatto del codice: ' + error.message);
+                            });
+                        }).catch((error) => {
+                            alert('Errore nell\'aggiornamento del saldo: ' + error.message);
+                        });
                     }
                 } else {
-                    alert("Codice non valido o già utilizzato.");
+                    alert('Codice non valido!');
                 }
             }).catch((error) => {
                 console.error("Errore nel recupero del codice: ", error);
