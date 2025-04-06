@@ -5,9 +5,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riscatta Codice</title>
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1em;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1.2em;
+            background-color: #f174ff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e30af5;
+        }
+
+        .alert {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e30af5;
+            color: white;
+            border-radius: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+
     <script>
         // Configurazione di Firebase
         var firebaseConfig = {
@@ -27,10 +98,12 @@
 
 <body>
 
-    <div>
+    <div class="container">
         <h2>Riscatta Codice</h2>
         <input type="text" id="redeemCode" placeholder="Inserisci il codice di riscatto">
         <button onclick="redeemCode()">Riscatta</button>
+
+        <div id="alertMessage" class="alert" style="display: none;"></div>
     </div>
 
     <script>
@@ -39,7 +112,7 @@
             var userCode = document.getElementById('redeemCode').value;  // Ottieni il codice inserito
 
             if (!userCode) {
-                alert('Per favore, inserisci un codice valido!');
+                displayAlert('Per favore, inserisci un codice valido!');
                 return;
             }
 
@@ -48,7 +121,7 @@
                 if (doc.exists) {
                     // Verifica se il codice è già stato utilizzato
                     if (doc.data().used) {
-                        alert('Questo codice è già stato utilizzato.');
+                        displayAlert('Questo codice è già stato utilizzato.');
                     } else {
                         // Aggiungi saldo all'utente
                         var userId = firebase.auth().currentUser.uid;
@@ -63,22 +136,30 @@
                             db.collection("redeemCodes").doc(userCode).update({
                                 used: true
                             }).then(() => {
-                                alert('Codice riscattato con successo! Il tuo saldo è stato aggiornato.');
+                                displayAlert('Codice riscattato con successo! Il tuo saldo è stato aggiornato.');
                             }).catch((error) => {
-                                alert('Errore nel riscatto del codice: ' + error.message);
+                                displayAlert('Errore nel riscatto del codice: ' + error.message);
                             });
                         }).catch((error) => {
-                            alert('Errore nell\'aggiornamento del saldo: ' + error.message);
+                            displayAlert('Errore nell\'aggiornamento del saldo: ' + error.message);
                         });
                     }
                 } else {
-                    alert('Codice non valido!');
+                    displayAlert('Codice non valido!');
                 }
             }).catch((error) => {
                 console.error("Errore nel recupero del codice: ", error);
             });
         }
+
+        // Funzione per visualizzare gli alert
+        function displayAlert(message) {
+            var alertMessage = document.getElementById('alertMessage');
+            alertMessage.textContent = message;
+            alertMessage.style.display = 'block';
+        }
     </script>
+
 </body>
 
 </html>
