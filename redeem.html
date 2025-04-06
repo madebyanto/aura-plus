@@ -94,6 +94,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
 
     // Funzione per riscattare il codice
     function redeemCode() {
@@ -107,7 +108,7 @@
       }
 
       // Verifica se l'utente è autenticato
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) {
         statusMessage.textContent = "Devi essere loggato per riscattare il codice!";
         return;
@@ -148,6 +149,8 @@
                 } else {
                   let currentBalance = userDoc.data().saldo || 0;
                   let valueToAdd = codeData.value || 0; // Prende il valore di redeemCode, se esiste
+                  console.log(`Saldo attuale: ${currentBalance}, Saldo da aggiungere: ${valueToAdd}`);
+
                   userRef.update({
                     saldo: currentBalance + valueToAdd
                   })
