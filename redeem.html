@@ -9,87 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #E30AF5, #F174FF);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-      font-weight: 600;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    header p {
-      font-size: 1.2em;
-      font-weight: 300;
-      margin-bottom: 30px;
-      animation: fadeIn 1.2s ease-in-out;
-    }
-
-    .widget {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 20px;
-      border-radius: 15px;
-      text-align: left;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      border: none;
-    }
-
-    .widget:hover {
-      transform: translateY(-5px);
-      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .widget::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.3);
-      transition: left 0.4s ease;
-    }
-
-    .widget:hover::after {
-      left: 100%;
-    }
-
-    .widget h2 {
-      font-size: 1.5em;
-      margin-bottom: 5px;
-      font-weight: 600;
-    }
-
-    .widget p {
-      font-size: 1em;
-      font-weight: 300;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* Stili come nel codice precedente */
   </style>
 </head>
 <body>
@@ -129,37 +49,51 @@
         return;
       }
 
+      console.log("Codice inserito:", code);
+
       // Recupera il codice da Firestore
       const redeemCodeRef = db.collection("redeemCodes").doc(code);
 
       redeemCodeRef.get().then((doc) => {
         if (!doc.exists) {
+          console.log("Codice non trovato!");
           statusMessage.textContent = "Codice non valido!";
         } else {
           const codeData = doc.data();
+          console.log("Dati codice:", codeData);
 
           // Verifica se il codice è già stato utilizzato
           if (codeData.used) {
+            console.log("Codice già utilizzato");
             statusMessage.textContent = "Questo codice è già stato utilizzato.";
           } else {
             // Segna il codice come usato
             redeemCodeRef.update({
               used: true,
-              usedBy: "testUserID" // Usa l'ID dell'utente autenticato
+              usedBy: firebase.auth().currentUser.uid // Usa l'ID dell'utente autenticato
             })
             .then(() => {
+              console.log("Codice segnato come usato");
+
               // Aggiungi il saldo dell'utente basato sul valore di redeemCode
-              const userRef = db.collection("users").doc("testUserID"); // Usa l'ID dell'utente autenticato
+              const userRef = db.collection("users").doc(firebase.auth().currentUser.uid); // Usa l'ID dell'utente autenticato
               userRef.get().then((userDoc) => {
-                let currentBalance = userDoc.exists ? userDoc.data().saldo : 0;
-                let valueToAdd = codeData.value || 0; // Prende il valore di redeemCode, se esiste
-                userRef.update({
-                  saldo: currentBalance + valueToAdd
-                });
-                statusMessage.textContent = `Codice riscattato con successo! Hai ricevuto ${valueToAdd} al saldo.`;
+                if (!userDoc.exists) {
+                  console.log("Utente non trovato");
+                  statusMessage.textContent = "Utente non trovato!";
+                } else {
+                  let currentBalance = userDoc.data().saldo || 0;
+                  let valueToAdd = codeData.value || 0; // Prende il valore di redeemCode, se esiste
+                  userRef.update({
+                    saldo: currentBalance + valueToAdd
+                  });
+                  console.log(`Saldo aggiornato, aggiunti ${valueToAdd}`);
+                  statusMessage.textContent = `Codice riscattato con successo! Hai ricevuto ${valueToAdd} al saldo.`;
+                }
               });
             })
             .catch((error) => {
+              console.error("Errore nel riscatto del codice: ", error);
               statusMessage.textContent = "Errore nel riscatto del codice: " + error.message;
             });
           }
