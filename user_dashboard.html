@@ -205,10 +205,10 @@ hr {
                             const profileImageURL = userData.profileImage || 'aurastudio.png'; // Se non c'è immagine, usa quella di default
                             document.getElementById('profile-img').src = profileImageURL;
 
-                            // Carica e mostra il badge basato sul campo 'admin'
-                            const badge = userData.admin === true ? 'Admin' : 'Utente'; // Se il campo 'admin' è true, mostra "Admin"
-                            document.getElementById('badge').textContent = "Badge: " + badge;
-                            document.getElementById('badge').classList.add('badge');
+                            // Carica e mostra il badge basato sul campo 'badge' personalizzato
+const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
+document.getElementById('badge').textContent = "Badge: " + badge;
+document.getElementById('badge').classList.add('badge');
                         } else {
                             document.getElementById('saldo').textContent = "0€";
                             console.log("Nessun documento trovato per l'utente, creando uno nuovo...");
