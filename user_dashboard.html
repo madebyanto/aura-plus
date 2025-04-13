@@ -156,10 +156,6 @@ hr {
     border: none
 }
 </style>
-
-
-        
-    </style>
 </head>
 <body>
 
@@ -172,6 +168,8 @@ hr {
 <hr>
         <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
         <h2>Benvenuto nella tua Dashboard!</h2>
+        <p id="fullname"></p> <!-- Full Name -->
+        <p id="nickname"></p> <!-- Nickname -->
         <p id="user-email"></p>
         <p id="user-uid"></p>
         <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
@@ -206,9 +204,15 @@ hr {
                             document.getElementById('profile-img').src = profileImageURL;
 
                             // Carica e mostra il badge basato sul campo 'badge' personalizzato
-const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
-document.getElementById('badge').textContent = "Badge: " + badge;
-document.getElementById('badge').classList.add('badge');
+                            const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
+                            document.getElementById('badge').textContent = "Badge: " + badge;
+                            document.getElementById('badge').classList.add('badge');
+
+                            // Carica fullname e nickname
+                            const fullname = userData.fullname || "Nome non disponibile";
+                            const nickname = userData.nickname || "Nickname non disponibile";
+                            document.getElementById('fullname').textContent = "Nome completo: " + fullname;
+                            document.getElementById('nickname').textContent = "Nickname: " + nickname;
                         } else {
                             document.getElementById('saldo').textContent = "0€";
                             console.log("Nessun documento trovato per l'utente, creando uno nuovo...");
@@ -217,7 +221,9 @@ document.getElementById('badge').classList.add('badge');
                             db.collection("users").doc(user.uid).set({
                                 saldo: 0,
                                 profileImage: 'aurastudio.png', // Immagine profilo di default
-                                admin: false // Imposta 'admin' su false di default
+                                admin: false, // Imposta 'admin' su false di default
+                                fullname: "Nome non disponibile", // Default fullname
+                                nickname: "Nickname non disponibile" // Default nickname
                             }).then(() => {
                                 console.log("Documento utente creato con saldo 0.");
                             }).catch((error) => {
@@ -234,10 +240,11 @@ document.getElementById('badge').classList.add('badge');
                 window.location.href = "login.html";
             }
         });
-function toggleBanner() {
-        const banner = document.querySelector('.banner');
-        banner.classList.toggle('show');
-    }
+
+        function toggleBanner() {
+            const banner = document.querySelector('.banner');
+            banner.classList.toggle('show');
+        }
 
     </script>
 
