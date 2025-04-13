@@ -43,97 +43,7 @@
         });
     </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #E30AF5, #F174FF);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-
-        .container {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .logo {
-            width: 150px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            font-weight: 300;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        input {
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            background-color: rgba(255, 255, 255, 0.3);
-            color: #fff;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #F174FF;
-        }
-
-        button {
-            background-color: #F174FF;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #e008f6;
-        }
-
-        .login-link {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        .login-link a {
-            color: #e008f6;
-            text-decoration: none;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
+        /* Stili per il form */
     </style>
 </head>
 <body>
@@ -174,7 +84,6 @@
                 .then((userCredential) => {
                     console.log("Login avvenuto con successo", userCredential);
                     alert("Benvenuto, " + userCredential.user.email);
-                    // Redirige alla dashboard
                     window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
@@ -191,7 +100,7 @@
             const fullname = document.getElementById('signup-fullname').value;
             const nickname = document.getElementById('signup-nickname').value;
 
-            // Controlla se il fullname o il nickname sono già in uso
+            // Controlla se il fullname è già in uso
             db.collection("users")
                 .where("fullname", "==", fullname)
                 .get()
@@ -200,7 +109,7 @@
                         // Se il fullname è già in uso
                         alert("Nome completo già in uso, scegli un altro nome.");
                     } else {
-                        // Controlla se il nickname è già in uso
+                        // Se il fullname è disponibile, continua con la verifica del nickname
                         db.collection("users")
                             .where("nickname", "==", nickname) // Cerca il nickname
                             .get()
@@ -233,13 +142,13 @@
                                 }
                             })
                             .catch((error) => {
-                                console.error("Errore nel controllo del nickname", error.message);
+                                console.error("Errore nel controllo del nickname:", error);
                                 alert("Errore nel controllo del nickname. Riprova.");
                             });
                     }
                 })
                 .catch((error) => {
-                    console.error("Errore nel controllo del fullname", error.message);
+                    console.error("Errore nel controllo del fullname:", error);
                     alert("Errore nel controllo del fullname. Riprova.");
                 });
         });
