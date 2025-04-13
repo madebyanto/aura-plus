@@ -216,7 +216,7 @@ document.getElementById('badge').classList.add('badge');
                             db.collection("users").doc(user.uid).set({
                                 saldo: 15,
                                 profileImage: 'aurastudio.png', // Immagine profilo di default
-                                admin: false // Imposta 'admin' su false di default
+                                badge: '' // Imposta 'admin' su false di default
                             }).then(() => {
                                 console.log("Documento utente creato con saldo 0.");
                             }).catch((error) => {
