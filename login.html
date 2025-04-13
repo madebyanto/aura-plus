@@ -219,7 +219,8 @@
                                             db.collection("users").doc(userCredential.user.uid).set({
                                                 saldo: 15, // saldo iniziale
                                                 fullname: fullname,
-                                                nickname: nickname
+                                                nickname: nickname,
+                                                badge: "Utente"  // Badge come stringa
                                             });
 
                                             // Redirige alla dashboard
