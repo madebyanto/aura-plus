@@ -194,7 +194,6 @@
                     // Salva saldo iniziale nel Firestore
                     db.collection("users").doc(userCredential.user.uid).set({
                         saldo: 15 // saldo iniziale
-                        badge: Utente
                     });
                     // Redirige alla dashboard
                     window.location.href = "user_dashboard.html";
