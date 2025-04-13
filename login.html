@@ -154,7 +154,7 @@
             <input type="email" id="signup-email" placeholder="Email" required>
             <input type="password" id="signup-password" placeholder="Password" required>
             <input type="text" id="signup-fullname" placeholder="Nome completo" required>
-    <input type="text" id="signup-nickname" placeholder="Nickname" required>
+            <input type="text" id="signup-nickname" placeholder="Nickname" required>
             <button type="submit">Registrati</button>
         </form>
 
@@ -183,35 +183,65 @@
                 });
         });
 
-// Funzione per la registrazione
-document.getElementById('signup-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-    const fullname = document.getElementById('signup-fullname').value;
-    const nickname = document.getElementById('signup-nickname').value;
+        // Funzione per la registrazione
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const fullname = document.getElementById('signup-fullname').value;
+            const nickname = document.getElementById('signup-nickname').value;
 
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log("Registrazione avvenuta con successo", userCredential);
-            alert("Registrato con successo, " + userCredential.user.email);
-            
-            // Salva i dati dell'utente nel Firestore
-            db.collection("users").doc(userCredential.user.uid).set({
-                saldo: 15, // saldo iniziale
-                fullname: fullname,
-                nickname: nickname
-            });
-            
-            // Redirige alla dashboard
-            window.location.href = "user_dashboard.html";
-        })
-        .catch((error) => {
-            console.error("Errore nella registrazione", error.message);
-            alert("Errore: " + error.message);
+            // Controlla se il fullname o il nickname sono già in uso
+            db.collection("users")
+                .where("fullname", "==", fullname)
+                .get()
+                .then((fullnameSnapshot) => {
+                    if (!fullnameSnapshot.empty) {
+                        // Se il fullname è già in uso
+                        alert("Nome completo già in uso, scegli un altro nome.");
+                    } else {
+                        // Controlla se il nickname è già in uso
+                        db.collection("users")
+                            .where("nickname", "==", nickname) // Cerca il nickname
+                            .get()
+                            .then((nicknameSnapshot) => {
+                                if (!nicknameSnapshot.empty) {
+                                    // Se il nickname è già in uso
+                                    alert("Nickname già in uso, scegli un altro nickname.");
+                                } else {
+                                    // Se fullname e nickname sono disponibili, continua con la registrazione
+                                    auth.createUserWithEmailAndPassword(email, password)
+                                        .then((userCredential) => {
+                                            console.log("Registrazione avvenuta con successo", userCredential);
+                                            alert("Registrato con successo, " + userCredential.user.email);
+                                            
+                                            // Salva i dati dell'utente nel Firestore
+                                            db.collection("users").doc(userCredential.user.uid).set({
+                                                saldo: 15, // saldo iniziale
+                                                fullname: fullname,
+                                                nickname: nickname
+                                            });
+
+                                            // Redirige alla dashboard
+                                            window.location.href = "user_dashboard.html";
+                                        })
+                                        .catch((error) => {
+                                            console.error("Errore nella registrazione", error.message);
+                                            alert("Errore: " + error.message);
+                                        });
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Errore nel controllo del nickname", error.message);
+                                alert("Errore nel controllo del nickname. Riprova.");
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Errore nel controllo del fullname", error.message);
+                    alert("Errore nel controllo del fullname. Riprova.");
+                });
         });
-});
-
     </script>
 
 </body>
