@@ -156,11 +156,15 @@ hr {
     border: none
 }
 </style>
+
+
+        
+    </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="widget-header" onclick="toggleBanner()">💥 Offerta Speciale!</div>
+        <div class="widget-header" onclick="toggleBanner()">?? Offerta Speciale!</div>
     <div class="banner">
         Stiamo regalando a tutti gli utenti iscritti dopo il 26 Marzo <b>15 di Saldo di benvenuto</b>.  
         <br>Contattaci su <a href="https://wa.me/tuonumero" target="_blank">WhatsApp</a> per riscattare il premio!
@@ -168,8 +172,6 @@ hr {
 <hr>
         <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
         <h2>Benvenuto nella tua Dashboard!</h2>
-        <p id="fullname"></p> <!-- Full Name -->
-        <p id="nickname"></p> <!-- Nickname -->
         <p id="user-email"></p>
         <p id="user-uid"></p>
         <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
@@ -204,26 +206,18 @@ hr {
                             document.getElementById('profile-img').src = profileImageURL;
 
                             // Carica e mostra il badge basato sul campo 'badge' personalizzato
-                            const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
-                            document.getElementById('badge').textContent = "Badge: " + badge;
-                            document.getElementById('badge').classList.add('badge');
-
-                            // Carica fullname e nickname
-                            const fullname = userData.fullname || "Nome non disponibile";
-                            const nickname = userData.nickname || "Nickname non disponibile";
-                            document.getElementById('fullname').textContent = "Nome completo: " + fullname;
-                            document.getElementById('nickname').textContent = "Nickname: " + nickname;
+const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
+document.getElementById('badge').textContent = "Badge: " + badge;
+document.getElementById('badge').classList.add('badge');
                         } else {
                             document.getElementById('saldo').textContent = "0€";
                             console.log("Nessun documento trovato per l'utente, creando uno nuovo...");
                             
                             // Creazione automatica del documento utente se non esiste
                             db.collection("users").doc(user.uid).set({
-                                saldo: 0,
+                                saldo: 15,
                                 profileImage: 'aurastudio.png', // Immagine profilo di default
-                                admin: false, // Imposta 'admin' su false di default
-                                fullname: "Nome non disponibile", // Default fullname
-                                nickname: "Nickname non disponibile" // Default nickname
+                                admin: false // Imposta 'admin' su false di default
                             }).then(() => {
                                 console.log("Documento utente creato con saldo 0.");
                             }).catch((error) => {
@@ -240,11 +234,10 @@ hr {
                 window.location.href = "login.html";
             }
         });
-
-        function toggleBanner() {
-            const banner = document.querySelector('.banner');
-            banner.classList.toggle('show');
-        }
+function toggleBanner() {
+        const banner = document.querySelector('.banner');
+        banner.classList.toggle('show');
+    }
 
     </script>
 
