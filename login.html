@@ -146,6 +146,8 @@
         <form id="login-form">
             <input type="email" id="login-email" placeholder="Email" required>
             <input type="password" id="login-password" placeholder="Password" required>
+             <input type="text" id="signup-fullname" placeholder="Nome completo" required>
+    <input type="text" id="signup-nickname" placeholder="Nickname" required>
             <button type="submit">Accedi</button>
         </form>
 
@@ -181,28 +183,35 @@
                 });
         });
 
-        // Funzione per la registrazione
-        document.getElementById('signup-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+// Funzione per la registrazione
+document.getElementById('signup-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const fullname = document.getElementById('signup-fullname').value;
+    const nickname = document.getElementById('signup-nickname').value;
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    console.log("Registrazione avvenuta con successo", userCredential);
-                    alert("Registrato con successo, " + userCredential.user.email);
-                    // Salva saldo iniziale nel Firestore
-                    db.collection("users").doc(userCredential.user.uid).set({
-                        saldo: 15 // saldo iniziale
-                    });
-                    // Redirige alla dashboard
-                    window.location.href = "user_dashboard.html";
-                })
-                .catch((error) => {
-                    console.error("Errore nella registrazione", error.message);
-                    alert("Errore: " + error.message);
-                });
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log("Registrazione avvenuta con successo", userCredential);
+            alert("Registrato con successo, " + userCredential.user.email);
+            
+            // Salva i dati dell'utente nel Firestore
+            db.collection("users").doc(userCredential.user.uid).set({
+                saldo: 15, // saldo iniziale
+                fullname: fullname,
+                nickname: nickname
+            });
+            
+            // Redirige alla dashboard
+            window.location.href = "user_dashboard.html";
+        })
+        .catch((error) => {
+            console.error("Errore nella registrazione", error.message);
+            alert("Errore: " + error.message);
         });
+});
+
     </script>
 
 </body>
