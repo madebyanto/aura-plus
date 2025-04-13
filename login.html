@@ -193,7 +193,7 @@
                     alert("Registrato con successo, " + userCredential.user.email);
                     // Salva saldo iniziale nel Firestore
                     db.collection("users").doc(userCredential.user.uid).set({
-                        saldo: 5 // saldo iniziale
+                        saldo: 15 // saldo iniziale
                         badge: Utente
                     });
                     // Redirige alla dashboard
