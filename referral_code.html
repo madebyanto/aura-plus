@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Tuo Codice Referral</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="referral_code.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .referral-container {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .referral-container p {
+            margin-bottom: 10px;
+        }
+
+        #referral-code {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        button {
+            background-color: #F174FF;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #e008f6;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .back-link a {
+            color: #e008f6;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .share-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .share-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="auraaccount.png" alt="Aura Account" class="logo">
+        <h1>Il Tuo Codice Referral</h1>
+
+        <div class="referral-container">
+            <p>Usa questo codice per invitare amici e guadagnare premi:</p>
+            <div id="referral-code"></div>
+            <button onclick="copyReferralCode()">Copia Codice</button>
+            <button class="share-button" onclick="shareReferralCode()">Condividi Codice</button>
+        </div>
+
+        <div class="back-link">
+            <p><a href="user_dashboard.html">Torna alla dashboard</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Configurazione Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+            authDomain: "myauraid-f03c6.firebaseapp.com",
+            projectId: "myauraid-f03c6",
+            storageBucket: "myauraid-f03c6.firebasestorage.app",
+            messagingSenderId: "190478237725",
+            appId: "1:190478237725:web:0d39907473f511b85a06f4"
+        };
+
+        // Inizializzazione di Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Controlla se l'utente è autenticato
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Recupera il codice referral dell'utente dal database
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const referralCode = doc.data().referralCode;
+                        document.getElementById('referral-code').textContent = referralCode;
+                    } else {
+                        console.log("Nessun dato trovato per questo utente");
+                    }
+                }).catch((error) => {
+                    console.error("Errore nel recuperare il codice referral:", error);
+                });
+            } else {
+                console.log("Nessun utente autenticato");
+                window.location.href = "index.html"; // Se l'utente non è autenticato, redirige al login
+            }
+        });
+
+        // Funzione per copiare il codice referral negli appunti
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referral-code').textContent;
+            navigator.clipboard.writeText(referralCode).then(() => {
+                alert('Codice referral copiato!');
+            }).catch((error) => {
+                console.error('Errore nel copiare il codice referral:', error);
+            });
+        }
+
+        // Funzione per condividere il codice referral tramite il menu di condivisione
+        function shareReferralCode() {
+            const referralCode = document.getElementById('referral-code').textContent;
+            const shareText = `Prova Aura+! Usa il mio codice referral ${referralCode} durante la registrazione per ottenere un bonus esclusivo!`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Invita su Aura+',
+                    text: shareText,
+                    url: window.location.href // Puoi anche includere un link diretto per la registrazione
+                }).then(() => {
+                    console.log('Codice referral condiviso con successo!');
+                }).catch((error) => {
+                    console.error('Errore durante la condivisione:', error);
+                });
+            } else {
+                alert('La funzione di condivisione non è supportata su questo dispositivo.');
+            }
+        }
+    </script>
+
+</body>
+</html>
