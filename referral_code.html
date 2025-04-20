@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
-        /* CSS già presente */
         * {
             margin: 0;
             padding: 0;
@@ -157,12 +156,17 @@
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         const referralCode = doc.data().referralCode;
-                        document.getElementById('referral-code').textContent = referralCode;
+                        if (referralCode) {
+                            document.getElementById('referral-code').textContent = referralCode;
+                        } else {
+                            document.getElementById('referral-code').textContent = 'Codice referral non disponibile';
+                        }
                     } else {
-                        console.log("Nessun dato trovato per questo utente");
+                        document.getElementById('referral-code').textContent = 'Nessun dato trovato per questo utente';
                     }
                 }).catch((error) => {
                     console.error("Errore nel recuperare il codice referral:", error);
+                    document.getElementById('referral-code').textContent = 'Errore nel recuperare il codice referral';
                 });
             } else {
                 console.log("Nessun utente autenticato");
