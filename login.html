@@ -19,7 +19,7 @@
             messagingSenderId: "190478237725",
             appId: "1:190478237725:web:0d39907473f511b85a06f4"
         };
-        
+
         // Inizializzazione di Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -134,6 +134,30 @@
         .login-link a:hover {
             text-decoration: underline;
         }
+
+        /* Style per il popup */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .popup button {
+            background-color: #F174FF;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -161,6 +185,11 @@
         </div>
     </div>
 
+    <div class="popup" id="popup-message">
+        <p id="popup-text"></p>
+        <button onclick="closePopup()">Chiudi</button>
+    </div>
+
     <script>
         // Funzione per il login
         document.getElementById('login-form').addEventListener('submit', function(event) {
@@ -170,14 +199,12 @@
 
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    console.log("Login avvenuto con successo", userCredential);
-                    alert("Benvenuto, " + userCredential.user.email);
+                    showPopup("Benvenuto, " + userCredential.user.email);
                     // Redirige alla dashboard
                     window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
-                    console.error("Errore nel login", error.message);
-                    alert("Errore: " + error.message);
+                    showPopup("Errore: " + error.message);
                 });
         });
 
@@ -189,8 +216,7 @@
 
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    console.log("Registrazione avvenuta con successo", userCredential);
-                    alert("Registrato con successo, " + userCredential.user.email);
+                    showPopup("Registrato con successo, " + userCredential.user.email);
                     // Salva saldo iniziale nel Firestore
                     db.collection("users").doc(userCredential.user.uid).set({
                         saldo: 15 // saldo iniziale
@@ -199,10 +225,18 @@
                     window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
-                    console.error("Errore nella registrazione", error.message);
-                    alert("Errore: " + error.message);
+                    showPopup("Errore: " + error.message);
                 });
         });
+
+        function showPopup(message) {
+            document.getElementById('popup-text').textContent = message;
+            document.getElementById('popup-message').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup-message').style.display = 'none';
+        }
     </script>
 
 </body>
