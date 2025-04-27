@@ -6,62 +6,67 @@
     <title>Login / Signup</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f7f7f7;
+            background: #f5f5f5;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
         }
 
         .container {
-            background-color: white;
+            background: white;
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 350px;
+            text-align: center;
         }
 
         .logo {
             width: 100px;
-            display: block;
             margin: 0 auto;
         }
 
         h1 {
-            text-align: center;
-            color: #333;
             font-size: 24px;
-            margin-bottom: 20px;
+            color: #333;
+            margin: 20px 0;
         }
 
         h2 {
             font-size: 18px;
             color: #333;
-            margin-bottom: 10px;
+            margin: 10px 0;
         }
 
         input[type="email"], input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
             font-size: 14px;
+            box-sizing: border-box;
         }
 
         button {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
+            border-radius: 6px;
+            border: none;
             background-color: #4CAF50;
             color: white;
-            border: none;
-            border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         button:hover {
@@ -69,18 +74,13 @@
         }
 
         .login-link {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .login-link p {
             font-size: 14px;
-            color: #555;
+            margin-top: 20px;
         }
 
         .login-link a {
-            color: #4CAF50;
             text-decoration: none;
+            color: #4CAF50;
         }
 
         .login-link a:hover {
@@ -89,8 +89,13 @@
 
         #message {
             color: #ff0000;
-            text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #ddd;
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -237,7 +242,7 @@
             <button type="submit">Accedi</button>
         </form>
 
-        <hr style="border: none; height: 30px; background: transparent;">
+        <hr>
 
         <h2>Registrati</h2>
         <form id="signup-form">
