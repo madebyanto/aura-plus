@@ -32,13 +32,9 @@
             });
 
         auth.onAuthStateChanged((user) => {
-            if (user && user.emailVerified) {
-                console.log("Utente verificato:", user.email);
+            if (user) {
+                console.log("Utente autenticato:", user.email);
                 window.location.href = "user_dashboard.html";
-            } else if (user && !user.emailVerified) {
-                console.log("Email non verificata:", user.email);
-                showMessage("Devi verificare la tua email prima di accedere.");
-                auth.signOut();
             }
         });
     </script>
@@ -168,8 +164,8 @@
 
         <div class="login-link">
             <p>Ci teniamo alla tua <a href="https://privacy.aurastudioitalia.it/privacypolicy.html">privacy</a></p>
-    </div>
- <p>Creando un account Aura, dichiari di aver letto i nostri <a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a>.</p>
+        </div>
+        <p>Creando un account Aura, dichiari di aver letto i nostri <a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a>.</p>
     </div>
 
     <script>
@@ -186,22 +182,12 @@
 
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    if (userCredential.user.emailVerified) {
-                        window.location.href = "user_dashboard.html";
-                    } else {
-                        showMessage("Devi prima verificare la tua email.");
-                        auth.signOut();
-                    }
+                    window.location.href = "user_dashboard.html";
                 })
-               .catch((error) => {
-    console.error("Errore nel login", error.message);
-    if (error.code === 'auth/user-disabled') {
-        window.location.href = "account_disabled.html";
-    } else {
-        showMessage("Errore: " + error.message);
-    }
-});
-
+                .catch((error) => {
+                    console.error("Errore nel login", error.message);
+                    showMessage("Errore: " + error.message);
+                });
         });
 
         document.getElementById('signup-form').addEventListener('submit', function(event) {
@@ -212,13 +198,6 @@
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    user.sendEmailVerification()
-                        .then(() => {
-                            showMessage("Ti abbiamo inviato un'email di verifica. Verifica entro 30 minuti.");
-                        })
-                        .catch((error) => {
-                            console.error("Errore nell'invio della verifica email:", error.message);
-                        });
 
                     db.collection("users").doc(user.uid).set({
                         saldo: 15
@@ -226,18 +205,7 @@
                         console.log("Saldo iniziale assegnato.");
                     });
 
-                    // Elimina l'utente dopo 30 minuti se non verifica
-                    setTimeout(() => {
-                        user.reload().then(() => {
-                            if (!user.emailVerified) {
-                                user.delete().then(() => {
-                                    console.log("Account eliminato per mancata verifica.");
-                                }).catch((error) => {
-                                    console.error("Errore nell'eliminazione dell'account:", error.message);
-                                });
-                            }
-                        });
-                    }, 30 * 60 * 1000);
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nella registrazione", error.message);
