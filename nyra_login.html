@@ -34,7 +34,7 @@
         auth.onAuthStateChanged((user) => {
             if (user) {
                 console.log("Utente autenticato:", user.email);
-                window.location.href = "go:Nyra";
+                window.location.href = "Nyra";
             }
         });
     </script>
@@ -182,7 +182,7 @@
 
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    window.location.href = "go:Nyra";
+                    window.location.href = "Nyra";
                 })
                 .catch((error) => {
                     console.error("Errore nel login", error.message);
@@ -205,7 +205,7 @@
                         console.log("Saldo iniziale assegnato.");
                     });
 
-                    window.location.href = "go:Nyra";
+                    window.location.href = "Nyra";
                 })
                 .catch((error) => {
                     console.error("Errore nella registrazione", error.message);
