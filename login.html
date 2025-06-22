@@ -188,7 +188,7 @@
     console.error("Errore nel login", error.message);
 
     if (error.code === 'auth/user-disabled') {
-        window.location.href = "disabled_account.html";
+        window.location.href = "account_disabled.html";
     } else {
         showMessage("Errore: " + error.message);
     }
