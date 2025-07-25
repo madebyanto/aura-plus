@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Personalizza Profilo</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     * {
       margin: 0; padding: 0; box-sizing: border-box;
@@ -130,7 +129,7 @@
   <!-- Popup -->
   <div class="popup" id="popup">
     <div class="popup-content">
-      <span class="close" onclick="$('#popup').fadeOut()">✖</span>
+      <span class="close" onclick="closePopup()">✖</span>
       <h2>Inserisci URL Immagine</h2>
       <input type="text" id="imageUrl" placeholder="https://esempio.com/avatar.jpg">
       <div id="error-msg">⚠️ Immagine non trovata o URL non valido.</div>
@@ -140,27 +139,49 @@
   </div>
 
   <script>
-    $('#openPopup').click(function() {
-      $('#popup').fadeIn();
-      $('#imageUrl').val('');
-      $('#preview').hide();
-      $('#error-msg').hide();
+    const popup = document.getElementById("popup");
+    const imageUrlInput = document.getElementById("imageUrl");
+    const errorMsg = document.getElementById("error-msg");
+    const preview = document.getElementById("preview");
+
+    document.getElementById("openPopup").addEventListener("click", () => {
+      popup.style.display = "block";
+      imageUrlInput.value = "";
+      preview.style.display = "none";
+      errorMsg.style.display = "none";
     });
 
+    function closePopup() {
+      popup.style.display = "none";
+    }
+
     function checkImage() {
-      const url = $('#imageUrl').val();
+      const url = imageUrlInput.value.trim();
+      if (!url) return;
+
       const img = new Image();
       img.onload = function () {
-        $('#preview').attr('src', url).fadeIn();
-        $('#error-msg').hide();
-        // Qui puoi salvare su Firestore o localStorage
+        preview.src = url;
+        preview.style.display = "block";
+        errorMsg.style.display = "none";
+
+        // 🔒 Qui potresti salvare su Firebase o localStorage
+        // localStorage.setItem("userProfileImage", url);
       };
+
       img.onerror = function () {
-        $('#preview').hide();
-        $('#error-msg').show();
+        preview.style.display = "none";
+        errorMsg.style.display = "block";
       };
+
       img.src = url;
     }
+
+    window.onclick = function(event) {
+      if (event.target === popup) {
+        closePopup();
+      }
+    };
   </script>
 </body>
 </html>
