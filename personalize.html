@@ -94,6 +94,25 @@
       object-fit: cover;
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script>
+    // Config Firebase (usa la tua config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+      authDomain: "myauraid-f03c6.firebaseapp.com",
+      projectId: "myauraid-f03c6",
+      storageBucket: "myauraid-f03c6.firebasestorage.app",
+      messagingSenderId: "190478237725",
+      appId: "1:190478237725:web:0d39907473f511b85a06f4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
 </head>
 <body>
   <div class="container">
@@ -121,14 +140,17 @@
     const popup = document.getElementById("popup");
     const profileImage = document.getElementById("profile-image");
 
+    // Mostra popup
     function openPopup() {
       popup.style.display = "block";
     }
 
+    // Nascondi popup
     function closePopup() {
       popup.style.display = "none";
     }
 
+    // Salva immagine dopo verifica
     function saveImage() {
       const url = document.getElementById("image-url").value.trim();
       if (!url) {
@@ -138,14 +160,43 @@
 
       const testImg = new Image();
       testImg.onload = function() {
-        profileImage.src = url;
-        closePopup();
+        // Verifica utente loggato
+        auth.onAuthStateChanged(function(user) {
+          if (user) {
+            // Salva URL immagine Firestore (merge per aggiornare solo campo)
+            db.collection("users").doc(user.uid).set({
+              profileImage: url
+            }, { merge: true }).then(() => {
+              alert("Immagine profilo aggiornata!");
+              profileImage.src = url;
+              closePopup();
+            }).catch((error) => {
+              alert("Errore salvataggio: " + error.message);
+            });
+          } else {
+            alert("Devi essere loggato per cambiare immagine.");
+          }
+        });
       };
       testImg.onerror = function() {
         alert("L'immagine non è valida o l'URL non è raggiungibile.");
       };
       testImg.src = url;
     }
+
+    // Carica immagine dal db all'avvio pagina (se vuoi mostrare già quella corrente)
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        db.collection("users").doc(user.uid).get().then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            if(data.profileImage) {
+              profileImage.src = data.profileImage;
+            }
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>
