@@ -1,268 +1,194 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Impostazioni e dettagli</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostazioni e dettagli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #E30AF5, #F174FF);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-    header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-      font-weight: 600;
-      animation: fadeIn 1s ease-in-out;
-    }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
+        }
 
-    header p {
-      font-size: 1.2em;
-      font-weight: 300;
-      margin-bottom: 30px;
-      animation: fadeIn 1.2s ease-in-out;
-    }
+        header p {
+            font-size: 1.2em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
 
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
 
-    .widget {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 20px;
-      border-radius: 15px;
-      text-align: left;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      border: none;
-    }
+        .widget {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
 
-    .widget:hover {
-      transform: translateY(-5px);
-      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-    }
+        .widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
 
-    .widget::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.3);
-      transition: left 0.4s ease;
-    }
+        .widget::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.4s ease;
+        }
 
-    .widget:hover::after {
-      left: 100%;
-    }
+        .widget:hover::after {
+            left: 100%;
+        }
 
-    .widget h2 {
-      font-size: 1.5em;
-      margin-bottom: 5px;
-      font-weight: 600;
-    }
+        .widget h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
 
-    .widget p {
-      font-size: 1em;
-      font-weight: 300;
-    }
+        .widget p {
+            font-size: 1em;
+            font-weight: 300;
+        }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .saldo {
-      font-weight: bold;
-    }
-
-    /* Carta fedeltà personalizzata */
-    .fedelta-card {
-      width: 340px;
-      height: 160px;
-      background: linear-gradient(135deg, #2c3e50, #34495e);
-      border-radius: 20px;
-      padding: 16px;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin: 40px auto 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      user-select: none;
-    }
-
-    .fedelta-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      font-size: 0.8rem;
-      line-height: 1.3;
-    }
-
-    .fedelta-info p {
-      margin: 2px 0;
-    }
-
-    .fedelta-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 8px;
-      border: 2px solid #ddd;
-      background-color: #222;
-    }
-  </style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Impostazioni e dettagli</h1>
-      <h2>Dettagli</h2>
-      <!-- Rimuovo vecchia visualizzazione diretta, la carta fedeltà la sostituisce -->
-      <!--<p id="user-email"></p>
-      <p id="user-uid"></p>
-      <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>-->
-      <div class="fedelta-card">
-        <div class="fedelta-info">
-          <p id="user-email">Email: ...</p>
-          <p id="user-uid">UID: ...</p>
-          <p id="saldo">Saldo: ...</p>
+    <div class="container">
+        <header>
+            <h1>Impostazioni e dettagli</h1>
+<h2>Dettagli</h2>
+<p id="user-email"></p>
+<p id="user-uid"></p>
+<p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
+<h2>Impostazioni</h2>
+            <p>Gestisci la tua sicurezza e le opzioni di privacy.</p>
+        </header>
+
+        <div class="buttons">
+            <!-- Reset Password -->
+            <div class="widget" onclick="resetPassword()">
+                <h2>Cambia Password</h2>
+                <p>Invia una email per reimpostare la tua password.</p>
+            </div>
+
+            <!-- Logout -->
+            <div class="widget" onclick="logoutButton()">
+                <h2>Esci dal tuo account</h2>
+                <p>Esci dal tuo account e cancella la sessione.</p>
+            </div>
         </div>
-        <img id="profile-image" class="fedelta-img" src="default-profile.png" alt="Immagine profilo">
-      </div>
-      <h2>Impostazioni</h2>
-      <p>Gestisci la tua sicurezza e le opzioni di privacy.</p>
-    </header>
-
-    <div class="buttons">
-      <!-- Reset Password -->
-      <div class="widget" onclick="resetPassword()">
-        <h2>Cambia Password</h2>
-        <p>Invia una email per reimpostare la tua password.</p>
-      </div>
-
-      <!-- Logout -->
-      <div class="widget" onclick="logoutButton()">
-        <h2>Esci dal tuo account</h2>
-        <p>Esci dal tuo account e cancella la sessione.</p>
-      </div>
     </div>
-  </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-      authDomain: "myauraid-f03c6.firebaseapp.com",
-      projectId: "myauraid-f03c6",
-      storageBucket: "myauraid-f03c6.firebasestorage.app",
-      messagingSenderId: "190478237725",
-      appId: "1:190478237725:web:0d39907473f511b85a06f4"
-    };
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+            authDomain: "myauraid-f03c6.firebaseapp.com",
+            projectId: "myauraid-f03c6",
+            storageBucket: "myauraid-f03c6.firebasestorage.app",
+            messagingSenderId: "190478237725",
+            appId: "1:190478237725:web:0d39907473f511b85a06f4"
+        };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-    auth.onAuthStateChanged((user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        // Email e UID nella carta fedeltà
-        document.getElementById("user-email").textContent = "Email: " + user.email;
-        document.getElementById("user-uid").textContent = "UID: " + user.uid;
-
-        // Imposta immagine profilo da Firestorage (o percorso /users/UID/profileImage)
-        // Se usi Firebase Storage, devi costruire l'URL con getDownloadURL. 
-        // Qui uso un percorso diretto ipotetico, adattalo se serve.
-        document.getElementById("profile-image").src = `/users/${user.uid}/profileImage` || 'default-profile.png';
-
-        // Recupera il saldo da Firestore e aggiorna la carta fedeltà
-        db.collection("users").doc(user.uid).get()
-          .then((doc) => {
-            if (doc.exists) {
-              const userData = doc.data();
-              if (userData.saldo !== undefined) {
-                document.getElementById("saldo").textContent = userData.saldo + " di saldo";
-              } else {
-                document.getElementById("saldo").textContent = "0€";
-              }
-            } else {
-              document.getElementById("saldo").textContent = "0€";
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = "login.html";
             }
-          })
-          .catch((error) => {
-            console.error("Errore nel recupero del saldo:", error);
-            document.getElementById("saldo").textContent = "Errore";
-          });
-      }
-    });
-
-    function logoutButton() {
-      auth.signOut()
-        .then(() => {
-          auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
-            .then(() => {
-              console.log("Logout effettuato e cookie rimossi.");
-              window.location.href = 'login.html';
-            })
-            .catch((error) => {
-              console.error("Errore nel rimuovere la persistenza:", error);
-            });
-        })
-        .catch((error) => {
-          console.error("Errore nel logout:", error);
         });
-    }
 
-    function resetPassword() {
-      const user = auth.currentUser;
-      if (user) {
-        auth.sendPasswordResetEmail(user.email)
-          .then(() => {
-            alert("Email di reset password inviata all'indirizzo: " + user.email);
-          })
-          .catch((error) => {
-            alert("Errore: " + error.message);
-          });
-      } else {
-        alert("Nessun utente autenticato. Effettua il login per resettare la password.");
-      }
-    }
-  </script>
+        function logoutButton() {
+            auth.signOut()
+                .then(() => {
+                    auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+                        .then(() => {
+                            console.log("Logout effettuato e cookie rimossi.");
+                            window.location.href = 'login.html';
+                        })
+                        .catch((error) => {
+                            console.error("Errore nel rimuovere la persistenza:", error);
+                        });
+                })
+                .catch((error) => {
+                    console.error("Errore nel logout:", error);
+                });
+        }
+
+        function resetPassword() {
+            const user = auth.currentUser;
+            if (user) {
+                auth.sendPasswordResetEmail(user.email)
+                    .then(() => {
+                        alert("Email di reset password inviata all'indirizzo: " + user.email);
+                    })
+                    .catch((error) => {
+                        alert("Errore: " + error.message);
+                    });
+            } else {
+                alert("Nessun utente autenticato. Effettua il login per resettare la password.");
+            }
+        }
+
+document.getElementById('user-email').textContent = "Email: " + user.email;
+
+document.getElementById('user-uid').textContent = "UID: " + user.uid;
+
+if (userData.saldo !== undefined) {
+    document.getElementById('saldo').textContent = userData.saldo + " di saldo";
+} else {
+    document.getElementById('saldo').textContent = "0€";
+}
+    </script>
 </body>
 </html>
