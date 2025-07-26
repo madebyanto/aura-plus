@@ -99,122 +99,97 @@
             animation: fadeIn 1.5s ease-in-out;
         }
 
-       .widget {
-        text-align: center;
-        margin: 20px;
-    }
-    
-    .widget-header {
-        background-color: #ff4d4d; /* Rosso acceso */
-        color: white;
-        padding: 10px 20px;
-        border-radius: 12px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        display: inline-block;
-        transition: background-color 0.3s ease;
-    }
-    
-    .widget-header:hover {
-        background-color: #e04444;
-    }
+        .widget {
+            text-align: center;
+            margin: 20px;
+        }
 
-    .special-offer {
-        color: red; /* Colore rosso per "Offerta Speciale" */
-    }
+        .widget-header {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
 
-    .banner {
-        display: none;
-        background-color: #ff4d4d; /* Rosso acceso */
-        color: white;
-        padding: 15px 20px;
-        border-radius: 12px;
-        font-size: 18px;
-        font-weight: bold;
-        text-align: center;
-        max-width: 600px;
-        margin: 20px auto;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transform: translateY(-20px);
-        opacity: 0;
-        transition: transform 0.5s ease, opacity 0.5s ease;
-    }
+        .widget-header:hover {
+            background-color: #e04444;
+        }
 
-    .banner.show {
-        display: block;
-        transform: translateY(0);
-        opacity: 1;
-    }
+        .special-offer {
+            color: red;
+        }
 
-    .banner a {
-        color: yellow;
-        text-decoration: underline;
-    }
+        .banner {
+            display: none;
+            background-color: #ff4d4d;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
 
-hr {
-    border: none
-}
-</style>
+        .banner.show {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
 
+        .banner a {
+            color: yellow;
+            text-decoration: underline;
+        }
 
-        
+        hr {
+            border: none
+        }
     </style>
 </head>
 <body>
 
-    
-        <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
-        <h2>La tua dashboard</h2>
-        <p id="user-email"></p>
-        <p id="user-uid"></p>
-        <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
-        <p id="badge"></p> <!-- Sezione per il badge -->
-        <p id="error-message" class="error"></p>
-        
-        <!-- Bottone Impostazioni -->
-        <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
-<button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
-        <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Saldo</button>
-        <button class="btn-settings" onclick="window.location.href='index.html'">Torna al menù opzioni</button>
-    </div>
+    <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
+    <h2>La tua dashboard</h2>
+    <p id="badge"></p>
+    <p id="error-message" class="error"></p>
+
+    <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
+    <button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
+    <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Saldo</button>
+    <button class="btn-settings" onclick="window.location.href='index.html'">Torna al menù opzioni</button>
 
     <script>
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                document.getElementById('user-email').textContent = "Email: " + user.email;
-                document.getElementById('user-uid').textContent = "UID: " + user.uid;
-
-                // Recupero saldo da Firestore
                 db.collection("users").doc(user.uid).get()
                     .then((doc) => {
                         if (doc.exists) {
                             const userData = doc.data();
-                            if (userData.saldo !== undefined) {
-                                document.getElementById('saldo').textContent = userData.saldo + " di saldo";
-                            } else {
-                                document.getElementById('saldo').textContent = "0€";
-                            }
 
-                            // Carica immagine profilo
-                            const profileImageURL = userData.profileImage || 'aurastudio.png'; // Se non c'è immagine, usa quella di default
+                            const profileImageURL = userData.profileImage || 'aurastudio.png';
                             document.getElementById('profile-img').src = profileImageURL;
 
-                            // Carica e mostra il badge basato sul campo 'badge' personalizzato
-const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
-document.getElementById('badge').textContent = "Badge: " + badge;
-document.getElementById('badge').classList.add('badge');
+                            const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : 'Utente';
+                            document.getElementById('badge').textContent = "Badge: " + badge;
+                            document.getElementById('badge').classList.add('badge');
                         } else {
-                            document.getElementById('saldo').textContent = "0€";
-                            console.log("Nessun documento trovato per l'utente, creando uno nuovo...");
-                            
-                            // Creazione automatica del documento utente se non esiste
                             db.collection("users").doc(user.uid).set({
                                 saldo: 15,
-                                profileImage: 'aurastudio.png', // Immagine profilo di default
-                                badge: '' // Imposta 'admin' su false di default
+                                profileImage: 'aurastudio.png',
+                                badge: ''
                             }).then(() => {
-                                console.log("Documento utente creato con saldo 0.");
+                                console.log("Documento utente creato.");
                             }).catch((error) => {
                                 document.getElementById('error-message').textContent = "Errore nel salvataggio dei dati.";
                                 console.error("Errore nella creazione del documento:", error);
@@ -223,17 +198,17 @@ document.getElementById('badge').classList.add('badge');
                     })
                     .catch((error) => {
                         console.error("Errore nel recupero dati:", error);
-                        document.getElementById('error-message').textContent = "Errore nel caricamento del saldo.";
+                        document.getElementById('error-message').textContent = "Errore nel caricamento dati.";
                     });
             } else {
                 window.location.href = "login.html";
             }
         });
-function toggleBanner() {
-        const banner = document.querySelector('.banner');
-        banner.classList.toggle('show');
-    }
 
+        function toggleBanner() {
+            const banner = document.querySelector('.banner');
+            banner.classList.toggle('show');
+        }
     </script>
 
 </body>
