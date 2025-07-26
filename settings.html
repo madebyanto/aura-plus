@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostazioni - Aura+</title>
+    <title>Impostazioni e dettagli</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -103,7 +103,12 @@
 <body>
     <div class="container">
         <header>
-            <h1>Impostazioni Account</h1>
+            <h1>Impostazioni e dettagli</h1>
+<h2>Dettagli</h2>
+<p id="user-email"></p>
+<p id="user-uid"></p>
+<p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
+<h2>Impostazioni</h2>
             <p>Gestisci la tua sicurezza e le opzioni di privacy.</p>
         </header>
 
@@ -174,6 +179,16 @@
                 alert("Nessun utente autenticato. Effettua il login per resettare la password.");
             }
         }
+
+document.getElementById('user-email').textContent = "Email: " + user.email;
+
+document.getElementById('user-uid').textContent = "UID: " + user.uid;
+
+if (userData.saldo !== undefined) {
+    document.getElementById('saldo').textContent = userData.saldo + " di saldo";
+} else {
+    document.getElementById('saldo').textContent = "0€";
+}
     </script>
 </body>
 </html>
