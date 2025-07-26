@@ -64,7 +64,7 @@
       text-align: center;
     }
 
-    .popup-content input {
+    .popup-content input, .popup-content textarea {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
@@ -100,7 +100,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script>
-    // Config Firebase (usa la tua config)
     const firebaseConfig = {
       apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
       authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -124,8 +123,14 @@
       <h2>Cambia immagine profilo</h2>
       <p>Clicca per cambiare la tua immagine profilo.</p>
     </div>
+
+    <div class="widget" onclick="openBioPopup()">
+      <h2>Cambia descrizione</h2>
+      <p>Clicca per aggiornare la tua bio personale (max 150 caratteri).</p>
+    </div>
   </div>
 
+  <!-- Popup immagine -->
   <div class="popup" id="popup">
     <div class="popup-content">
       <h2>Inserisci URL immagine</h2>
@@ -136,21 +141,38 @@
     </div>
   </div>
 
+  <!-- Popup descrizione -->
+  <div class="popup" id="bio-popup">
+    <div class="popup-content">
+      <h2>Inserisci descrizione</h2>
+      <textarea id="bio-text" rows="4" maxlength="150" placeholder="Scrivi qui la tua descrizione... (max 150 caratteri)"></textarea>
+      <br>
+      <button onclick="saveBio()">Salva</button>
+      <button onclick="closeBioPopup()">Annulla</button>
+    </div>
+  </div>
+
   <script>
     const popup = document.getElementById("popup");
+    const bioPopup = document.getElementById("bio-popup");
     const profileImage = document.getElementById("profile-image");
 
-    // Mostra popup
     function openPopup() {
       popup.style.display = "block";
     }
 
-    // Nascondi popup
     function closePopup() {
       popup.style.display = "none";
     }
 
-    // Salva immagine dopo verifica
+    function openBioPopup() {
+      bioPopup.style.display = "block";
+    }
+
+    function closeBioPopup() {
+      bioPopup.style.display = "none";
+    }
+
     function saveImage() {
       const url = document.getElementById("image-url").value.trim();
       if (!url) {
@@ -160,10 +182,8 @@
 
       const testImg = new Image();
       testImg.onload = function() {
-        // Verifica utente loggato
         auth.onAuthStateChanged(function(user) {
           if (user) {
-            // Salva URL immagine Firestore (merge per aggiornare solo campo)
             db.collection("users").doc(user.uid).set({
               profileImage: url
             }, { merge: true }).then(() => {
@@ -184,7 +204,29 @@
       testImg.src = url;
     }
 
-    // Carica immagine dal db all'avvio pagina (se vuoi mostrare già quella corrente)
+    function saveBio() {
+      const bioText = document.getElementById("bio-text").value.trim();
+      if (bioText.length > 150) {
+        alert("La descrizione non può superare i 150 caratteri.");
+        return;
+      }
+
+      auth.onAuthStateChanged(function(user) {
+        if (user) {
+          db.collection("users").doc(user.uid).collection("bio").doc("info").set({
+            description: bioText
+          }).then(() => {
+            alert("Descrizione aggiornata!");
+            closeBioPopup();
+          }).catch((error) => {
+            alert("Errore salvataggio: " + error.message);
+          });
+        } else {
+          alert("Devi essere loggato per cambiare la descrizione.");
+        }
+      });
+    }
+
     auth.onAuthStateChanged(function(user) {
       if (user) {
         db.collection("users").doc(user.uid).get().then((doc) => {
