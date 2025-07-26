@@ -141,7 +141,7 @@
     </div>
   </div>
 
-  <!-- Popup descrizione -->
+  <!-- Popup bio -->
   <div class="popup" id="bio-popup">
     <div class="popup-content">
       <h2>Inserisci descrizione</h2>
@@ -213,9 +213,11 @@
 
       auth.onAuthStateChanged(function(user) {
         if (user) {
-          db.collection("users").doc(user.uid).collection("bio").doc("info").set({
-            description: bioText
-          }).then(() => {
+          db.collection("users").doc(user.uid).set({
+            bio: {
+              description: bioText
+            }
+          }, { merge: true }).then(() => {
             alert("Descrizione aggiornata!");
             closeBioPopup();
           }).catch((error) => {
@@ -232,8 +234,11 @@
         db.collection("users").doc(user.uid).get().then((doc) => {
           if (doc.exists) {
             const data = doc.data();
-            if(data.profileImage) {
+            if (data.profileImage) {
               profileImage.src = data.profileImage;
+            }
+            if (data.bio && data.bio.description) {
+              document.getElementById("bio-text").value = data.bio.description;
             }
           }
         });
