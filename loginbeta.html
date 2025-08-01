@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="login.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
@@ -157,7 +158,6 @@
         <h2>Registrati</h2>
         <form id="signup-form">
             <input type="email" id="signup-email" placeholder="Email" required>
-            <input type="text" id="signup-username" placeholder="Username" required>
             <input type="password" id="signup-password" placeholder="Password" required>
             <button type="submit">Registrati</button>
         </form>
@@ -195,48 +195,38 @@
 });
         });
 
-        document.getElementById('signup-form').addEventListener('submit', async function(event) {
+document.getElementById('signup-form').addEventListener('submit', function(event) {
     event.preventDefault();
-
-    const email = document.getElementById('signup-email').value.trim();
+    const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
-    const usernameRaw = document.getElementById('signup-username').value.trim();
-    const username = usernameRaw.toLowerCase();
 
-    if (!username) {
-        showMessage("Inserisci un username valido!");
-        return;
-    }
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
 
-    try {
-        // Controllo unicità username
-        const usernameDoc = await db.collection("usernames").doc(username).get();
-        if (usernameDoc.exists) {
-            showMessage("Oh! Username già in uso..");
-            return;
-        }
+            // Invia email di verifica
+            user.sendEmailVerification()
+                .then(() => {
+                    showMessage("Registrazione completata! Controlla la tua email per verificare il tuo account.");
 
-        // Crea utente email+password
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+                    // Imposta saldo dopo la verifica inviata
+                    db.collection("users").doc(user.uid).set({
+                        saldo: 15
+                    }).then(() => {
+                        console.log("Saldo iniziale assegnato.");
+                    });
 
-        // Salva saldo e username nel documento utente, senza modificare altro
-        await db.collection("users").doc(user.uid).set({
-            saldo: 15,
-            username: username
-        }, { merge: true });
-
-        // Salva mapping username → uid per bloccare duplicati
-        await db.collection("usernames").doc(username).set({
-            uid: user.uid
+                    auth.signOut(); // Logout per obbligare verifica prima del login
+                })
+                .catch((error) => {
+                    console.error("Errore nell'invio dell'email di verifica", error.message);
+                    showMessage("Errore nell'invio dell'email di verifica: " + error.message);
+                });
+        })
+        .catch((error) => {
+            console.error("Errore nella registrazione", error.message);
+            showMessage("Errore: " + error.message);
         });
-
-        window.location.href = "user_dashboard.html";
-
-    } catch (error) {
-        console.error("Errore nella registrazione", error.message);
-        showMessage("Errore: " + error.message);
-    }
 });
 
     </script>
