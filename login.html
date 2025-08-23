@@ -109,12 +109,8 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    if (user.emailVerified) {
-                        window.location.href = "user_dashboard.html";
-                    } else {
-                        showMessage("Devi prima verificare la tua email.");
-                        auth.signOut();
-                    }
+                    // ✅ Rimuoviamo controllo emailVerified
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nel login", error.message);
@@ -126,7 +122,7 @@
                 });
         });
 
-        // SIGNUP con email di verifica
+        // SIGNUP
         document.getElementById('signup-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const email = document.getElementById('signup-email').value;
@@ -136,15 +132,12 @@
                 .then((userCredential) => {
                     const user = userCredential.user;
 
-                    user.sendEmailVerification()
-                        .then(() => showMessage("Email di verifica inviata. Controlla la tua casella di posta."))
-                        .catch((error) => console.error("Errore invio email verifica:", error.message));
-
                     db.collection("users").doc(user.uid).set({
                         saldo: 15
                     }).then(() => console.log("Saldo iniziale assegnato."));
 
-                    auth.signOut(); // blocca accesso fino a verifica
+                    // ✅ Non blocchiamo accesso
+                    window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
                     console.error("Errore nella registrazione", error.message);
@@ -166,6 +159,13 @@
                     console.error("Errore nel reset password", error.message);
                     showMessage("Errore: " + error.message);
                 });
+        });
+
+        // Mantieni login utente dopo refresh
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = "user_dashboard.html";
+            }
         });
     </script>
 
