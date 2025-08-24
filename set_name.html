@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Completa il profilo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+      authDomain: "myauraid-f03c6.firebaseapp.com",
+      projectId: "myauraid-f03c6",
+      storageBucket: "myauraid-f03c6.appspot.com",
+      messagingSenderId: "190478237725",
+      appId: "1:190478237725:web:0d39907473f511b85a06f4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #E30AF5, #F174FF);
+      color: #fff;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; text-align: center;
+    }
+    .container {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px; border-radius: 15px;
+      box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+      width: 100%; max-width: 400px;
+    }
+    h1 { font-size: 1.6em; margin-bottom: 15px; font-weight: 600; }
+    form { display: flex; flex-direction: column; }
+    input {
+      padding: 12px; margin: 10px 0; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 14px;
+      background-color: rgba(255, 255, 255, 0.3); color: #fff;
+    }
+    input:focus { outline: none; border-color: #F174FF; }
+    button {
+      background-color: #F174FF; color: white;
+      padding: 12px; border: none; border-radius: 8px;
+      font-size: 14px; cursor: pointer; transition: background-color 0.3s ease;
+    }
+    button:hover { background-color: #e008f6; }
+    #message { margin-top: 15px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Completa il tuo profilo</h1>
+    <p>Inserisci il tuo nome e cognome per continuare</p>
+    <form id="profile-form">
+      <input type="text" id="nome" placeholder="Nome" required>
+      <input type="text" id="cognome" placeholder="Cognome" required>
+      <button type="submit">Salva</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const messageBox = document.getElementById('message');
+    const showMessage = (text) => { messageBox.textContent = text; };
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = "index.html"; // torna al login se non loggato
+      } else {
+        db.collection("users").doc(user.uid).get().then((doc) => {
+          if (doc.exists && doc.data().nome && doc.data().cognome) {
+            // Se nome e cognome ci sono già, vai in dashboard
+            window.location.href = "user_dashboard.html";
+          }
+        });
+      }
+    });
+
+    document.getElementById('profile-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const cognome = document.getElementById('cognome').value;
+
+      const user = auth.currentUser;
+      if (user) {
+        db.collection("users").doc(user.uid).set({
+          nome: nome,
+          cognome: cognome
+        }, { merge: true })
+        .then(() => {
+          showMessage("Profilo aggiornato!");
+          setTimeout(() => window.location.href = "user_dashboard.html", 1000);
+        })
+        .catch((error) => {
+          console.error("Errore aggiornamento:", error);
+          showMessage("Errore: " + error.message);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
