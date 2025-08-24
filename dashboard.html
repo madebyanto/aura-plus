@@ -1,202 +1,193 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Utente - Aura+</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profilo Aura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #E30AF5, #F174FF);
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      color: #333;
+    }
 
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-    authDomain: "myauraid-f03c6.firebaseapp.com",
-    projectId: "myauraid-f03c6",
-    storageBucket: "myauraid-f03c6.firebasestorage.app",
-    messagingSenderId: "190478237725",
-    appId: "1:190478237725:web:0d39907473f511b85a06f4"
-};
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-</script>
+    .card {
+      position: relative;
+      width: 350px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      overflow: hidden;
+      text-align: center;
+    }
 
-<style>
-body {
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background: linear-gradient(135deg, #E30AF5, #F174FF);
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    min-height:100vh;
-    padding:20px;
-}
+    /* Barra riflesso */
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 90px;
+      background: linear-gradient(to bottom, rgba(0,123,255,0.4), transparent);
+    }
 
-/* CARD PRINCIPALE */
-.card {
-    background: rgba(0,0,0,0.45);
-    border-radius: 20px;
-    max-width: 500px;
-    width: 100%;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    overflow: hidden;
-    text-align:center;
-    animation: fadeIn 1s ease-in-out;
-}
+    .profile-pic {
+      margin-top: 45px;
+    }
 
-/* AREA RIFLESSO */
-.card .reflection {
-    position: relative;
-    background: rgba(255,255,255,0.1);
-    padding: 40px 0 60px;
-}
-.card .reflection::after {
-    content:'';
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:50px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0));
-}
+    .profile-pic img {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      object-fit: cover;
+      background: #eee;
+    }
 
-/* IMMAGINE PROFILO */
-#profile-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #fff;
-    position: relative;
-    z-index: 1;
-    margin:0 auto;
-}
+    .info {
+      padding: 20px;
+    }
 
-/* INFO SOTTO */
-.card .info {
-    padding: 20px;
-}
-.card .info p {
-    margin: 10px 0;
-}
-.saldo {
-    font-weight: bold;
-    font-size: 1.2em;
-}
-.badge {
-    display: inline-block;
-    padding: 4px 10px;
-    background-color: #00bfff;
-    border-radius: 10px;
-    font-weight: 500;
-    margin-top: 5px;
-}
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
 
-/* BIO */
-.bio-terminal {
-    font-family: monospace;
-    background: rgba(255,255,255,0.05);
-    padding: 10px;
-    border-radius: 10px;
-    color: #e0e0e0;
-    margin: 15px 0;
-    min-height: 60px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    text-align:left;
-}
+    .username {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
 
-/* PULSANTI */
-.buttons {
-    display:flex;
-    flex-wrap:wrap;
-    gap: 10px;
-    justify-content:center;
-}
-.btn-settings {
-    flex:1 1 45%;
-    padding:10px;
-    background-color:#F174FF;
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    font-size:16px;
-    cursor:pointer;
-    transition: background 0.3s;
-}
-.btn-settings:hover { background-color:#E30AF5; }
+    .email, .uid, .saldo {
+      font-size: 14px;
+      color: #555;
+      margin: 4px 0;
+      word-wrap: break-word;
+    }
 
-/* ANIMAZIONE */
-.typing { border-right:2px solid #fff; overflow:hidden;}
-@keyframes fadeIn { from{opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }
+    .bio-terminal {
+      font-family: 'Courier New', monospace;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 50px;
+      border-left: 4px solid #007bff;
+    }
 
-</style>
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="reflection">
-        <img id="profile-img" src="default-profile.png" alt="Profilo Utente">
+  <div class="card">
+    <div class="profile-pic">
+      <img id="profile-img" src="default-profile.png" alt="Foto profilo">
     </div>
     <div class="info">
-        <p id="user-email"></p>
-        <p id="user-uid"></p>
-        <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
-        <p id="badge" class="badge"></p>
-        <div class="bio-terminal"><span id="bio-text" class="typing"></span></div>
+      <div id="badge" class="badge">Utente</div>
+      <div class="username" id="user-name">Caricamento...</div>
+      <p class="email" id="user-email"></p>
+      <p class="uid" id="user-uid"></p>
+      <p class="saldo">Saldo: <span id="saldo">Caricamento...</span></p>
+      <div id="bio-display" class="bio-terminal">
+        <span id="bio-text"></span>
+      </div>
+      <p id="error-message" class="error"></p>
     </div>
+  </div>
 
-    <div class="buttons">
-        <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
-        <button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
-        <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Saldo & Wallet</button>
-    </div>
-</div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+      authDomain: "myauraid-f03c6.firebaseapp.com",
+      projectId: "myauraid-f03c6",
+      storageBucket: "myauraid-f03c6.firebasestorage.app",
+      messagingSenderId: "190478237725",
+      appId: "1:190478237725:web:0d39907473f511b85a06f4"
+    };
 
-<script>
-auth.onAuthStateChanged(function(user){
-    if(!user){ window.location.href="login.html"; return; }
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    document.getElementById('user-email').textContent = "Email: "+user.email;
-    document.getElementById('user-uid').textContent = "UID: "+user.uid;
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById('user-email').textContent = "Email: " + user.email;
+        document.getElementById('user-uid').textContent = "UID: " + user.uid;
+        document.getElementById('user-name').textContent = user.displayName || "Anonimo";
 
-    db.collection("users").doc(user.uid).get().then(doc=>{
-        if(doc.exists){
-            const data = doc.data();
-            document.getElementById('saldo').textContent = (data.saldo || 0)+"€";
-            document.getElementById('profile-img').src = data.profileImage || 'default-profile.png';
-            
-            const badge = data.badge && data.badge.trim()!=="" ? data.badge : "Utente";
-            document.getElementById('badge').textContent = badge;
+        db.collection("users").doc(user.uid).get()
+          .then((doc) => {
+            if (doc.exists) {
+              const userData = doc.data();
 
-            // Bio typing
-            const bioEl = document.getElementById('bio-text');
-            const bioText = data.bio?.description?.trim() || "Nessuna descrizione impostata.";
-            let index=0;
-            function typeWriter(){
-                if(index<bioText.length){
-                    bioEl.textContent += bioText.charAt(index);
-                    index++;
-                    setTimeout(typeWriter,25);
+              // Saldo
+              document.getElementById('saldo').textContent =
+                (userData.saldo !== undefined ? userData.saldo : 0) + "€";
+
+              // Foto profilo
+              const profileImageURL = userData.profileImage || "aurastudio.png";
+              document.getElementById('profile-img').src = profileImageURL;
+
+              // Bio con effetto scrittura
+              const bioTextEl = document.getElementById("bio-text");
+              const description = userData.bio && userData.bio.description
+                ? userData.bio.description.trim()
+                : "Nessuna descrizione impostata.";
+              let index = 0;
+              function typeWriter() {
+                if (index < description.length) {
+                  bioTextEl.textContent += description.charAt(index);
+                  index++;
+                  setTimeout(typeWriter, 25);
                 }
+              }
+              bioTextEl.textContent = "";
+              typeWriter();
+
+              // Badge
+              const badge = userData.badge && userData.badge.trim() !== "" ? userData.badge : "Utente";
+              document.getElementById("badge").textContent = badge;
+
+            } else {
+              document.getElementById("saldo").textContent = "0€";
+              console.log("Nessun documento trovato.");
             }
-            bioEl.textContent="";
-            typeWriter();
-        } else {
-            db.collection("users").doc(user.uid).set({
-                saldo: 15,
-                profileImage: 'default-profile.png',
-                badge: ''
-            });
-            document.getElementById('saldo').textContent="15€";
-            document.getElementById('badge').textContent="Utente";
-        }
+          })
+          .catch((error) => {
+            console.error("Errore:", error);
+            document.getElementById('error-message').textContent = "Errore nel caricamento dei dati.";
+          });
+      } else {
+        window.location.href = "login.html";
+      }
     });
-});
-</script>
+  </script>
 
 </body>
 </html>
