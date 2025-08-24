@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+    authDomain: "myauraid-f03c6.firebaseapp.com",
+    projectId: "myauraid-f03c6",
+    storageBucket: "myauraid-f03c6.firebasestorage.app",
+    messagingSenderId: "190478237725",
+    appId: "1:190478237725:web:0d39907473f511b85a06f4"
+};
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+</script>
+
+<style>
+/* FONT E RESET */
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif;}
+body {
+    background: linear-gradient(135deg, #E30AF5, #F174FF);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* CARD CONTAINER */
+.container {
+    background: rgba(0,0,0,0.5);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    max-width: 700px;
+    width: 100%;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* HEADER */
+#profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid #fff;
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* INFO UTENTE */
+.info {
+    margin-bottom: 25px;
+    text-align: center;
+}
+.saldo {
+    font-weight: 700;
+    font-size: 1.2em;
+}
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #FF5C5C;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+.bio-terminal {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    color: #e0e0e0;
+    margin-bottom: 20px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    min-height: 60px;
+    text-align: left;
+    border-left: 4px solid #fff;
+}
+
+/* PULSANTI */
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+.btn-settings {
+    flex: 1 1 45%;
+    padding: 12px;
+    background-color: #F174FF;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-align: center;
+}
+.btn-settings:hover {
+    background-color: #E30AF5;
+}
+
+/* ANIMAZIONE TYPING */
+.typing {border-right:2px solid #fff; white-space:nowrap; overflow:hidden;}
+@keyframes fadeIn {from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <img id="profile-img" src="default-profile.png" alt="Profilo Utente">
+    <h2>La tua Dashboard</h2>
+
+    <div class="info">
+        <p id="user-email"></p>
+        <p id="user-uid"></p>
+        <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
+        <p id="badge" class="badge"></p>
+    </div>
+
+    <div id="bio-display" class="bio-terminal"><span id="bio-text" class="typing"></span></div>
+
+    <div class="buttons">
+        <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
+        <button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
+        <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Saldo & Wallet</button>
+    </div>
+</div>
+
+<script>
+auth.onAuthStateChanged(function(user) {
+    if(!user){ window.location.href="login.html"; return; }
+
+    document.getElementById('user-email').textContent = "Email: " + user.email;
+    document.getElementById('user-uid').textContent = "UID: " + user.uid;
+
+    db.collection("users").doc(user.uid).get()
+    .then(doc => {
+        if(doc.exists){
+            const data = doc.data();
+            document.getElementById('saldo').textContent = (data.saldo || 0) + "€";
+            document.getElementById('profile-img').src = data.profileImage || 'default-profile.png';
+
+            // Badge
+            const badge = data.badge && data.badge.trim() !== "" ? data.badge : "Utente";
+            const badgeEl = document.getElementById('badge');
+            badgeEl.textContent = badge;
+
+            // Bio typing
+            const bioEl = document.getElementById('bio-text');
+            const bioText = data.bio?.description?.trim() || "Nessuna descrizione impostata.";
+            let index=0;
+            function typeWriter(){
+                if(index < bioText.length){
+                    bioEl.textContent += bioText.charAt(index);
+                    index++;
+                    setTimeout(typeWriter, 25);
+                }
+            }
+            bioEl.textContent = "";
+            typeWriter();
+
+        } else {
+            db.collection("users").doc(user.uid).set({
+                saldo: 15,
+                profileImage: 'default-profile.png',
+                badge: ''
+            });
+            document.getElementById('saldo').textContent = "15€";
+            document.getElementById('badge').textContent = "Utente";
+        }
+    });
+});
+</script>
+
+</body>
+</html>
