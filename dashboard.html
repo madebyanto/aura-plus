@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<title>Dashboard Utente - Aura+</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -24,117 +24,130 @@ const db = firebase.firestore();
 </script>
 
 <style>
-/* FONT E RESET */
-* {margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif;}
 body {
+    margin:0;
+    font-family:'Poppins',sans-serif;
     background: linear-gradient(135deg, #E30AF5, #F174FF);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:20px;
 }
 
-/* CARD CONTAINER */
-.container {
-    background: rgba(0,0,0,0.5);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    max-width: 700px;
+/* CARD PRINCIPALE */
+.card {
+    background: rgba(0,0,0,0.45);
+    border-radius: 20px;
+    max-width: 500px;
     width: 100%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+    text-align:center;
     animation: fadeIn 1s ease-in-out;
 }
 
-/* HEADER */
+/* AREA RIFLESSO */
+.card .reflection {
+    position: relative;
+    background: rgba(255,255,255,0.1);
+    padding: 40px 0 60px;
+}
+.card .reflection::after {
+    content:'';
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:50px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0));
+}
+
+/* IMMAGINE PROFILO */
 #profile-img {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 20px;
     border: 3px solid #fff;
+    position: relative;
+    z-index: 1;
+    margin:0 auto;
 }
 
-h2 {
-    font-size: 2em;
-    margin-bottom: 15px;
-    text-align: center;
+/* INFO SOTTO */
+.card .info {
+    padding: 20px;
 }
-
-/* INFO UTENTE */
-.info {
-    margin-bottom: 25px;
-    text-align: center;
+.card .info p {
+    margin: 10px 0;
 }
 .saldo {
-    font-weight: 700;
+    font-weight: bold;
     font-size: 1.2em;
 }
 .badge {
     display: inline-block;
-    padding: 6px 12px;
-    background-color: #FF5C5C;
-    border-radius: 20px;
-    font-weight: 600;
-    margin-top: 10px;
+    padding: 4px 10px;
+    background-color: #00bfff;
+    border-radius: 10px;
+    font-weight: 500;
+    margin-top: 5px;
 }
+
+/* BIO */
 .bio-terminal {
-    background: rgba(255,255,255,0.1);
-    padding: 15px;
+    font-family: monospace;
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
     border-radius: 10px;
     color: #e0e0e0;
-    margin-bottom: 20px;
-    font-family: monospace;
-    white-space: pre-wrap;
+    margin: 15px 0;
     min-height: 60px;
-    text-align: left;
-    border-left: 4px solid #fff;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align:left;
 }
 
 /* PULSANTI */
 .buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
+    display:flex;
+    flex-wrap:wrap;
+    gap: 10px;
+    justify-content:center;
 }
 .btn-settings {
-    flex: 1 1 45%;
-    padding: 12px;
-    background-color: #F174FF;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
+    flex:1 1 45%;
+    padding:10px;
+    background-color:#F174FF;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
     transition: background 0.3s;
-    text-align: center;
 }
-.btn-settings:hover {
-    background-color: #E30AF5;
-}
+.btn-settings:hover { background-color:#E30AF5; }
 
-/* ANIMAZIONE TYPING */
-.typing {border-right:2px solid #fff; white-space:nowrap; overflow:hidden;}
-@keyframes fadeIn {from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);}}
+/* ANIMAZIONE */
+.typing { border-right:2px solid #fff; overflow:hidden;}
+@keyframes fadeIn { from{opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }
+
 </style>
 </head>
 <body>
 
-<div class="container">
-    <img id="profile-img" src="default-profile.png" alt="Profilo Utente">
-    <h2>La tua Dashboard</h2>
-
+<div class="card">
+    <div class="reflection">
+        <img id="profile-img" src="default-profile.png" alt="Profilo Utente">
+    </div>
     <div class="info">
         <p id="user-email"></p>
         <p id="user-uid"></p>
         <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
         <p id="badge" class="badge"></p>
+        <div class="bio-terminal"><span id="bio-text" class="typing"></span></div>
     </div>
-
-    <div id="bio-display" class="bio-terminal"><span id="bio-text" class="typing"></span></div>
 
     <div class="buttons">
         <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
@@ -144,46 +157,42 @@ h2 {
 </div>
 
 <script>
-auth.onAuthStateChanged(function(user) {
+auth.onAuthStateChanged(function(user){
     if(!user){ window.location.href="login.html"; return; }
 
-    document.getElementById('user-email').textContent = "Email: " + user.email;
-    document.getElementById('user-uid').textContent = "UID: " + user.uid;
+    document.getElementById('user-email').textContent = "Email: "+user.email;
+    document.getElementById('user-uid').textContent = "UID: "+user.uid;
 
-    db.collection("users").doc(user.uid).get()
-    .then(doc => {
+    db.collection("users").doc(user.uid).get().then(doc=>{
         if(doc.exists){
             const data = doc.data();
-            document.getElementById('saldo').textContent = (data.saldo || 0) + "€";
+            document.getElementById('saldo').textContent = (data.saldo || 0)+"€";
             document.getElementById('profile-img').src = data.profileImage || 'default-profile.png';
-
-            // Badge
-            const badge = data.badge && data.badge.trim() !== "" ? data.badge : "Utente";
-            const badgeEl = document.getElementById('badge');
-            badgeEl.textContent = badge;
+            
+            const badge = data.badge && data.badge.trim()!=="" ? data.badge : "Utente";
+            document.getElementById('badge').textContent = badge;
 
             // Bio typing
             const bioEl = document.getElementById('bio-text');
             const bioText = data.bio?.description?.trim() || "Nessuna descrizione impostata.";
             let index=0;
             function typeWriter(){
-                if(index < bioText.length){
+                if(index<bioText.length){
                     bioEl.textContent += bioText.charAt(index);
                     index++;
-                    setTimeout(typeWriter, 25);
+                    setTimeout(typeWriter,25);
                 }
             }
-            bioEl.textContent = "";
+            bioEl.textContent="";
             typeWriter();
-
         } else {
             db.collection("users").doc(user.uid).set({
                 saldo: 15,
                 profileImage: 'default-profile.png',
                 badge: ''
             });
-            document.getElementById('saldo').textContent = "15€";
-            document.getElementById('badge').textContent = "Utente";
+            document.getElementById('saldo').textContent="15€";
+            document.getElementById('badge').textContent="Utente";
         }
     });
 });
