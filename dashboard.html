@@ -28,6 +28,7 @@ body {
     background: linear-gradient(135deg,#E30AF5,#F174FF);
     display:flex; justify-content:center; align-items:center;
     min-height:100vh; padding:20px;
+    color: #fff; /* testo bianco di default */
 }
 
 .dashboard-card {
@@ -39,6 +40,7 @@ body {
     text-align: center;
     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     backdrop-filter: blur(15px);
+    color: #fff;
 }
 
 #profile-img {
@@ -53,6 +55,7 @@ body {
 h2 {
     font-size: 1.8em;
     margin-bottom:5px;
+    color: #fff;
 }
 
 .user-name {
@@ -61,6 +64,10 @@ h2 {
     color: #fff;
     opacity: 0.9;
     margin-bottom: 15px;
+}
+
+#user-email, .saldo, #badge {
+    color: #fff;
 }
 
 .saldo {font-weight:600; font-size:1.1em; margin:10px 0;}
@@ -79,7 +86,7 @@ h2 {
     background: rgba(0,0,0,0.3);
     padding:15px;
     border-radius:12px;
-    color:#e0e0e0;
+    color:#fff; /* testo bianco */
     margin:15px 0;
     white-space: pre-wrap;
     overflow:hidden;
@@ -87,6 +94,8 @@ h2 {
     text-align:left;
     min-height:50px;
 }
+#error-message {color:#ff6b6b;}
+
 @media (max-width: 480px){
     .dashboard-card {padding:20px 15px;}
     #profile-img {width:100px; height:100px;}
@@ -103,7 +112,7 @@ h2 {
     <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
     <div id="bio-display" class="bio-terminal"><span id="bio-text"></span></div>
     <p id="badge"></p>
-    <p id="error-message" style="color:red;"></p>
+    <p id="error-message"></p>
 
     <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
     <button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
