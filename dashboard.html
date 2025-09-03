@@ -2,319 +2,234 @@
 <html lang="it">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dashboard Utente — Aura</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard — Aura</title>
 
 <!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<!-- Firebase v8 (stessa versione del tuo file) -->
+<!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <style>
   :root{
-    --bg1: #E30AF5;
-    --bg2: #F174FF;
+    --bg1:#E30AF5; --bg2:#F174FF;
     --glass: rgba(255,255,255,0.12);
-    --glass-strong: rgba(255,255,255,0.18);
-    --accent: #f174ff;
-    --text: #ffffff;
+    --glass-2: rgba(255,255,255,0.08);
     --muted: rgba(255,255,255,0.85);
-    --success: #22c55e;
+    --accent: #f174ff;
+    --white: #ffffff;
   }
 
   *{box-sizing:border-box; margin:0; padding:0}
-  html,body{height:100%; font-family:'Poppins',sans-serif; color:var(--text); background:linear-gradient(135deg,var(--bg1),var(--bg2));}
+  html,body{height:100%; font-family:'Poppins',sans-serif; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--white); -webkit-font-smoothing:antialiased;}
+  a{color:inherit; text-decoration:none}
 
-  /* NAVBAR */
-  .topbar{
-    position:fixed;
-    top:0; left:0; right:0;
-    height:64px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 18px;
-    backdrop-filter: blur(8px);
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    z-index:20;
-  }
-  .brand {display:flex; align-items:center; gap:12px; cursor:pointer;}
-  .brand .logo{
-    width:40px; height:40px; border-radius:10px;
-    background: linear-gradient(135deg,#fff5,#fff2);
-    display:grid; place-items:center; color:#000; font-weight:700;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  }
-  .brand .title{font-weight:600; letter-spacing:0.2px}
-
-  nav.nav{
-    display:flex; gap:12px; align-items:center;
-  }
-  .nav a{
-    color:var(--text);
-    text-decoration:none;
-    padding:8px 12px;
-    border-radius:10px;
-    font-weight:500;
-    opacity:0.9;
-  }
-  .nav a.active, .nav a:hover{
-    background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-    transform:translateY(-2px);
+  /* Container mobile-first */
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:18px 16px 90px; /* spazio per bottom nav */
   }
 
-  /* Layout */
-  .container{
-    max-width:1100px;
-    margin:88px auto 40px; /* leave space for topbar */
-    padding: 24px;
-    display:grid;
-    grid-template-columns: 320px 1fr;
-    gap:20px;
-    width:calc(100% - 40px);
+  /* Header area inside page (not fixed) */
+  .page-header{
+    display:flex; align-items:center; gap:12px; margin-bottom:12px;
   }
+  .logo-pill{
+    width:52px; height:52px; border-radius:12px; display:grid; place-items:center;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
+    color:#000; font-weight:700;
+  }
+  .page-title{font-size:18px; font-weight:600}
+  .page-sub{font-size:12px; color:var(--muted); margin-top:2px}
 
-  /* PROFILE CARD (left) */
-  .profile-card{
-    background: var(--glass);
-    border-radius:16px;
-    padding:22px;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.28);
-    backdrop-filter: blur(14px);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:12px;
-  }
-  #profile-img{
-    width:120px; height:120px; border-radius:50%; object-fit:cover;
-    border: 3px solid rgba(255,255,255,0.25);
-  }
-  .welcome{
-    text-align:center;
-  }
-  .welcome h1{font-size:20px; margin-bottom:6px}
-  .welcome p{font-size:14px; color:var(--muted); margin-bottom:4px}
-
-  .badge {
-    margin-top:6px;
-    display:inline-block;
-    background: rgba(0,0,0,0.25);
-    padding:6px 12px;
-    border-radius:999px;
-    font-weight:600;
-    font-size:13px;
-  }
-
-  /* Right content */
-  .right-grid{
-    display:grid;
-    grid-template-rows: auto 1fr;
-    gap:16px;
-  }
-
-  .cards-row{
-    display:flex;
-    gap:14px;
-  }
+  /* Cards */
   .card{
-    flex:1;
-    background: var(--glass-strong);
-    padding:16px;
+    background: var(--glass);
     border-radius:14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.24);
-    backdrop-filter: blur(10px);
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+    backdrop-filter: blur(12px);
   }
-  .card.small{max-width:220px}
 
-  .saldo-amount{font-size:20px; font-weight:700}
-  .saldo-label{color:var(--muted); font-size:13px; margin-bottom:8px}
+  /* Profile compact */
+  .profile-row{display:flex; gap:12px; align-items:center}
+  .avatar{
+    width:78px; height:78px; border-radius:50%; overflow:hidden; flex:0 0 78px; border:3px solid rgba(255,255,255,0.18);
+    background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  }
+  .avatar img{width:100%; height:100%; object-fit:cover; display:block}
+
+  .profile-meta{flex:1}
+  .profile-meta h2{font-size:16px; margin-bottom:4px}
+  .profile-meta p{font-size:13px; color:var(--muted); margin-bottom:6px}
+
+  .mini-stats{display:flex; gap:10px; margin-top:6px}
+  .stat{flex:1; background: rgba(255,255,255,0.03); padding:8px; border-radius:10px; text-align:center}
+  .stat .label{font-size:12px; color:var(--muted)}
+  .stat .value{font-weight:700; margin-top:6px}
 
   /* Bio terminal */
   .bio-terminal{
-    background: rgba(0,0,0,0.25);
-    padding:14px;
-    border-radius:12px;
-    min-height:78px;
+    margin-top:10px;
     font-family: 'Courier New', monospace;
-    font-size:14px;
-    color:var(--text);
-    border-left:4px solid rgba(255,255,255,0.08);
-    white-space:pre-wrap;
-    overflow:auto;
+    background: rgba(0,0,0,0.24);
+    padding:10px; border-radius:10px;
+    min-height:72px; white-space:pre-wrap; overflow:auto; font-size:13px;
   }
 
-  /* Buttons */
-  .actions{
-    display:flex; gap:10px; margin-top:6px;
-  }
-  .btn{
-    flex:1;
-    background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-    border:1px solid rgba(255,255,255,0.06);
-    padding:10px 12px;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:600;
-  }
-  .btn.primary{
-    background: linear-gradient(90deg,var(--accent),#e008f6);
-    color:#fff;
-    border:none;
-  }
-
-  /* News list */
-  .news-list{display:flex; flex-direction:column; gap:10px}
+  /* News list simple */
   .news-item{
-    background: rgba(255,255,255,0.03);
-    padding:12px;
-    border-radius:10px;
-    display:flex;
-    gap:10px;
-    align-items:flex-start;
+    padding:10px; border-radius:10px; background: rgba(255,255,255,0.03); margin-bottom:8px;
   }
-  .news-item h4{margin-bottom:6px; font-size:15px}
+  .news-item h4{font-size:14px; margin-bottom:6px}
   .news-item p{font-size:13px; color:var(--muted)}
 
-  /* Footer small note */
-  .small-note{font-size:12px; color:var(--muted); margin-top:8px}
+  /* Settings list */
+  .settings-list{display:flex; flex-direction:column; gap:8px}
+  .settings-row{display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:10px; background: rgba(255,255,255,0.03)}
 
-  /* Responsive */
-  @media (max-width:900px){
-    .container{grid-template-columns: 1fr; margin-top:86px}
-    .cards-row{flex-direction:column}
-    .card.small{max-width:100%}
+  /* Bottom navigation (fixed) */
+  .bottom-nav{
+    position:fixed; left:0; right:0; bottom:0; height:72px;
+    display:flex; justify-content:center; align-items:center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.08));
+    border-top:1px solid rgba(255,255,255,0.04);
+    z-index:30;
+    padding:10px 12px;
+  }
+  .nav-inner{
+    width:100%; max-width:720px; display:flex; justify-content:space-around; gap:6px;
+    padding:6px; background: rgba(255,255,255,0.02); border-radius:14px;
+  }
+  .nav-btn{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    padding:6px 8px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:12px;
+  }
+  .nav-btn.active{
+    color:var(--white);
+    background: linear-gradient(90deg,var(--accent), #e008f6);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.28);
+    transform:translateY(-3px);
+  }
+
+  /* icon style */
+  .icon {
+    width:22px; height:22px; display:block;
+  }
+
+  /* Responsive: larger screens */
+  @media(min-width:900px){
+    .wrap{padding:26px 22px 110px}
+    .profile-row .avatar{width:100px; height:100px; flex:0 0 100px}
+    .page-title{font-size:20px}
+    .bottom-nav{height:84px}
   }
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<header class="topbar" role="banner">
-  <div class="brand" onclick="goHome()">
-    <div class="logo">A+</div>
+<div class="wrap" role="main">
+  <header class="page-header" aria-label="Header pagina">
+    <div class="logo-pill">A+</div>
     <div>
-      <div class="title">Aura Studio</div>
-      <div style="font-size:12px; color:rgba(255,255,255,0.85)">Dashboard Utente</div>
+      <div class="page-title">Aura — Dashboard</div>
+      <div class="page-sub">Benvenuto — area personale</div>
     </div>
-  </div>
+  </header>
 
-  <nav class="nav" role="navigation" aria-label="Principale">
-    <a href="#" id="nav-dashboard" class="active" onclick="showSection('dashboard')">Dashboard</a>
-    <a href="#" id="nav-news" onclick="showSection('news')">Notizie</a>
-    <a href="#" id="nav-settings" onclick="showSection('settings')">Impostazioni</a>
-  </nav>
-
-  <div style="display:flex; align-items:center; gap:12px">
-    <div id="top-avatar" style="width:40px; height:40px; border-radius:50%; overflow:hidden; border:2px solid rgba(255,255,255,0.12)">
-      <img src="default-profile.png" id="top-avatar-img" style="width:100%; height:100%; object-fit:cover" alt="avatar">
-    </div>
-  </div>
-</header>
-
-<!-- MAIN LAYOUT -->
-<main class="container" role="main">
-
-  <!-- Left profile -->
-  <aside class="profile-card" aria-label="Profilo utente">
-    <img id="profile-img" src="default-profile.png" alt="Immagine profilo">
-    <div class="welcome">
-      <h1 id="user-name">Caricamento...</h1>
-      <p id="user-email" style="color:var(--muted)">—</p>
-    </div>
-
-    <div style="width:100%; display:flex; justify-content:space-between; gap:10px">
-      <div style="text-align:left">
-        <div style="font-size:12px; color:var(--muted)">Saldo</div>
-        <div class="saldo-amount" id="saldo">Caricamento...</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:12px; color:var(--muted)">Livello</div>
-        <div class="badge" id="badge">Utente</div>
-      </div>
-    </div>
-
-    <div style="width:100%; margin-top:8px">
-      <div class="small-note">Account attivo</div>
-      <div class="small-note" id="user-uid" style="word-break:break-all; font-size:12px; color:rgba(255,255,255,0.6)"></div>
-    </div>
-
-    <div style="width:100%; margin-top:10px" class="actions">
-      <button class="btn" onclick="goTo('howtogetbalance.html')">Saldo & Wallet</button>
-      <button class="btn primary" onclick="goTo('personalize.html')">Personalizza</button>
-    </div>
-  </aside>
-
-  <!-- Right area -->
-  <section class="right-grid">
-
-    <!-- top cards row -->
-    <div class="cards-row">
-      <div class="card small" aria-labelledby="bio-label">
-        <div id="bio-label" style="font-size:13px; color:var(--muted); margin-bottom:8px">Bio</div>
-        <div class="bio-terminal" id="bio-display"><span id="bio-text">Caricamento...</span></div>
-        <div style="margin-top:10px; display:flex; gap:8px">
-          <button class="btn" onclick="goTo('settings.html')">Impostazioni</button>
-          <button class="btn" onclick="logout()">Esci</button>
+  <!-- DASHBOARD SECTION -->
+  <section id="section-dashboard" class="section" aria-labelledby="dashboard-title">
+    <div class="card" aria-hidden="false">
+      <div class="profile-row">
+        <div class="avatar" id="avatar-wrap">
+          <img id="profile-img" src="default-profile.png" alt="Immagine profilo" />
+        </div>
+        <div class="profile-meta">
+          <h2 id="user-name">Caricamento...</h2>
+          <p id="user-email"></p>
+          <div class="mini-stats">
+            <div class="stat">
+              <div class="label">Saldo</div>
+              <div class="value" id="saldo">Caricamento...</div>
+            </div>
+            <div class="stat">
+              <div class="label">Badge</div>
+              <div class="value" id="badge">—</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card" aria-labelledby="actions-label">
-        <div id="actions-label" style="font-size:13px; color:var(--muted); margin-bottom:8px">Azioni rapide</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap">
-          <button class="btn" onclick="goTo('support.html')">Contatta supporto</button>
-          <button class="btn" onclick="goTo('vipchat.html')">Vai VIP Chat</button>
-          <button class="btn" onclick="goTo('marketplace.html')">Marketplace</button>
-          <button class="btn" onclick="goTo('transactions.html')">Transazioni</button>
-        </div>
-        <div class="small-note">Nota: tutte le pagine sono link locali (settings.html, personalize.html, etc.)</div>
+      <div class="bio-terminal" id="bio-display" aria-live="polite">
+        <span id="bio-text">Caricamento...</span>
       </div>
+      <div style="margin-top:10px; color:rgba(255,255,255,0.75); font-size:12px" id="user-uid"></div>
     </div>
 
-    <!-- news / dynamic content -->
-    <div class="card" id="section-dashboard">
-      <h3 style="margin-bottom:12px">Attività recenti & Notizie</h3>
-
-      <div id="news-area">
-        <div class="news-list" id="news-list">
-          <!-- Notizie popolate da Firestore (se presenti) -->
-          <div style="color:var(--muted)">Caricamento notizie...</div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" id="error-message" role="status" aria-live="polite"></div>
-    </div>
-
-    <!-- settings / news hidden sections swapped by navbar -->
-    <div class="card" id="section-news" style="display:none">
-      <h3>Notizie</h3>
-      <div id="news-items" class="news-list">
-        <div style="color:var(--muted)">Nessuna notizia caricata dalla collezione <code>news</code>.</div>
+    <div class="card" style="margin-top:8px">
+      <h3 style="margin-bottom:10px; font-size:15px">Notizie recenti</h3>
+      <div id="news-list">
+        <div style="color:var(--muted)">Caricamento notizie...</div>
       </div>
     </div>
-
-    <div class="card" id="section-settings" style="display:none">
-      <h3>Impostazioni</h3>
-      <p style="color:var(--muted)">Link rapidi e impostazioni account.</p>
-      <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px">
-        <button class="btn" onclick="goTo('settings.html')">Impostazioni account</button>
-        <button class="btn" onclick="goTo('privacy.html')">Privacy</button>
-        <button class="btn" onclick="goTo('notifications.html')">Notifiche</button>
-      </div>
-    </div>
-
   </section>
 
-</main>
+  <!-- NEWS SECTION -->
+  <section id="section-news" class="section" style="display:none">
+    <div class="card">
+      <h3 style="margin-bottom:10px">Notizie</h3>
+      <div id="news-items">
+        <div style="color:var(--muted)">Caricamento...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS SECTION -->
+  <section id="section-settings" class="section" style="display:none">
+    <div class="card">
+      <h3 style="margin-bottom:10px">Impostazioni</h3>
+      <div class="settings-list">
+        <div class="settings-row"><div>Profilo</div><div style="color:var(--muted)">Modifica nome / immagine</div></div>
+        <div class="settings-row"><div>Privacy</div><div style="color:var(--muted)">Controlla visibilità</div></div>
+        <div class="settings-row"><div>Account</div><div style="color:var(--muted)">Gestisci email / password</div></div>
+        <div class="settings-row"><div>Logout</div><div><button id="btn-logout" style="background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer">Esci</button></div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" role="navigation" aria-label="Navigazione principale">
+  <div class="nav-inner" role="menubar">
+    <div class="nav-btn active" id="nav-btn-dashboard" role="menuitem" aria-current="page" tabindex="0" onclick="showSection('dashboard')">
+      <!-- Home icon -->
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>Dashboard</div>
+    </div>
+
+    <div class="nav-btn" id="nav-btn-news" role="menuitem" tabindex="0" onclick="showSection('news')">
+      <!-- News icon -->
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <div>Notizie</div>
+    </div>
+
+    <div class="nav-btn" id="nav-btn-settings" role="menuitem" tabindex="0" onclick="showSection('settings')">
+      <!-- Settings icon -->
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09c.66 0 1.23-.4 1.51-1a1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.83 2.34l.06.06c.46.4 1.08.46 1.61.2.49-.24 1.05-.37 1.62-.37H12c.57 0 1.13.13 1.62.37.53.26 1.15.2 1.61-.2l.06-.06A2 2 0 1 1 19.4 4.5l-.06.06c-.4.46-.46 1.08-.2 1.61.24.49.37 1.05.37 1.62V12c0 .57-.13 1.13-.37 1.62-.26.53-.2 1.15.2 1.61z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>Impostazioni</div>
+    </div>
+  </div>
+</nav>
 
 <script>
 /* ---------------------------
-   Firebase config (identico a quello che hai fornito)
+   Firebase config (identico)
    --------------------------- */
 const firebaseConfig = {
     apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
@@ -328,151 +243,185 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* Utility navigazione */
-function goTo(url){ window.location.href = url; }
-function goHome(){ showSection('dashboard'); window.scrollTo({top:0,behavior:'smooth'}); }
-
-/* NAV handling */
+/* Helpers */
+function $(id){ return document.getElementById(id) }
 function showSection(name){
-  // navbar active class
-  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
-  if(name==='dashboard') document.getElementById('nav-dashboard').classList.add('active');
-  if(name==='news') document.getElementById('nav-news').classList.add('active');
-  if(name==='settings') document.getElementById('nav-settings').classList.add('active');
-
-  // show/hide sections
-  document.getElementById('section-dashboard').style.display = (name==='dashboard') ? 'block' : 'none';
-  document.getElementById('section-news').style.display = (name==='news') ? 'block' : 'none';
-  document.getElementById('section-settings').style.display = (name==='settings') ? 'block' : 'none';
+  // hide all then show target
+  const sections = ['dashboard','news','settings'];
+  sections.forEach(s => {
+    const el = $('section-' + s) || $('section-' + s);
+    if(el) el.style.display = (s === name) ? 'block' : 'none';
+    // nav btn active state
+    const btn = $('nav-btn-' + s);
+    if(btn) {
+      if(s === name) { btn.classList.add('active'); btn.setAttribute('aria-current','page') }
+      else { btn.classList.remove('active'); btn.removeAttribute('aria-current') }
+    }
+  });
+  // focus main for a11y
+  document.activeElement.blur && document.activeElement.blur();
 }
 
-/* Logout */
-function logout(){
-  auth.signOut().then(()=> window.location.href = 'login.html').catch(err=> alert('Errore durante logout: '+err.message));
+/* Image fallback (data URL SVG) */
+const defaultAvatarSVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="100%" height="100%" rx="20" fill="#ffffff22"/><text x="50%" y="52%" font-size="36" text-anchor="middle" fill="#ffffff" font-family="Poppins, sans-serif" dy=".3em">A+</text></svg>`
+);
+function fixImg(imgEl){
+  imgEl.onerror = null;
+  imgEl.src = defaultAvatarSVG;
 }
 
-/* Funzione per animare la bio (typewriter) */
-function animateBio(text, el, speed=25){
+/* Typewriter bio */
+function animateBio(text, el, speed=20){
+  if(!el) return;
   el.textContent = '';
   let i = 0;
-  const step = ()=> {
+  (function step(){
     if(i < text.length){
-      el.textContent += text.charAt(i);
-      i++;
+      el.textContent += text.charAt(i++);
       setTimeout(step, speed);
     }
-  };
-  step();
+  })();
 }
 
-/* Caricamento dati utente */
+/* Auth handling */
 auth.onAuthStateChanged(async (user) => {
-  const errEl = document.getElementById('error-message');
   if(!user){
-    // se non loggato, rimanda a login
     window.location.href = 'login.html';
     return;
   }
 
-  document.getElementById('user-uid').textContent = "UID: " + user.uid;
+  $('user-uid').textContent = 'UID: ' + user.uid;
+  $('user-email').textContent = user.email ? 'Email: ' + user.email : '';
 
   try{
     const docRef = db.collection('users').doc(user.uid);
     const doc = await docRef.get();
 
     if(!doc.exists){
-      // se non esiste, crea con valori base (come fatto nel tuo codice)
-      await docRef.set({ saldo:15, profileImage:'aurastudio.png', badge:'Utente' });
+      // create default doc like nel tuo codice
+      await docRef.set({ saldo:15, profileImage:'aurastudio.png', badge:'' });
+      // fetch the new doc
+      var data = (await docRef.get()).data();
+    } else {
+      var data = doc.data();
     }
 
-    const data = (await docRef.get()).data() || {};
+    // Nome e cognome (fallback a displayName / Nome Cognome)
+    const fullName = (data && data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : (data && data.displayName) || user.displayName || 'Nome Cognome';
+    $('user-name').textContent = fullName;
 
-    // Nome
-    const fullName = (data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : (data.displayName || user.displayName || 'Nome Cognome');
-    document.getElementById('user-name').textContent = fullName;
-
-    // Email
-    document.getElementById('user-email').textContent = user.email ? "Email: " + user.email : '';
-
-    // Saldo (manteniamo le stesse stringhe)
-    document.getElementById('saldo').textContent = (data.saldo !== undefined) ? (data.saldo + " di saldo") : "0€";
-
-    // Immagine profilo
-    const profileImg = data.profileImage || 'aurastudio.png';
-    document.getElementById('profile-img').src = profileImg;
-    document.getElementById('top-avatar-img').src = profileImg;
-
-    // Bio animata
-    const description = (data.bio && data.bio.description) ? data.bio.description : "Nessuna descrizione impostata.";
-    animateBio(description, document.getElementById('bio-text'), 25);
+    // Saldo
+    $('saldo').textContent = (data && data.saldo !== undefined) ? (data.saldo + " di saldo") : "0€";
 
     // Badge
-    const badgeText = (data.badge && data.badge.trim() !== '') ? data.badge : "Utente";
-    const badgeEl = document.getElementById('badge');
-    badgeEl.textContent = badgeText;
+    const badgeText = (data && data.badge && data.badge.trim() !== '') ? data.badge : 'Utente';
+    $('badge').textContent = badgeText;
 
-    // Carica notizie dalla collezione "news" se esistono (mostra le 5 più recenti)
+    // Profile image (con fallback)
+    const profileImgUrl = (data && data.profileImage) ? data.profileImage : 'aurastudio.png';
+    const imgEl = $('profile-img');
+    imgEl.src = profileImgUrl;
+    imgEl.onerror = function(){ fixImg(imgEl) };
+    // ensure small top avatar updated if exists
+    // top avatar uses same id 'profile-img' (single)
+    // Bio
+    const bioText = (data && data.bio && data.bio.description) ? data.bio.description : 'Nessuna descrizione impostata.';
+    animateBio(bioText, $('bio-text'), 20);
+
+    // Load news
     loadNews();
 
   }catch(err){
-    console.error(err);
-    errEl.textContent = "Errore nel caricamento dei dati. Controlla la console.";
+    console.error('Errore caricamento utente:', err);
+    $('news-list').innerHTML = `<div style="color:#ffb4b4">Errore nel caricamento: controlla console.</div>`;
   }
 });
 
-/* Carica notizie da Firestore (se presenti) */
+/* Logout button in settings */
+document.addEventListener('click', (e)=>{
+  if(e.target && e.target.id === 'btn-logout'){
+    auth.signOut().then(()=> window.location.href = 'login.html').catch(err => alert('Errore logout: '+err.message));
+  }
+});
+
+/* Load news: robust fallback if orderBy fails */
 async function loadNews(){
-  const newsList = document.getElementById('news-list');
-  const newsItemsContainer = document.getElementById('news-items');
-  newsList.innerHTML = '';
-  newsItemsContainer.innerHTML = '';
+  const out = $('news-list');
+  const outAll = $('news-items');
+  out.innerHTML = '';
+  outAll && (outAll.innerHTML = '');
 
   try{
-    const snap = await db.collection('news').orderBy('createdAt','desc').limit(5).get();
+    // prova a ordinare per createdAt (caso normale)
+    const snap = await db.collection('news').orderBy('createdAt','desc').limit(8).get();
     if(snap.empty){
-      newsList.innerHTML = '<div style="color:var(--muted)">Nessuna notizia recente.</div>';
-      newsItemsContainer.innerHTML = '<div style="color:var(--muted)">Nessuna notizia recente.</div>';
+      out.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`;
+      outAll && (outAll.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`);
       return;
     }
-    snap.forEach(doc => {
+    snap.forEach(doc=>{
       const d = doc.data();
-      const title = d.title || 'Titolo';
-      const summary = d.summary || (d.content ? d.content.substring(0,120) + '...' : '');
-      const time = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleString() : '';
-      const item = document.createElement('div');
-      item.className = 'news-item';
-      item.innerHTML = `<div style="flex:1">
-          <h4>${escapeHtml(title)}</h4>
-          <p>${escapeHtml(summary)}</p>
-          <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:6px">${escapeHtml(time)}</div>
-        </div>`;
-      newsList.appendChild(item);
-
-      // Also add to 📰 "Notizie" section (news-items)
-      const item2 = item.cloneNode(true);
-      newsItemsContainer.appendChild(item2);
+      appendNewsItem(out, d);
+      outAll && appendNewsItem(outAll, d);
     });
   }catch(err){
-    console.error('Errore caricamento news:', err);
-    document.getElementById('news-list').innerHTML = '<div style="color:#ffb4b4">Errore nel caricare le notizie.</div>';
+    // fallback: se orderBy non funziona (es. campo mancante), prendi tutto e ordina in JS
+    console.warn('OrderBy news fallito, fallback:', err);
+    try{
+      const snap2 = await db.collection('news').get();
+      const list = [];
+      snap2.forEach(doc=>{
+        const d = doc.data();
+        d._id = doc.id;
+        // convert Firestore Timestamp to ms if possibile
+        d._ts = (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().getTime() : 0;
+        list.push(d);
+      });
+      // sort desc by timestamp
+      list.sort((a,b) => (b._ts || 0) - (a._ts || 0));
+      if(list.length === 0){
+        out.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`;
+        outAll && (outAll.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`);
+        return;
+      }
+      list.slice(0,8).forEach(d=>{
+        appendNewsItem(out, d);
+        outAll && appendNewsItem(outAll, d);
+      });
+    }catch(err2){
+      console.error('Errore caricamento news fallback:', err2);
+      out.innerHTML = `<div style="color:#ffb4b4">Errore nel caricare le notizie.</div>`;
+    }
   }
 }
 
-/* Escape basic html to avoid injection when outputting strings from DB */
-function escapeHtml(str){
-  if(!str) return '';
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+/* Helper to add a news block */
+function appendNewsItem(container, d){
+  const title = d.title || 'Titolo';
+  const summary = d.summary || (d.content ? d.content.substring(0,140) + '...' : 'Nessun testo.');
+  const ts = (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().toLocaleString() : (d._ts ? new Date(d._ts).toLocaleString() : '');
+  const div = document.createElement('div');
+  div.className = 'news-item';
+  div.innerHTML = `<h4>${escapeHtml(title)}</h4><p>${escapeHtml(summary)}</p><div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:6px">${escapeHtml(ts)}</div>`;
+  container.appendChild(div);
 }
 
-/* Quick init: ensure default profile images exist in case Firestore returns null */
-document.addEventListener('DOMContentLoaded', ()=> {
-  // assicurati di avere un'immagine default nella root chiamata default-profile.png o aurastudio.png
+/* Simple escaping */
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+/* Accessibility: keyboard navigation for nav buttons */
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }
+  });
 });
+
+/* Initial visible section */
+showSection('dashboard');
 </script>
 </body>
 </html>
