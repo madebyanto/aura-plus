@@ -325,7 +325,7 @@ auth.onAuthStateChanged(user=>{
         const data=doc.data();
         document.getElementById('user-name').childNodes[0].textContent = 
           (data.nome&&data.cognome)?`${data.nome} ${data.cognome} `:"Nome Cognome ";
-        document.getElementById('user-email').textContent="Email: "+user.email;
+        document.getElementById('user-email').textContent=" "+user.email;
         document.getElementById('user-uid').textContent="UID: "+user.uid;
         document.getElementById('saldo').textContent=(data.saldo!==undefined)?data.saldo+" €":"0 €";
         document.getElementById('profile-img').src=data.profileImage||'aurastudio.png';
