@@ -3,424 +3,422 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dashboard — Aura</title>
+<title>Dashboard — Aura (Mobile)</title>
 
-<!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<!-- Firebase v8 -->
+<!-- Firebase v8 (stessa config) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <style>
-  :root{
-    --bg1:#E30AF5; --bg2:#F174FF;
-    --glass: rgba(255,255,255,0.12);
-    --glass-2: rgba(255,255,255,0.08);
-    --muted: rgba(255,255,255,0.85);
-    --accent: #f174ff;
-    --white: #ffffff;
-  }
+:root{
+  --bg1:#E30AF5; --bg2:#F174FF;
+  --glass: rgba(255,255,255,0.12);
+  --glass-2: rgba(255,255,255,0.06);
+  --muted: rgba(255,255,255,0.85);
+  --accent: #f174ff;
+  --azure: #4fc3f7; /* etichetta azzurra badge */
+  --blue-value: #0b63d6; /* saldo blu */
+  --white: #fff;
+}
 
-  *{box-sizing:border-box; margin:0; padding:0}
-  html,body{height:100%; font-family:'Poppins',sans-serif; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--white); -webkit-font-smoothing:antialiased;}
-  a{color:inherit; text-decoration:none}
+/* Reset base */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--white);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
 
-  /* Container mobile-first */
-  .wrap{
-    max-width:720px;
-    margin:0 auto;
-    padding:18px 16px 90px; /* spazio per bottom nav */
-  }
+/* Main wrapper (mobile-first) */
+.wrap{max-width:720px;margin:0 auto;padding:18px 14px 110px} /* spazio bottom nav */
 
-  /* Header area inside page (not fixed) */
-  .page-header{
-    display:flex; align-items:center; gap:12px; margin-bottom:12px;
-  }
-  .logo-pill{
-    width:52px; height:52px; border-radius:12px; display:grid; place-items:center;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
-    color:#000; font-weight:700;
-  }
-  .page-title{font-size:18px; font-weight:600}
-  .page-sub{font-size:12px; color:var(--muted); margin-top:2px}
+/* Header */
+.header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.logo-pill{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#ffffffcc,#ffffff88);color:#000;font-weight:700}
+.title-block{line-height:1}
+.title-block .title{font-size:18px;font-weight:600}
+.title-block .sub{font-size:12px;color:var(--muted);margin-top:3px}
 
-  /* Cards */
-  .card{
-    background: var(--glass);
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:12px;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.22);
-    backdrop-filter: blur(12px);
-  }
+/* Profile card */
+.card{background:var(--glass);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 12px 36px rgba(0,0,0,0.22);backdrop-filter: blur(10px)}
+.profile-row{display:flex;gap:12px;align-items:center}
+.avatar{width:78px;height:78px;border-radius:50%;overflow:hidden;flex:0 0 78px;border:3px solid rgba(255,255,255,0.14);background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-meta{flex:1;display:flex;flex-direction:column;gap:8px}
+.profile-meta h2{font-size:16px;margin-bottom:0}
+.profile-meta p{font-size:13px;color:var(--muted)}
 
-  /* Profile compact */
-  .profile-row{display:flex; gap:12px; align-items:center}
-  .avatar{
-    width:78px; height:78px; border-radius:50%; overflow:hidden; flex:0 0 78px; border:3px solid rgba(255,255,255,0.18);
-    background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  }
-  .avatar img{width:100%; height:100%; object-fit:cover; display:block}
+/* SALDO widget (enfasi) */
+.saldo-widget{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.saldo-label{font-size:12px;color:var(--muted)}
+.saldo-value{font-size:28px;font-weight:800;color:var(--blue-value);letter-spacing:0.2px}
 
-  .profile-meta{flex:1}
-  .profile-meta h2{font-size:16px; margin-bottom:4px}
-  .profile-meta p{font-size:13px; color:var(--muted); margin-bottom:6px}
+/* small stats column arrangement (left heavy) */
+.left-column{display:flex;flex-direction:column;gap:8px;min-width:120px}
 
-  .mini-stats{display:flex; gap:10px; margin-top:6px}
-  .stat{flex:1; background: rgba(255,255,255,0.03); padding:8px; border-radius:10px; text-align:center}
-  .stat .label{font-size:12px; color:var(--muted)}
-  .stat .value{font-weight:700; margin-top:6px}
+/* bio terminal: first line aligned left as requested */
+.bio-terminal{margin-top:10px;font-family:'Courier New', monospace;background:rgba(0,0,0,0.24);padding:10px;border-radius:10px;min-height:72px;white-space:pre-wrap;overflow:auto;font-size:13px;text-align:left;border-left:4px solid rgba(255,255,255,0.06)}
+/* ensure first-line visually left (already left) but ensure preserving */
+.bio-terminal p{margin:0}
 
-  /* Bio terminal */
-  .bio-terminal{
-    margin-top:10px;
-    font-family: 'Courier New', monospace;
-    background: rgba(0,0,0,0.24);
-    padding:10px; border-radius:10px;
-    min-height:72px; white-space:pre-wrap; overflow:auto; font-size:13px;
-  }
+/* badge azzurrina posizionata sotto bio e sopra UID */
+.badge-pill{display:inline-block;margin-top:10px;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--azure),#3fb0ea);color:#012;text-transform:none;font-weight:700;font-size:13px}
 
-  /* News list simple */
-  .news-item{
-    padding:10px; border-radius:10px; background: rgba(255,255,255,0.03); margin-bottom:8px;
-  }
-  .news-item h4{font-size:14px; margin-bottom:6px}
-  .news-item p{font-size:13px; color:var(--muted)}
+/* UID small text */
+.user-uid{font-size:12px;color:rgba(255,255,255,0.7);margin-top:8px;word-break:break-all}
 
-  /* Settings list */
-  .settings-list{display:flex; flex-direction:column; gap:8px}
-  .settings-row{display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:10px; background: rgba(255,255,255,0.03)}
+/* NEWS area: horizontal scroll collection */
+.news-collection{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-top:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.news-card{flex:0 0 78%;max-width:78%;background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;scroll-snap-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.22)}
+.news-card img{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+.news-card h4{font-size:15px;margin-bottom:6px}
+.news-card p{font-size:13px;color:var(--muted);margin-bottom:8px}
+.news-actions{display:flex;justify-content:space-between;align-items:center}
+.read-more{font-weight:700;color:var(--accent);font-size:13px}
 
-  /* Bottom navigation (fixed) */
-  .bottom-nav{
-    position:fixed; left:0; right:0; bottom:0; height:72px;
-    display:flex; justify-content:center; align-items:center;
-    background: linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.08));
-    border-top:1px solid rgba(255,255,255,0.04);
-    z-index:30;
-    padding:10px 12px;
-  }
-  .nav-inner{
-    width:100%; max-width:720px; display:flex; justify-content:space-around; gap:6px;
-    padding:6px; background: rgba(255,255,255,0.02); border-radius:14px;
-  }
-  .nav-btn{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-    padding:6px 8px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:12px;
-  }
-  .nav-btn.active{
-    color:var(--white);
-    background: linear-gradient(90deg,var(--accent), #e008f6);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.28);
-    transform:translateY(-3px);
-  }
+/* filter chips */
+.chips{display:flex;gap:8px;overflow:auto;padding:8px 0 6px}
+.chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chip.active{background:linear-gradient(90deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03));color:var(--white);font-weight:700}
 
-  /* icon style */
-  .icon {
-    width:22px; height:22px; display:block;
-  }
+/* scroll hint (animated) */
+.scroll-hint{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:13px}
+.scroll-arrow{display:inline-block;transform:translateX(0);opacity:0.9;animation:hint 1.2s infinite}
+@keyframes hint{0%{transform:translateX(0);opacity:0.9}50%{transform:translateX(8px);opacity:0.6}100%{transform:translateX(0);opacity:0.9}}
 
-  /* Responsive: larger screens */
-  @media(min-width:900px){
-    .wrap{padding:26px 22px 110px}
-    .profile-row .avatar{width:100px; height:100px; flex:0 0 100px}
-    .page-title{font-size:20px}
-    .bottom-nav{height:84px}
-  }
+/* SETTINGS list */
+.settings-list{display:flex;flex-direction:column;gap:8px}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.03);font-weight:600}
+
+/* Bottom nav (downbar) fixed */
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:78px;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.08));border-top:1px solid rgba(255,255,255,0.04);z-index:40;padding:10px}
+.nav-inner{width:100%;max-width:720px;display:flex;justify-content:space-around;padding:6px;background:rgba(255,255,255,0.02);border-radius:14px}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;border-radius:10px;color:var(--muted);font-size:12px;cursor:pointer}
+.nav-btn.active{background:linear-gradient(90deg,var(--accent),#e008f6);color:var(--white);transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.28)}
+
+/* responsive tweaks */
+@media(min-width:900px){
+  .wrap{padding:26px 22px 140px}
+  .news-card{flex:0 0 38%; max-width:38%}
+  .avatar{width:96px;height:96px;flex:0 0 96px}
+  .saldo-value{font-size:34px}
+}
 </style>
 </head>
-<body>
 
+<body>
 <div class="wrap" role="main">
-  <header class="page-header" aria-label="Header pagina">
+  <header class="header" aria-label="Header">
     <div class="logo-pill">A+</div>
-    <div>
-      <div class="page-title">Aura — Dashboard</div>
-      <div class="page-sub">Benvenuto — area personale</div>
+    <div class="title-block">
+      <div class="title">Aura — Dashboard</div>
+      <div class="sub">Area personale</div>
     </div>
   </header>
 
-  <!-- DASHBOARD SECTION -->
-  <section id="section-dashboard" class="section" aria-labelledby="dashboard-title">
-    <div class="card" aria-hidden="false">
-      <div class="profile-row">
-        <div class="avatar" id="avatar-wrap">
-          <img id="profile-img" src="default-profile.png" alt="Immagine profilo" />
+  <!-- PROFILE + SALDO -->
+  <section class="card" aria-labelledby="profile-title">
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <!-- left column: SALDO widget (BIG) -->
+      <div class="left-column" style="min-width:140px">
+        <div class="saldo-widget">
+          <div class="saldo-label">Saldo:</div>
+          <div id="saldo" class="saldo-value">Caricamento...</div>
         </div>
-        <div class="profile-meta">
-          <h2 id="user-name">Caricamento...</h2>
-          <p id="user-email"></p>
-          <div class="mini-stats">
-            <div class="stat">
-              <div class="label">Saldo</div>
-              <div class="value" id="saldo">Caricamento...</div>
-            </div>
-            <div class="stat">
-              <div class="label">Badge</div>
-              <div class="value" id="badge">—</div>
-            </div>
+      </div>
+
+      <!-- right column: avatar + name + email -->
+      <div style="flex:1">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="avatar"><img id="profile-img" src="default-profile.png" alt="Immagine profilo"></div>
+          <div style="flex:1">
+            <h2 id="user-name">Caricamento...</h2>
+            <p id="user-email" style="color:var(--muted)"></p>
           </div>
         </div>
-      </div>
 
-      <div class="bio-terminal" id="bio-display" aria-live="polite">
-        <span id="bio-text">Caricamento...</span>
-      </div>
-      <div style="margin-top:10px; color:rgba(255,255,255,0.75); font-size:12px" id="user-uid"></div>
-    </div>
+        <!-- bio (first line left) -->
+        <div class="bio-terminal" id="bio-display" aria-live="polite">
+          <p id="bio-text">Caricamento...</p>
+        </div>
 
-    <div class="card" style="margin-top:8px">
-      <h3 style="margin-bottom:10px; font-size:15px">Notizie recenti</h3>
-      <div id="news-list">
-        <div style="color:var(--muted)">Caricamento notizie...</div>
-      </div>
-    </div>
-  </section>
+        <!-- badge azzurrina sotto la descrizione e sopra UID -->
+        <div style="margin-top:6px">
+          <span id="badge" class="badge-pill">Utente</span>
+        </div>
 
-  <!-- NEWS SECTION -->
-  <section id="section-news" class="section" style="display:none">
-    <div class="card">
-      <h3 style="margin-bottom:10px">Notizie</h3>
-      <div id="news-items">
-        <div style="color:var(--muted)">Caricamento...</div>
+        <!-- UID -->
+        <div id="user-uid" class="user-uid"></div>
       </div>
     </div>
   </section>
 
-  <!-- SETTINGS SECTION -->
-  <section id="section-settings" class="section" style="display:none">
-    <div class="card">
-      <h3 style="margin-bottom:10px">Impostazioni</h3>
-      <div class="settings-list">
-        <div class="settings-row"><div>Profilo</div><div style="color:var(--muted)">Modifica nome / immagine</div></div>
-        <div class="settings-row"><div>Privacy</div><div style="color:var(--muted)">Controlla visibilità</div></div>
-        <div class="settings-row"><div>Account</div><div style="color:var(--muted)">Gestisci email / password</div></div>
-        <div class="settings-row"><div>Logout</div><div><button id="btn-logout" style="background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer">Esci</button></div></div>
-      </div>
+  <!-- NOTIZIE: title + filters + horizontal scroll -->
+  <section id="section-dashboard" class="card" aria-labelledby="notizie-title">
+    <h3 id="notizie-title" style="margin-bottom:8px">Notizie</h3>
+
+    <!-- filter chips -->
+    <div class="chips" id="news-chips" aria-hidden="false">
+      <div class="chip active" data-cat="all">Tutte</div>
+      <!-- other chips populated dinamically -->
     </div>
+
+    <!-- horizontal collection (latest -> older) -->
+    <div class="news-collection" id="news-collection" tabindex="0" aria-label="Raccolta notizie orizzontale">
+      <!-- news cards injected here -->
+      <div style="color:var(--muted);padding:8px">Caricamento notizie...</div>
+    </div>
+
+    <!-- scroll hint -->
+    <div class="scroll-hint"><span class="scroll-arrow">⟶</span><div>Scorri orizzontalmente: le notizie partono dall'ultima</div></div>
   </section>
 
+  <!-- NEWS page (se vogliamo una vista estesa) -->
+  <section id="section-news" class="card" style="display:none">
+    <h3>Notizie — Tutte</h3>
+    <div id="news-items-vertical" style="margin-top:10px"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="section-settings" class="card" style="display:none">
+    <h3>Impostazioni</h3>
+    <div class="settings-list" style="margin-top:10px">
+      <div class="settings-row" role="button" onclick="openPage('account.html')">Account</div>
+      <div class="settings-row" role="button" onclick="openPage('personalize.html')">Personalizza</div>
+      <div class="settings-row" role="button" onclick="openPage('howtogetbalance.html')">Saldo &amp; Wallet</div>
+      <div class="settings-row" role="button" onclick="logout()">Esci</div>
+    </div>
+  </section>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- Bottom nav (downbar) -->
 <nav class="bottom-nav" role="navigation" aria-label="Navigazione principale">
   <div class="nav-inner" role="menubar">
-    <div class="nav-btn active" id="nav-btn-dashboard" role="menuitem" aria-current="page" tabindex="0" onclick="showSection('dashboard')">
-      <!-- Home icon -->
-      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="nav-btn active" id="nav-dashboard" role="menuitem" tabindex="0" onclick="showSection('dashboard')">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 11.5L12 4l9 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div>Dashboard</div>
     </div>
 
-    <div class="nav-btn" id="nav-btn-news" role="menuitem" tabindex="0" onclick="showSection('news')">
-      <!-- News icon -->
-      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <div class="nav-btn" id="nav-news" role="menuitem" tabindex="0" onclick="showSection('news')">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       <div>Notizie</div>
     </div>
 
-    <div class="nav-btn" id="nav-btn-settings" role="menuitem" tabindex="0" onclick="showSection('settings')">
-      <!-- Settings icon -->
-      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09c.66 0 1.23-.4 1.51-1a1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.83 2.34l.06.06c.46.4 1.08.46 1.61.2.49-.24 1.05-.37 1.62-.37H12c.57 0 1.13.13 1.62.37.53.26 1.15.2 1.61-.2l.06-.06A2 2 0 1 1 19.4 4.5l-.06.06c-.4.46-.46 1.08-.2 1.61.24.49.37 1.05.37 1.62V12c0 .57-.13 1.13-.37 1.62-.26.53-.2 1.15.2 1.61z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="nav-btn" id="nav-settings" role="menuitem" tabindex="0" onclick="showSection('settings')">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.6"/></svg>
       <div>Impostazioni</div>
     </div>
   </div>
 </nav>
 
 <script>
-/* ---------------------------
-   Firebase config (identico)
-   --------------------------- */
+/* Firebase config identico */
 const firebaseConfig = {
-    apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-    authDomain: "myauraid-f03c6.firebaseapp.com",
-    projectId: "myauraid-f03c6",
-    storageBucket: "myauraid-f03c6.firebasestorage.app",
-    messagingSenderId: "190478237725",
-    appId: "1:190478237725:web:0d39907473f511b85a06f4"
+  apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+  authDomain: "myauraid-f03c6.firebaseapp.com",
+  projectId: "myauraid-f03c6",
+  storageBucket: "myauraid-f03c6.firebasestorage.app",
+  messagingSenderId: "190478237725",
+  appId: "1:190478237725:web:0d39907473f511b85a06f4"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 /* Helpers */
-function $(id){ return document.getElementById(id) }
+function $(id){return document.getElementById(id)}
+function openPage(url){ window.location.href = url }
 function showSection(name){
-  // hide all then show target
-  const sections = ['dashboard','news','settings'];
-  sections.forEach(s => {
-    const el = $('section-' + s) || $('section-' + s);
-    if(el) el.style.display = (s === name) ? 'block' : 'none';
-    // nav btn active state
-    const btn = $('nav-btn-' + s);
-    if(btn) {
-      if(s === name) { btn.classList.add('active'); btn.setAttribute('aria-current','page') }
-      else { btn.classList.remove('active'); btn.removeAttribute('aria-current') }
-    }
+  // hide all three main sections (dashboard=notizie scorrimento, news=lista completa, settings)
+  const sections = {
+    dashboard: document.querySelector('#section-dashboard'),
+    news: document.querySelector('#section-news'),
+    settings: document.querySelector('#section-settings')
+  };
+  Object.keys(sections).forEach(k=>{
+    if(!sections[k]) return;
+    sections[k].style.display = (k === name) ? 'block' : 'none';
+    const btn = $('nav-' + k);
+    if(btn) btn.classList.toggle('active', k === name);
   });
-  // focus main for a11y
-  document.activeElement.blur && document.activeElement.blur();
+  // small a11y
+  document.activeElement && document.activeElement.blur && document.activeElement.blur();
 }
 
-/* Image fallback (data URL SVG) */
+/* Image fallback */
 const defaultAvatarSVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="100%" height="100%" rx="20" fill="#ffffff22"/><text x="50%" y="52%" font-size="36" text-anchor="middle" fill="#ffffff" font-family="Poppins, sans-serif" dy=".3em">A+</text></svg>`
 );
-function fixImg(imgEl){
-  imgEl.onerror = null;
-  imgEl.src = defaultAvatarSVG;
-}
+function fixImg(el){ el.onerror = null; el.src = defaultAvatarSVG }
 
-/* Typewriter bio */
+/* Typewriter for bio */
 function animateBio(text, el, speed=20){
-  if(!el) return;
   el.textContent = '';
-  let i = 0;
+  let i=0;
   (function step(){
-    if(i < text.length){
-      el.textContent += text.charAt(i++);
-      setTimeout(step, speed);
-    }
+    if(i < text.length){ el.textContent += text.charAt(i++); setTimeout(step, speed) }
   })();
 }
 
-/* Auth handling */
+/* Auth state */
 auth.onAuthStateChanged(async (user) => {
-  if(!user){
-    window.location.href = 'login.html';
-    return;
-  }
-
+  if(!user){ window.location.href = 'login.html'; return }
   $('user-uid').textContent = 'UID: ' + user.uid;
-  $('user-email').textContent = user.email ? 'Email: ' + user.email : '';
-
+  $('user-email') && ($('user-email').textContent = user.email ? 'Email: ' + user.email : '');
   try{
     const docRef = db.collection('users').doc(user.uid);
     const doc = await docRef.get();
-
+    let data;
     if(!doc.exists){
-      // create default doc like nel tuo codice
       await docRef.set({ saldo:15, profileImage:'aurastudio.png', badge:'' });
-      // fetch the new doc
-      var data = (await docRef.get()).data();
-    } else {
-      var data = doc.data();
-    }
+      data = (await docRef.get()).data();
+    } else data = doc.data();
 
-    // Nome e cognome (fallback a displayName / Nome Cognome)
+    // Nome
     const fullName = (data && data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : (data && data.displayName) || user.displayName || 'Nome Cognome';
     $('user-name').textContent = fullName;
 
-    // Saldo
+    // Saldo (big, left)
     $('saldo').textContent = (data && data.saldo !== undefined) ? (data.saldo + " di saldo") : "0€";
 
-    // Badge
-    const badgeText = (data && data.badge && data.badge.trim() !== '') ? data.badge : 'Utente';
-    $('badge').textContent = badgeText;
-
-    // Profile image (con fallback)
+    // Profile image
     const profileImgUrl = (data && data.profileImage) ? data.profileImage : 'aurastudio.png';
     const imgEl = $('profile-img');
     imgEl.src = profileImgUrl;
     imgEl.onerror = function(){ fixImg(imgEl) };
-    // ensure small top avatar updated if exists
-    // top avatar uses same id 'profile-img' (single)
-    // Bio
-    const bioText = (data && data.bio && data.bio.description) ? data.bio.description : 'Nessuna descrizione impostata.';
-    animateBio(bioText, $('bio-text'), 20);
 
-    // Load news
-    loadNews();
+    // Bio: ensure first line left (text-align left applied in CSS)
+    const bio = (data && data.bio && data.bio.description) ? data.bio.description : 'Nessuna descrizione impostata.';
+    animateBio(bio, $('bio-text'), 20);
+
+    // Badge (azzurrina)
+    const badgeText = (data && data.badge && data.badge.trim() !== '') ? data.badge : 'Utente';
+    $('badge').textContent = badgeText;
+
+    // Load news (horizontal)
+    loadNewsHorizontal();
 
   }catch(err){
     console.error('Errore caricamento utente:', err);
-    $('news-list').innerHTML = `<div style="color:#ffb4b4">Errore nel caricamento: controlla console.</div>`;
+    $('news-collection').innerHTML = `<div style="color:#ffb4b4;padding:8px">Errore nel caricamento (vedi console).</div>`;
   }
 });
 
-/* Logout button in settings */
-document.addEventListener('click', (e)=>{
-  if(e.target && e.target.id === 'btn-logout'){
-    auth.signOut().then(()=> window.location.href = 'login.html').catch(err => alert('Errore logout: '+err.message));
-  }
-});
+/* Logout */
+function logout(){
+  auth.signOut().then(()=> window.location.href='login.html').catch(err=> alert('Errore logout: '+err.message));
+}
 
-/* Load news: robust fallback if orderBy fails */
-async function loadNews(){
-  const out = $('news-list');
-  const outAll = $('news-items');
-  out.innerHTML = '';
-  outAll && (outAll.innerHTML = '');
+/* News: horizontal load, chips/categories */
+async function loadNewsHorizontal(){
+  const collection = $('news-collection');
+  const vertical = $('news-items-vertical');
+  const chips = $('news-chips');
+
+  collection.innerHTML = `<div style="color:var(--muted);padding:8px">Caricamento notizie...</div>`;
+  vertical && (vertical.innerHTML = '');
 
   try{
-    // prova a ordinare per createdAt (caso normale)
-    const snap = await db.collection('news').orderBy('createdAt','desc').limit(8).get();
+    const snap = await db.collection('news').orderBy('createdAt','desc').get();
     if(snap.empty){
-      out.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`;
-      outAll && (outAll.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`);
+      collection.innerHTML = `<div style="color:var(--muted);padding:8px">Nessuna notizia recente.</div>`;
+      vertical && (vertical.innerHTML = `<div style="color:var(--muted);padding:8px">Nessuna notizia recente.</div>`);
       return;
     }
-    snap.forEach(doc=>{
+
+    // accumulate data, categories
+    const list = [];
+    const categories = new Set();
+    snap.forEach(doc => {
       const d = doc.data();
-      appendNewsItem(out, d);
-      outAll && appendNewsItem(outAll, d);
+      d._id = doc.id;
+      // category or type fallback
+      const cat = (d.category || d.type || 'Generale').toString();
+      d._cat = cat;
+      categories.add(cat);
+      // convert timestamp for display
+      d._ts = (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().getTime() : 0;
+      list.push(d);
     });
+
+    // populate chips (reset first keeping "Tutte")
+    // clear chips except "Tutte"
+    Array.from(chips.children).forEach((ch, idx) => { if(idx>0) ch.remove() });
+    categories.forEach(cat => {
+      const el = document.createElement('div');
+      el.className = 'chip';
+      el.textContent = cat;
+      el.dataset.cat = cat;
+      el.addEventListener('click', ()=>{ Array.from(chips.children).forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderNewsList(list, cat) });
+      chips.appendChild(el);
+    });
+
+    // show latest first (snap already desc)
+    renderNewsList(list, 'all');
+
+    // vertical list (all)
+    vertical && list.forEach(d => {
+      const item = document.createElement('div');
+      item.className = 'news-card';
+      item.style.maxWidth = '100%';
+      item.innerHTML = createNewsInner(d);
+      vertical.appendChild(item);
+    });
+
   }catch(err){
-    // fallback: se orderBy non funziona (es. campo mancante), prendi tutto e ordina in JS
-    console.warn('OrderBy news fallito, fallback:', err);
-    try{
-      const snap2 = await db.collection('news').get();
-      const list = [];
-      snap2.forEach(doc=>{
-        const d = doc.data();
-        d._id = doc.id;
-        // convert Firestore Timestamp to ms if possibile
-        d._ts = (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().getTime() : 0;
-        list.push(d);
-      });
-      // sort desc by timestamp
-      list.sort((a,b) => (b._ts || 0) - (a._ts || 0));
-      if(list.length === 0){
-        out.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`;
-        outAll && (outAll.innerHTML = `<div style="color:var(--muted)">Nessuna notizia recente.</div>`);
-        return;
-      }
-      list.slice(0,8).forEach(d=>{
-        appendNewsItem(out, d);
-        outAll && appendNewsItem(outAll, d);
-      });
-    }catch(err2){
-      console.error('Errore caricamento news fallback:', err2);
-      out.innerHTML = `<div style="color:#ffb4b4">Errore nel caricare le notizie.</div>`;
-    }
+    console.error('Errore caricamento news:', err);
+    collection.innerHTML = `<div style="color:#ffb4b4;padding:8px">Errore nel caricare le notizie.</div>`;
   }
 }
 
-/* Helper to add a news block */
-function appendNewsItem(container, d){
-  const title = d.title || 'Titolo';
-  const summary = d.summary || (d.content ? d.content.substring(0,140) + '...' : 'Nessun testo.');
-  const ts = (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().toLocaleString() : (d._ts ? new Date(d._ts).toLocaleString() : '');
-  const div = document.createElement('div');
-  div.className = 'news-item';
-  div.innerHTML = `<h4>${escapeHtml(title)}</h4><p>${escapeHtml(summary)}</p><div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:6px">${escapeHtml(ts)}</div>`;
-  container.appendChild(div);
-}
+/* Render horizontal/vertical depending on filter */
+function renderNewsList(list, category){
+  const collection = $('news-collection');
+  collection.innerHTML = '';
+  // filter
+  const filtered = (category === 'all' || category === 'Tutte') ? list : list.filter(d=>d._cat === category);
+  if(filtered.length === 0){
+    collection.innerHTML = `<div style="color:var(--muted);padding:8px">Nessuna notizia nella categoria.</div>`;
+    return;
+  }
 
-/* Simple escaping */
-function escapeHtml(str){
-  if(!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
-
-/* Accessibility: keyboard navigation for nav buttons */
-document.querySelectorAll('.nav-btn').forEach(btn=>{
-  btn.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }
+  // build cards: newest first already
+  filtered.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    card.innerHTML = createNewsInner(d);
+    collection.appendChild(card);
   });
+
+  // ensure horizontal starts at left (most recent)
+  collection.scrollTo({left:0, top:0, behavior:'smooth'});
+}
+
+/* Create inner HTML for news */
+function createNewsInner(d){
+  const img = d.image || d.thumbnail || d.img || '';
+  const title = escapeHtml(d.title || 'Titolo');
+  const summary = escapeHtml((d.summary) ? d.summary : (d.content ? (d.content.substring(0,120)+'...') : 'Nessuna descrizione.'));
+  const time = d._ts ? new Date(d._ts).toLocaleString() : '';
+  const readUrl = d.url || '#';
+  return `
+    ${img? `<img src="${escapeAttr(img)}" alt="${title}" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'600\\' height=\\'300\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'#ffffff22\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'24\\' text-anchor=\\'middle\\' fill=\\'#fff\\' dy=\\'.3em\\'>No Image</text></svg>')}">` : ''}
+    <h4>${title}</h4>
+    <p>${summary}</p>
+    <div class="news-actions"><div style="font-size:12px;color:var(--muted)">${escapeHtml(time)}</div><a class="read-more" href="${escapeAttr(readUrl)}" target="_blank" rel="noreferrer">Leggi di più</a></div>
+  `;
+}
+
+/* helpers for escaping */
+function escapeHtml(str){ if(!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+function escapeAttr(s){ return s ? s.replace(/"/g,'&quot;') : '#'; }
+
+/* accessibility: keyboard on chips & nav */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){ showSection('dashboard') }
 });
 
-/* Initial visible section */
+/* init show */
 showSection('dashboard');
 </script>
 </body>
