@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Utente</title>
+<title>Aura Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -22,132 +22,384 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 </script>
 <style>
-* {margin:0; padding:0; box-sizing:border-box;}
-html, body {
-    height: 100%;
-    font-family:'Poppins',sans-serif;
-    background: linear-gradient(135deg,#E30AF5,#F174FF);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color: #fff; /* testo bianco di default */
-    overflow: hidden; /* impedisce lo scroll */
+*{margin:0;padding:0;box-sizing:border-box}
+body {
+  font-family:'Poppins',sans-serif;
+  background: linear-gradient(135deg,#E30AF5,#F174FF);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  color:#fff;
 }
 
+/* Container principale */
+main {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:1rem;
+  padding-bottom:80px; /* spazio per la navbar */
+}
+
+/* Card */
 .dashboard-card {
-    background: rgba(255,255,255,0.15);
-    border-radius: 20px;
-    padding: 30px 20px;
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    backdrop-filter: blur(15px);
-    color: #fff;
+  width:100%;
+  max-width:420px;
+  background:rgba(255,255,255,0.15);
+  border-radius:20px;
+  padding:1.2rem;
+  box-shadow:0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter:blur(12px);
 }
 
+/* Profilo */
+.profile-header {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
 #profile-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
-    border: 3px solid rgba(255,255,255,0.4);
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(255,255,255,0.6);
+}
+.user-info {
+  flex:1;
+}
+.user-info h2 {
+  font-size:1.2rem;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.badge {
+  font-size:0.7rem;
+  background:#007bff;
+  color:#fff;
+  padding:2px 8px;
+  border-radius:8px;
+}
+.user-info p {
+  font-size:0.7rem;
+  opacity:0.8;
+  margin-top:2px;
+  word-break:break-word;
 }
 
-h2 {
-    font-size: 1.8em;
-    margin-bottom:5px;
-    color: #fff;
+#user-uid {
+  font-size: 0.65rem;  /* più piccolo dell’email */
+  opacity: 0.7;
 }
 
-.user-name {
-    font-size: 1.2em;
-    font-weight: 400;
-    color: #fff;
-    opacity: 0.9;
-    margin-bottom: 15px;
+/* Saldo widget */
+.saldo-widget {
+  margin:1rem 0;
+  background:rgba(0,0,0,0.3);
+  border-radius:12px;
+  padding:0.8rem 1rem;
+}
+.saldo-widget small {
+  display:block;
+  font-size:0.8rem;
+  opacity:0.8;
+}
+.saldo-widget .amount {
+  font-size:1.6rem;
+  font-weight:600;
+  color:#00c3ff;
+  margin-top:0.2rem;
+  text-align:left;
 }
 
-#user-email, .saldo, #badge {
-    color: #fff;
-}
-
-.saldo {font-weight:600; font-size:1.1em; margin:10px 0;}
-.badge {padding:5px 10px; background-color:#007bff; color:white; border-radius:10px; display:inline-block; margin-top:10px;}
-.btn-settings {
-    margin-top:15px; padding:12px;
-    background: #f174ff; color:#fff;
-    border:none; border-radius:12px;
-    font-size:16px; cursor:pointer;
-    width:100%;
-    transition: all 0.3s ease;
-}
-.btn-settings:hover {background:#e008f6;}
+/* Bio terminal */
 .bio-terminal {
-    font-family:'Courier New', monospace;
-    background: rgba(0,0,0,0.3);
-    padding:15px;
-    border-radius:12px;
-    color:#fff; /* testo bianco */
-    margin:15px 0;
-    white-space: pre-wrap;
-    overflow:hidden;
-    border-left:4px solid #888;
-    text-align:left;
-    min-height:50px;
+  font-family:'Courier New',monospace;
+  background:rgba(0,0,0,0.3);
+  padding:0.8rem;
+  border-radius:12px;
+  border-left:4px solid #888;
+  white-space:pre-wrap;
+  text-align:left;
+  min-height:60px;
+  margin-top:0.8rem;
 }
-#error-message {color:#ff6b6b;}
 
-@media (max-width: 480px){
-    .dashboard-card {padding:20px 15px;}
-    #profile-img {width:100px; height:100px;}
-    h2{font-size:1.5em;}
+/* Navbar */
+.navbar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:65px;
+  background:rgba(255,255,255,0.2);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  backdrop-filter:blur(10px);
+  border-radius:20px 20px 0 0;
+}
+.nav-item {
+  flex:1;
+  text-align:center;
+  font-size:1.6rem;
+  cursor:pointer;
+  transition:0.2s;
+}
+.nav-item.active {
+  transform:scale(1.2);
+}
+
+/* Notizie */
+#news-section {
+  display:none;
+  width:100%;
+  max-width:420px;
+}
+.news-header {
+  font-weight:600;
+  font-size:1.2rem;
+  margin-bottom:0.8rem;
+}
+.news-container {
+  display:flex;
+  overflow-x:auto;
+  gap:1rem;
+  flex-direction:row-reverse; /* da Z a A */
+  scroll-snap-type:x mandatory;
+}
+.news-card {
+  flex:0 0 260px;
+  background:rgba(255,255,255,0.15);
+  border-radius:16px;
+  padding:0.8rem;
+  scroll-snap-align:center;
+}
+.news-card img {
+  width:100%;
+  height:140px;
+  border-radius:12px;
+  object-fit:cover;
+}
+.news-card h3 {
+  margin:0.5rem 0;
+  font-size:1rem;
+}
+.news-card p {
+  font-size:0.85rem;
+  opacity:0.9;
+}
+.news-card a {
+  display:inline-block;
+  margin-top:0.4rem;
+  font-size:0.8rem;
+  color:#00c3ff;
+}
+.channel-widget {
+  background:rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.channel-widget img {
+  width: 300px;
+  height: 150px;
+  border-radius: 5%;
+  object-fit: cover;
+}
+.channel-widget h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+.channel-widget p {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin: 0;
+}
+.channel-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.channel-buttons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+.channel-buttons .whatsapp {
+  background: #25D366;
+}
+.channel-buttons .telegram {
+  background: #0088CC;
+}
+.channel-buttons a:hover {
+  filter: brightness(1.2);
+}
+
+/* Account section */
+#account-section {
+  display:none;
+  width:100%;
+  max-width:420px;
+}
+.account-header {
+  font-weight:600;
+  font-size:1.2rem;
+  margin-bottom:0.8rem;
+}
+.account-options button {
+  display:block;
+  width:100%;
+  padding:0.8rem;
+  margin:0.5rem 0;
+  border:none;
+  border-radius:12px;
+  font-size:1rem;
+  background:#f174ff;
+  color:#fff;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.3s;
+}
+.account-options button:hover {
+  background:#e008f6;
+}
+
+/* Mobile */
+@media(max-width:480px){
+  .user-info h2 {font-size:1rem;}
+  .saldo-widget .amount {font-size:1.3rem;}
 }
 </style>
 </head>
 <body>
-<div class="dashboard-card">
-    <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
-    <h2>Benvenuto</h2>
-    <p class="user-name" id="user-name">Caricamento...</p>
-    <p id="user-email"></p>
-    <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
-    <div id="bio-display" class="bio-terminal"><span id="bio-text"></span></div>
-    <p id="badge"></p>
-    <p id="error-message"></p>
 
-    <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
-    <button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
-    <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Saldo e Wallet</button>
+<main>
+  <div class="dashboard-card" id="dashboard-section">
+    <div class="profile-header">
+      <img id="profile-img" src="default-profile.png" alt="Profile">
+      <div class="user-info">
+        <h2 id="user-name">Nome Cognome <span id="badge" class="badge">badge</span></h2>
+        <p id="user-email">email</p>
+        <p id="user-uid">uid</p>
+      </div>
+    </div>
+    <div class="saldo-widget">
+      <small>Saldo</small>
+      <div class="amount" id="saldo">0 €</div>
+    </div>
+    <div id="bio-display" class="bio-terminal"><span id="bio-text"></span></div>
+  </div>
+
+  <div id="news-section">
+    <div class="news-header">Notizie</div>
+    <div class="news-container">
+      <div class="news-card">
+        <img src="custombadge.jpg" alt="notizia">
+        <h3>Cambiamento sui badge</h3>
+        <p>Ora i badge possono avere tra le 4-6 lettere.</p>
+        <a href="#">Leggi di più</a>
+      </div>
+      <div class="news-card">
+        <img src="https://aurastudioitalia.it/aurasutelegram.png" alt="notizia">
+        <h3>Aura su Telegram</h3>
+        <p>Abbiamo aperto il canale Aura su Telegram!</p>
+        <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n/293">Leggi di più</a>
+      </div>
+      <div class="news-card">
+        <img src="https://aurastudioitalia.it/scarica_auraplus.png" alt="notizia">
+        <h3>Nuova dashboard</h3>
+        <p>Ora Aura+ ha una nuova dashboard!</p>
+        <a href="#">Leggi di più</a>
+      </div>
+    </div>
+    <div class="channel-widget">
+      <img src="https://aurastudioitalia.it/aura-grafic-2.png" alt="Aura Logo">
+      <h3>Aura a portata di chat</h3>
+      <p>Unisciti ai canali WhatsApp e/o Telegram per ricevere tutte le news a portata di chat!</p>
+      <div class="channel-buttons">
+        <a href="https://whatsapp.com" class="whatsapp">WhatsApp</a>
+        <a href="https://telegram.me" class="telegram">Telegram</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="account-section">
+    <div class="account-header">Account</div>
+    <div class="account-options">
+      <button onclick="window.location.href='settings.html'">Account</button>
+      <button onclick="window.location.href='personalize.html'">Personalizza</button>
+      <button onclick="window.location.href='howtogetbalance.html'">Saldo & Wallet</button>
+    </div>
+  </div>
+</main>
+
+<div class="navbar">
+  <div class="nav-item active" onclick="showSection('dashboard')">🏠</div>
+  <div class="nav-item" onclick="showSection('news')">📰</div>
+  <div class="nav-item" onclick="showSection('account')">⚙️</div>
 </div>
 
 <script>
-auth.onAuthStateChanged(function(user){
-    if(user){
-        db.collection("users").doc(user.uid).get().then(doc=>{
-            if(doc.exists){
-                const data = doc.data();
-                document.getElementById('user-name').textContent = (data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : "Nome Cognome";
-                document.getElementById('user-email').textContent = "Email: "+user.email;
-                document.getElementById('saldo').textContent = (data.saldo!==undefined)? data.saldo+" di saldo" : "0€";
-                document.getElementById('profile-img').src = data.profileImage || 'aurastudio.png';
-                // Bio animata
-                const bioTextEl = document.getElementById('bio-text');
-                const description = (data.bio && data.bio.description) ? data.bio.description : "Nessuna descrizione impostata.";
-                let index=0;
-                function typeWriter(){if(index<description.length){bioTextEl.textContent+=description.charAt(index); index++; setTimeout(typeWriter,25);}}
-                bioTextEl.textContent=""; typeWriter();
-                // Badge
-                const badge = (data.badge && data.badge.trim()!=="") ? data.badge : "Utente";
-                const badgeEl = document.getElementById('badge');
-                badgeEl.textContent = "Badge: "+badge;
-                badgeEl.classList.add('badge');
-            }else{
-                db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});
-            }
-        }).catch(err=>{document.getElementById('error-message').textContent="Errore nel caricamento dei dati."; console.error(err);});
-    }else{window.location.href="login.html";}
+function showSection(section){
+  document.getElementById("dashboard-section").style.display="none";
+  document.getElementById("news-section").style.display="none";
+  document.getElementById("account-section").style.display="none";
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+
+  if(section==="dashboard"){
+    document.getElementById("dashboard-section").style.display="block";
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+  }else if(section==="news"){
+    document.getElementById("news-section").style.display="block";
+    document.querySelectorAll('.nav-item')[1].classList.add('active');
+  }else{
+    document.getElementById("account-section").style.display="block";
+    document.querySelectorAll('.nav-item')[2].classList.add('active');
+  }
+}
+
+// Firebase user data
+auth.onAuthStateChanged(user=>{
+  if(user){
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      if(doc.exists){
+        const data=doc.data();
+        document.getElementById('user-name').childNodes[0].textContent = 
+          (data.nome&&data.cognome)?`${data.nome} ${data.cognome} `:"Nome Cognome ";
+        document.getElementById('user-email').textContent=" "+user.email;
+        document.getElementById('user-uid').textContent="UID: "+user.uid;
+        document.getElementById('saldo').textContent=(data.saldo!==undefined)?data.saldo+" €":"0 €";
+        document.getElementById('profile-img').src=data.profileImage||'aurastudio.png';
+        // Bio animata
+        const bioTextEl=document.getElementById('bio-text');
+        const description=(data.bio&&data.bio.description)?data.bio.description:"Nessuna descrizione impostata.";
+        let index=0;
+        function typeWriter(){if(index<description.length){bioTextEl.textContent+=description.charAt(index);index++;setTimeout(typeWriter,25);}}
+        bioTextEl.textContent="";typeWriter();
+        // Badge
+        document.getElementById('badge').textContent=(data.badge&&data.badge.trim()!=="")?data.badge:"Utente";
+      }else{
+        db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});
+      }
+    });
+  }else{window.location.href="login.html";}
 });
 </script>
 </body>
