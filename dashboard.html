@@ -198,6 +198,59 @@ main {
   font-size:0.8rem;
   color:#00c3ff;
 }
+.channel-widget {
+  background:rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.channel-widget img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.channel-widget h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+.channel-widget p {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin: 0;
+}
+.channel-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.channel-buttons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+.channel-buttons .whatsapp {
+  background: #25D366;
+}
+.channel-buttons .telegram {
+  background: #0088CC;
+}
+.channel-buttons a:hover {
+  filter: brightness(1.2);
+}
 
 /* Account section */
 #account-section {
@@ -238,7 +291,6 @@ main {
 <body>
 
 <main>
-  <!-- Dashboard -->
   <div class="dashboard-card" id="dashboard-section">
     <div class="profile-header">
       <img id="profile-img" src="default-profile.png" alt="Profile">
@@ -255,7 +307,6 @@ main {
     <div id="bio-display" class="bio-terminal"><span id="bio-text"></span></div>
   </div>
 
-  <!-- Notizie -->
   <div id="news-section">
     <div class="news-header">Notizie</div>
     <div class="news-container">
@@ -278,9 +329,17 @@ main {
         <a href="#">Leggi di più</a>
       </div>
     </div>
+    <div class="channel-widget">
+      <img src="https://via.placeholder.com/100" alt="Aura Logo">
+      <h3>Aura a portata di chat</h3>
+      <p>Unisciti ai canali WhatsApp e/o Telegram per ricevere tutte le news a portata di chat!</p>
+      <div class="channel-buttons">
+        <a href="https://whatsapp.com" class="whatsapp">WhatsApp</a>
+        <a href="https://telegram.me" class="telegram">Telegram</a>
+      </div>
+    </div>
   </div>
 
-  <!-- Account -->
   <div id="account-section">
     <div class="account-header">Account</div>
     <div class="account-options">
@@ -291,7 +350,6 @@ main {
   </div>
 </main>
 
-<!-- Navbar -->
 <div class="navbar">
   <div class="nav-item active" onclick="showSection('dashboard')">🏠</div>
   <div class="nav-item" onclick="showSection('news')">📰</div>
