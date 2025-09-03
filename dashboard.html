@@ -1,456 +1,343 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Aura — Dashboard (mobile)</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-<!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+    authDomain: "myauraid-f03c6.firebaseapp.com",
+    projectId: "myauraid-f03c6",
+    storageBucket: "myauraid-f03c6.firebasestorage.app",
+    messagingSenderId: "190478237725",
+    appId: "1:190478237725:web:0d39907473f511b85a06f4"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+</script>
 <style>
-:root{
-  --bg1:#E30AF5; --bg2:#F174FF;
-  --glass: rgba(255,255,255,0.12);
-  --muted: rgba(255,255,255,0.85);
-  --accent: #f174ff;
-  --azure: #4fc3f7;
-  --blue-value: #0b63d6;
-  --white:#fff;
+*{margin:0;padding:0;box-sizing:border-box}
+body {
+  font-family:'Poppins',sans-serif;
+  background: linear-gradient(135deg,#E30AF5,#F174FF);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  color:#fff;
 }
 
-/* Base */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:"Poppins",sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--white);-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
-
-/* Wrapper mobile-first */
-.wrap{max-width:720px;margin:0 auto;padding:18px 14px 110px} /* spazio per downbar */
-
-/* Header */
-.header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.logo-pill{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#ffffffcc,#ffffff88);color:#000;font-weight:700}
-.title-block .title{font-size:18px;font-weight:600}
-.title-block .sub{font-size:12px;color:var(--muted);margin-top:3px}
+/* Container principale */
+main {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:1rem;
+  padding-bottom:80px; /* spazio per la navbar */
+}
 
 /* Card */
-.card{background:var(--glass);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 12px 36px rgba(0,0,0,0.22);backdrop-filter: blur(10px)}
-.profile-row{display:flex;gap:12px;align-items:flex-start}
+.dashboard-card {
+  width:100%;
+  max-width:420px;
+  background:rgba(255,255,255,0.15);
+  border-radius:20px;
+  padding:1.2rem;
+  box-shadow:0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter:blur(12px);
+}
 
-/* Avatar */
-.avatar{width:78px;height:78px;border-radius:50%;overflow:hidden;flex:0 0 78px;border:3px solid rgba(255,255,255,0.14);background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))}
-.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+/* Profilo */
+.profile-header {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+#profile-img {
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(255,255,255,0.6);
+}
+.user-info {
+  flex:1;
+}
+.user-info h2 {
+  font-size:1.2rem;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.badge {
+  font-size:0.7rem;
+  background:#007bff;
+  color:#fff;
+  padding:2px 8px;
+  border-radius:8px;
+}
+.user-info p {
+  font-size:0.85rem;
+  opacity:0.9;
+  margin-top:2px;
+  word-break:break-word;
+}
 
-/* Left big saldo */
-.left-column{min-width:140px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.saldo-label{font-size:12px;color:var(--muted)}
-.saldo-value{font-size:28px;font-weight:800;color:var(--blue-value);letter-spacing:0.2px}
+/* Saldo widget */
+.saldo-widget {
+  margin:1rem 0;
+  background:rgba(0,0,0,0.3);
+  border-radius:12px;
+  padding:0.8rem 1rem;
+}
+.saldo-widget small {
+  display:block;
+  font-size:0.8rem;
+  opacity:0.8;
+}
+.saldo-widget .amount {
+  font-size:1.6rem;
+  font-weight:600;
+  color:#00c3ff;
+  margin-top:0.2rem;
+  text-align:left;
+}
 
-/* Profile meta */
-.profile-meta{flex:1;display:flex;flex-direction:column;gap:8px}
-.profile-meta h2{font-size:16px;margin-bottom:0}
-.profile-meta p{font-size:13px;color:var(--muted)}
+/* Bio terminal */
+.bio-terminal {
+  font-family:'Courier New',monospace;
+  background:rgba(0,0,0,0.3);
+  padding:0.8rem;
+  border-radius:12px;
+  border-left:4px solid #888;
+  white-space:pre-wrap;
+  text-align:left;
+  min-height:60px;
+  margin-top:0.8rem;
+}
 
-/* Bio terminal: first line aligned left */
-.bio-terminal{margin-top:10px;font-family:'Courier New', monospace;background:rgba(0,0,0,0.24);padding:10px;border-radius:10px;min-height:72px;white-space:pre-wrap;overflow:auto;font-size:13px;text-align:left;border-left:4px solid rgba(255,255,255,0.06)}
-.bio-terminal p{margin:0}
+/* Navbar */
+.navbar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:65px;
+  background:rgba(255,255,255,0.2);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  backdrop-filter:blur(10px);
+  border-radius:20px 20px 0 0;
+}
+.nav-item {
+  flex:1;
+  text-align:center;
+  font-size:1.6rem;
+  cursor:pointer;
+  transition:0.2s;
+}
+.nav-item.active {
+  transform:scale(1.2);
+}
 
-/* Badge azzurro sotto bio e sopra UID */
-.badge-pill{display:inline-block;margin-top:10px;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--azure),#3fb0ea);color:#012;font-weight:700;font-size:13px}
+/* Notizie */
+#news-section {
+  display:none;
+  width:100%;
+  max-width:420px;
+}
+.news-header {
+  font-weight:600;
+  font-size:1.2rem;
+  margin-bottom:0.8rem;
+}
+.news-container {
+  display:flex;
+  overflow-x:auto;
+  gap:1rem;
+  flex-direction:row-reverse; /* da Z a A */
+  scroll-snap-type:x mandatory;
+}
+.news-card {
+  flex:0 0 260px;
+  background:rgba(255,255,255,0.15);
+  border-radius:16px;
+  padding:0.8rem;
+  scroll-snap-align:center;
+}
+.news-card img {
+  width:100%;
+  height:140px;
+  border-radius:12px;
+  object-fit:cover;
+}
+.news-card h3 {
+  margin:0.5rem 0;
+  font-size:1rem;
+}
+.news-card p {
+  font-size:0.85rem;
+  opacity:0.9;
+}
+.news-card a {
+  display:inline-block;
+  margin-top:0.4rem;
+  font-size:0.8rem;
+  color:#00c3ff;
+}
 
-/* UID small */
-.user-uid{font-size:12px;color:rgba(255,255,255,0.7);margin-top:8px;word-break:break-all}
+/* Account section */
+#account-section {
+  display:none;
+  width:100%;
+  max-width:420px;
+}
+.account-header {
+  font-weight:600;
+  font-size:1.2rem;
+  margin-bottom:0.8rem;
+}
+.account-options button {
+  display:block;
+  width:100%;
+  padding:0.8rem;
+  margin:0.5rem 0;
+  border:none;
+  border-radius:12px;
+  font-size:1rem;
+  background:#f174ff;
+  color:#fff;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.3s;
+}
+.account-options button:hover {
+  background:#e008f6;
+}
 
-/* SECTION Title */
-.section-title{font-size:15px;margin-bottom:8px}
-
-/* NOTIZIE (in sezione Notizie) */
-.news-area{margin-top:6px}
-.chips{display:flex;gap:8px;overflow:auto;padding-bottom:6px}
-.chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
-.chip.active{background:linear-gradient(90deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03));color:var(--white);font-weight:700}
-
-/* Horizontal collection */
-.news-collection{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;margin-top:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
-.news-card{flex:0 0 78%;max-width:78%;background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;scroll-snap-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.22)}
-.news-card img{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px}
-.news-card h4{font-size:15px;margin-bottom:6px}
-.news-card p{font-size:13px;color:var(--muted);margin-bottom:8px}
-.read-more{font-weight:700;color:var(--accent);font-size:13px}
-
-/* Hint anim */
-.scroll-hint{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:13px}
-.scroll-arrow{display:inline-block;transform:translateX(0);opacity:0.9;animation:hint 1.2s infinite}
-@keyframes hint{0%{transform:translateX(0);opacity:0.9}50%{transform:translateX(8px);opacity:0.6}100%{transform:translateX(0);opacity:0.9}}
-
-/* SETTINGS list */
-.settings-list{display:flex;flex-direction:column;gap:8px}
-.settings-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.03);font-weight:700;cursor:pointer}
-
-/* bottom nav */
-.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:78px;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.08));border-top:1px solid rgba(255,255,255,0.04);z-index:40;padding:10px}
-.nav-inner{width:100%;max-width:720px;display:flex;justify-content:space-around;padding:6px;background:rgba(255,255,255,0.02);border-radius:14px}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;border-radius:10px;color:var(--muted);font-size:12px;cursor:pointer}
-.nav-btn.active{background:linear-gradient(90deg,var(--accent),#e008f6);color:var(--white);transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.28)}
-
-/* Responsive larger */
-@media(min-width:900px){
-  .wrap{padding:26px 22px 140px}
-  .news-card{flex:0 0 38%;max-width:38%}
-  .avatar{width:96px;height:96px;flex:0 0 96px}
-  .saldo-value{font-size:34px}
+/* Mobile */
+@media(max-width:480px){
+  .user-info h2 {font-size:1rem;}
+  .saldo-widget .amount {font-size:1.3rem;}
 }
 </style>
 </head>
 <body>
 
-<div class="wrap" role="main">
-  <header class="header" aria-label="Header">
-    <div class="logo-pill">A+</div>
-    <div class="title-block">
-      <div class="title">Aura — Dashboard</div>
-      <div class="sub">Area personale</div>
-    </div>
-  </header>
-
-  <!-- DASHBOARD: PROFILO + SALDO (NO NOTIZIE QUI) -->
-  <section id="section-dashboard" class="card" aria-labelledby="profile-title">
-    <div style="display:flex;gap:12px;align-items:flex-start">
-      <!-- SALDO grande a sinistra -->
-      <div class="left-column">
-        <div class="saldo-label">Saldo:</div>
-        <div id="saldo" class="saldo-value">Caricamento...</div>
-      </div>
-
-      <!-- Profilo a destra -->
-      <div style="flex:1">
-        <div style="display:flex;gap:10px;align-items:center">
-          <div class="avatar"><img id="profile-img" src="default-profile.png" alt="Immagine profilo"></div>
-          <div style="flex:1" class="profile-meta">
-            <h2 id="user-name">Caricamento...</h2>
-            <p id="user-email" style="color:var(--muted)"></p>
-          </div>
-        </div>
-
-        <div class="bio-terminal" id="bio-display" aria-live="polite">
-          <p id="bio-text">Caricamento...</p>
-        </div>
-
-        <div style="margin-top:6px">
-          <span id="badge" class="badge-pill">Utente</span>
-        </div>
-
-        <div id="user-uid" class="user-uid"></div>
+<main>
+  <!-- Dashboard -->
+  <div class="dashboard-card" id="dashboard-section">
+    <div class="profile-header">
+      <img id="profile-img" src="default-profile.png" alt="Profile">
+      <div class="user-info">
+        <h2 id="user-name">Nome Cognome <span id="badge" class="badge">badge</span></h2>
+        <p id="user-email">email</p>
+        <p id="user-uid">uid</p>
       </div>
     </div>
-  </section>
-
-  <!-- NOTIZIE: in sezione separata (visibile solo selezionando Notizie) -->
-  <section id="section-news" class="card" style="display:none">
-    <div class="section-title">Notizie</div>
-
-    <!-- chips -->
-    <div class="chips" id="news-chips">
-      <div class="chip active" data-cat="all">Tutte</div>
+    <div class="saldo-widget">
+      <small>Saldo</small>
+      <div class="amount" id="saldo">0 €</div>
     </div>
+    <div id="bio-display" class="bio-terminal"><span id="bio-text"></span></div>
+  </div>
 
-    <!-- collection orizzontale -->
-    <div class="news-area">
-      <div class="news-collection" id="news-collection" tabindex="0" aria-label="Raccolta notizie orizzontale">
-        <div style="color:var(--muted);padding:8px">Caricamento notizie...</div>
+  <!-- Notizie -->
+  <div id="news-section">
+    <div class="news-header">Notizie</div>
+    <div class="news-container">
+      <div class="news-card">
+        <img src="https://via.placeholder.com/300x140" alt="notizia">
+        <h3>Titolo 3</h3>
+        <p>Descrizione breve della notizia 3...</p>
+        <a href="#">Leggi di più</a>
       </div>
-      <div class="scroll-hint"><span class="scroll-arrow">⟶</span><div>Scorri orizzontalmente: le notizie partono dall'ultima</div></div>
-    </div>
-  </section>
-
-  <!-- SETTINGS -->
-  <section id="section-settings" class="card" style="display:none">
-    <div class="section-title">Impostazioni</div>
-    <div class="settings-list" style="margin-top:10px">
-      <div class="settings-row" onclick="openPage('account.html')">Account</div>
-      <div class="settings-row" onclick="openPage('personalize.html')">Personalizza</div>
-      <div class="settings-row" onclick="openPage('howtogetbalance.html')">Saldo &amp; Wallet</div>
-      <div class="settings-row" onclick="logout()">Esci</div>
-    </div>
-  </section>
-</div>
-
-<!-- bottom nav (downbar) -->
-<nav class="bottom-nav" role="navigation" aria-label="Navigazione principale">
-  <div class="nav-inner" role="menubar">
-    <div class="nav-btn active" id="nav-dashboard" role="menuitem" tabindex="0" onclick="showSection('dashboard')">
-      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 11.5L12 4l9 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div>Dashboard</div>
-    </div>
-    <div class="nav-btn" id="nav-news" role="menuitem" tabindex="0" onclick="showSection('news')">
-      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <div>Notizie</div>
-    </div>
-    <div class="nav-btn" id="nav-settings" role="menuitem" tabindex="0" onclick="showSection('settings')">
-      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.6"/></svg>
-      <div>Impostazioni</div>
+      <div class="news-card">
+        <img src="https://via.placeholder.com/300x140" alt="notizia">
+        <h3>Titolo 2</h3>
+        <p>Descrizione breve della notizia 2...</p>
+        <a href="#">Leggi di più</a>
+      </div>
+      <div class="news-card">
+        <img src="https://via.placeholder.com/300x140" alt="notizia">
+        <h3>Titolo 1</h3>
+        <p>Descrizione breve della notizia 1...</p>
+        <a href="#">Leggi di più</a>
+      </div>
     </div>
   </div>
-</nav>
+
+  <!-- Account -->
+  <div id="account-section">
+    <div class="account-header">Account</div>
+    <div class="account-options">
+      <button onclick="window.location.href='settings.html'">Account</button>
+      <button onclick="window.location.href='personalize.html'">Personalizza</button>
+      <button onclick="window.location.href='howtogetbalance.html'">Saldo & Wallet</button>
+    </div>
+  </div>
+</main>
+
+<!-- Navbar -->
+<div class="navbar">
+  <div class="nav-item active" onclick="showSection('dashboard')">🏠</div>
+  <div class="nav-item" onclick="showSection('news')">📰</div>
+  <div class="nav-item" onclick="showSection('account')">⚙️</div>
+</div>
 
 <script>
-/* =========================
-   Firebase (init once)
-   ========================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-  authDomain: "myauraid-f03c6.firebaseapp.com",
-  projectId: "myauraid-f03c6",
-  storageBucket: "myauraid-f03c6.firebasestorage.app",
-  messagingSenderId: "190478237725",
-  appId: "1:190478237725:web:0d39907473f511b85a06f4"
-};
-// init only once
-if(!firebase.apps.length){
-  firebase.initializeApp(firebaseConfig);
-}
-const auth = firebase.auth();
-const db = firebase.firestore();
+function showSection(section){
+  document.getElementById("dashboard-section").style.display="none";
+  document.getElementById("news-section").style.display="none";
+  document.getElementById("account-section").style.display="none";
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
 
-/* =========================
-   Helpers
-   ========================= */
-function $(id){ return document.getElementById(id) }
-function openPage(url){ window.location.href = url }
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-function escapeAttr(s){ return s? String(s).replace(/"/g,'&quot;') : '#'; }
-
-/* Image fallback dataURL */
-const defaultAvatarSVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" rx="20" fill="#ffffff22"/><text x="50%" y="50%" font-size="48" text-anchor="middle" fill="#fff" font-family="Poppins, sans-serif" dy=".3em">A+</text></svg>`
-);
-function applyImgFallback(imgEl){
-  if(!imgEl) return;
-  imgEl.onerror = null;
-  imgEl.src = defaultAvatarSVG;
-}
-
-/* =========================
-   Section switching (downbar)
-   ========================= */
-function showSection(name){
-  const map = {
-    dashboard: $('section-dashboard'),
-    news: $('section-news'),
-    settings: $('section-settings')
-  };
-  Object.keys(map).forEach(k=>{
-    if(!map[k]) return;
-    map[k].style.display = (k === name) ? 'block' : 'none';
-    const btn = $('nav-' + k);
-    if(btn) btn.classList.toggle('active', k === name);
-  });
-  // accessibility nicety
-  document.activeElement && document.activeElement.blur && document.activeElement.blur();
-}
-
-/* =========================
-   Auth state & load user
-   ========================= */
-auth.onAuthStateChanged(async (user) => {
-  if(!user){
-    // not logged -> redirect
-    window.location.href = 'login.html';
-    return;
+  if(section==="dashboard"){
+    document.getElementById("dashboard-section").style.display="block";
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+  }else if(section==="news"){
+    document.getElementById("news-section").style.display="block";
+    document.querySelectorAll('.nav-item')[1].classList.add('active');
+  }else{
+    document.getElementById("account-section").style.display="block";
+    document.querySelectorAll('.nav-item')[2].classList.add('active');
   }
-
-  // show uid & email (if exist)
-  $('user-uid').textContent = 'UID: ' + user.uid;
-  // optional: if you want to show email inside profile area
-  if($('user-email')) $('user-email').textContent = user.email ? 'Email: ' + user.email : '';
-
-  try{
-    const docRef = db.collection('users').doc(user.uid);
-    const doc = await docRef.get();
-    let data;
-    if(!doc.exists){
-      // create with defaults (like tuo codice originale)
-      await docRef.set({ saldo:15, profileImage:'aurastudio.png', badge:'' });
-      data = (await docRef.get()).data();
-    } else {
-      data = doc.data();
-    }
-
-    // Name
-    const fullName = (data && data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : (data && data.displayName) || user.displayName || 'Nome Cognome';
-    $('user-name').textContent = fullName;
-
-    // Saldo left big (string as before)
-    $('saldo').textContent = (data && data.saldo !== undefined) ? (data.saldo + " di saldo") : "0€";
-
-    // Profile image (with fallback)
-    const profileImg = (data && data.profileImage) ? data.profileImage : 'aurastudio.png';
-    const imgEl = $('profile-img');
-    imgEl.src = profileImg;
-    imgEl.onerror = function(){ applyImgFallback(imgEl) };
-
-    // Bio (typewriter)
-    const bioText = (data && data.bio && data.bio.description) ? data.bio.description : 'Nessuna descrizione impostata.';
-    animateBio(bioText, $('bio-text'), 20);
-
-    // Badge azzurro
-    const badgeText = (data && data.badge && data.badge.trim() !== '') ? data.badge : 'Utente';
-    $('badge').textContent = badgeText;
-
-    // Load news into the Notizie section (separate)
-    await loadNewsIntoSection();
-
-  }catch(err){
-    console.error('Errore caricamento utente:', err);
-    // show minimal fallback
-    $('bio-text').textContent = 'Errore nel caricamento dei dati.';
-  }
-});
-
-/* Typewriter for bio */
-function animateBio(text, el, speed=20){
-  if(!el) return;
-  el.textContent = '';
-  let i = 0;
-  (function step(){
-    if(i < text.length){ el.textContent += text.charAt(i++); setTimeout(step, speed) }
-  })();
 }
 
-/* Logout */
-function logout(){
-  auth.signOut().then(()=> window.location.href = 'login.html').catch(err=> alert('Errore logout: '+err.message));
-}
-
-/* =========================
-   NEWS: load into section-news (horizontal) with chips
-   ========================= */
-async function loadNewsIntoSection(){
-  const collectionEl = $('news-collection');
-  const chipsEl = $('news-chips');
-
-  // placeholder
-  if(collectionEl) collectionEl.innerHTML = `<div style="color:var(--muted);padding:8px">Caricamento notizie...</div>`;
-
-  try{
-    // try to order by createdAt desc
-    let snap;
-    try{
-      snap = await db.collection('news').orderBy('createdAt','desc').get();
-    }catch(e){
-      // fallback: collection without createdAt ordering
-      snap = await db.collection('news').get();
-    }
-
-    if(!snap || snap.empty){
-      collectionEl.innerHTML = `<div style="color:var(--muted);padding:8px">Nessuna notizia recente.</div>`;
-      return;
-    }
-
-    // parse docs into list
-    const list = [];
-    const categories = new Set();
-    snap.forEach(doc => {
-      const d = doc.data() || {};
-      d._id = doc.id;
-      d._cat = (d.category || d.type || 'Generale').toString();
-      categories.add(d._cat);
-      d._ts = (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().getTime() : 0;
-      list.push(d);
+// Firebase user data
+auth.onAuthStateChanged(user=>{
+  if(user){
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      if(doc.exists){
+        const data=doc.data();
+        document.getElementById('user-name').childNodes[0].textContent = 
+          (data.nome&&data.cognome)?`${data.nome} ${data.cognome} `:"Nome Cognome ";
+        document.getElementById('user-email').textContent="Email: "+user.email;
+        document.getElementById('user-uid').textContent="UID: "+user.uid;
+        document.getElementById('saldo').textContent=(data.saldo!==undefined)?data.saldo+" €":"0 €";
+        document.getElementById('profile-img').src=data.profileImage||'aurastudio.png';
+        // Bio animata
+        const bioTextEl=document.getElementById('bio-text');
+        const description=(data.bio&&data.bio.description)?data.bio.description:"Nessuna descrizione impostata.";
+        let index=0;
+        function typeWriter(){if(index<description.length){bioTextEl.textContent+=description.charAt(index);index++;setTimeout(typeWriter,25);}}
+        bioTextEl.textContent="";typeWriter();
+        // Badge
+        document.getElementById('badge').textContent=(data.badge&&data.badge.trim()!=="")?data.badge:"Utente";
+      }else{
+        db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});
+      }
     });
-
-    // Ensure sorted by timestamp desc (safe)
-    list.sort((a,b) => (b._ts || 0) - (a._ts || 0));
-
-    // populate chips (keep first 'Tutte')
-    // remove old chips except first
-    Array.from(chipsEl.children).forEach((ch, idx) => { if(idx>0) ch.remove() });
-    categories.forEach(cat => {
-      const chip = document.createElement('div');
-      chip.className = 'chip';
-      chip.textContent = cat;
-      chip.dataset.cat = cat;
-      chip.tabIndex = 0;
-      chip.addEventListener('click', ()=> {
-        // toggle active
-        Array.from(chipsEl.children).forEach(c=>c.classList.remove('active'));
-        chip.classList.add('active');
-        renderNewsFiltered(list, cat);
-      });
-      chip.addEventListener('keydown', (e)=> { if(e.key==='Enter'||e.key===' ') chip.click() });
-      chipsEl.appendChild(chip);
-    });
-
-    // ensure initial active is "Tutte"
-    Array.from(chipsEl.children).forEach(c=>c.classList.remove('active'));
-    chipsEl.querySelector('.chip[data-cat="all"]')?.classList.add('active');
-
-    // render all (latest -> older)
-    renderNewsFiltered(list, 'all');
-
-  }catch(err){
-    console.error('Errore caricamento news:', err);
-    collectionEl.innerHTML = `<div style="color:#ffb4b4;padding:8px">Errore nel caricamento delle notizie.</div>`;
-  }
-}
-
-/* Render function */
-function renderNewsFiltered(list, category){
-  const container = $('news-collection');
-  container.innerHTML = '';
-  const filtered = (category === 'all' || category === 'Tutte') ? list : list.filter(d => d._cat === category);
-
-  if(!filtered.length){
-    container.innerHTML = `<div style="color:var(--muted);padding:8px">Nessuna notizia nella categoria.</div>`;
-    return;
-  }
-
-  filtered.forEach(d => {
-    const card = document.createElement('div');
-    card.className = 'news-card';
-    // sanitize fields
-    const title = escapeHtml(d.title || 'Titolo');
-    const summary = escapeHtml(d.summary || (d.content ? (d.content.substring(0,120) + '...') : 'Nessuna descrizione.'));
-    const time = d._ts ? new Date(d._ts).toLocaleString() : '';
-    const image = d.image || d.thumbnail || d.img || '';
-    const url = d.url || '#';
-
-    card.innerHTML = `
-      ${image ? `<img src="${escapeAttr(image)}" alt="${title}" />` : ''}
-      <h4>${title}</h4>
-      <p>${summary}</p>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:12px;color:rgba(255,255,255,0.6)">${escapeHtml(time)}</div>
-        <a class="read-more" href="${escapeAttr(url)}" target="_blank" rel="noreferrer">Leggi di più</a>
-      </div>
-    `;
-    // add image fallback handler if image exists
-    const imgEl = card.querySelector('img');
-    if(imgEl){
-      imgEl.onerror = function(){ this.onerror=null; this.src = defaultAvatarSVG; };
-    }
-
-    container.appendChild(card);
-  });
-
-  // scroll to start (most recent) to show that order is newest -> older
-  container.scrollTo({left:0,top:0,behavior:'smooth'});
-}
-
-/* =========================
-   Keyboard + UX small helpers
-   ========================= */
-/* keyboard nav for bottom nav */
-document.querySelectorAll('.nav-btn').forEach(btn=>{
-  btn.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); btn.click(); } });
+  }else{window.location.href="login.html";}
 });
-
-/* initial visible section */
-showSection('dashboard');
 </script>
 </body>
 </html>
