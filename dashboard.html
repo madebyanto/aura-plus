@@ -1,14 +1,321 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Utente</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Utente — Aura</title>
+
+<!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Firebase v8 (stessa versione del tuo file) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<style>
+  :root{
+    --bg1: #E30AF5;
+    --bg2: #F174FF;
+    --glass: rgba(255,255,255,0.12);
+    --glass-strong: rgba(255,255,255,0.18);
+    --accent: #f174ff;
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.85);
+    --success: #22c55e;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%; font-family:'Poppins',sans-serif; color:var(--text); background:linear-gradient(135deg,var(--bg1),var(--bg2));}
+
+  /* NAVBAR */
+  .topbar{
+    position:fixed;
+    top:0; left:0; right:0;
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 18px;
+    backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    z-index:20;
+  }
+  .brand {display:flex; align-items:center; gap:12px; cursor:pointer;}
+  .brand .logo{
+    width:40px; height:40px; border-radius:10px;
+    background: linear-gradient(135deg,#fff5,#fff2);
+    display:grid; place-items:center; color:#000; font-weight:700;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  }
+  .brand .title{font-weight:600; letter-spacing:0.2px}
+
+  nav.nav{
+    display:flex; gap:12px; align-items:center;
+  }
+  .nav a{
+    color:var(--text);
+    text-decoration:none;
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:500;
+    opacity:0.9;
+  }
+  .nav a.active, .nav a:hover{
+    background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    transform:translateY(-2px);
+  }
+
+  /* Layout */
+  .container{
+    max-width:1100px;
+    margin:88px auto 40px; /* leave space for topbar */
+    padding: 24px;
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    gap:20px;
+    width:calc(100% - 40px);
+  }
+
+  /* PROFILE CARD (left) */
+  .profile-card{
+    background: var(--glass);
+    border-radius:16px;
+    padding:22px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.28);
+    backdrop-filter: blur(14px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+  #profile-img{
+    width:120px; height:120px; border-radius:50%; object-fit:cover;
+    border: 3px solid rgba(255,255,255,0.25);
+  }
+  .welcome{
+    text-align:center;
+  }
+  .welcome h1{font-size:20px; margin-bottom:6px}
+  .welcome p{font-size:14px; color:var(--muted); margin-bottom:4px}
+
+  .badge {
+    margin-top:6px;
+    display:inline-block;
+    background: rgba(0,0,0,0.25);
+    padding:6px 12px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:13px;
+  }
+
+  /* Right content */
+  .right-grid{
+    display:grid;
+    grid-template-rows: auto 1fr;
+    gap:16px;
+  }
+
+  .cards-row{
+    display:flex;
+    gap:14px;
+  }
+  .card{
+    flex:1;
+    background: var(--glass-strong);
+    padding:16px;
+    border-radius:14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .card.small{max-width:220px}
+
+  .saldo-amount{font-size:20px; font-weight:700}
+  .saldo-label{color:var(--muted); font-size:13px; margin-bottom:8px}
+
+  /* Bio terminal */
+  .bio-terminal{
+    background: rgba(0,0,0,0.25);
+    padding:14px;
+    border-radius:12px;
+    min-height:78px;
+    font-family: 'Courier New', monospace;
+    font-size:14px;
+    color:var(--text);
+    border-left:4px solid rgba(255,255,255,0.08);
+    white-space:pre-wrap;
+    overflow:auto;
+  }
+
+  /* Buttons */
+  .actions{
+    display:flex; gap:10px; margin-top:6px;
+  }
+  .btn{
+    flex:1;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    border:1px solid rgba(255,255,255,0.06);
+    padding:10px 12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn.primary{
+    background: linear-gradient(90deg,var(--accent),#e008f6);
+    color:#fff;
+    border:none;
+  }
+
+  /* News list */
+  .news-list{display:flex; flex-direction:column; gap:10px}
+  .news-item{
+    background: rgba(255,255,255,0.03);
+    padding:12px;
+    border-radius:10px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .news-item h4{margin-bottom:6px; font-size:15px}
+  .news-item p{font-size:13px; color:var(--muted)}
+
+  /* Footer small note */
+  .small-note{font-size:12px; color:var(--muted); margin-top:8px}
+
+  /* Responsive */
+  @media (max-width:900px){
+    .container{grid-template-columns: 1fr; margin-top:86px}
+    .cards-row{flex-direction:column}
+    .card.small{max-width:100%}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="topbar" role="banner">
+  <div class="brand" onclick="goHome()">
+    <div class="logo">A+</div>
+    <div>
+      <div class="title">Aura Studio</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.85)">Dashboard Utente</div>
+    </div>
+  </div>
+
+  <nav class="nav" role="navigation" aria-label="Principale">
+    <a href="#" id="nav-dashboard" class="active" onclick="showSection('dashboard')">Dashboard</a>
+    <a href="#" id="nav-news" onclick="showSection('news')">Notizie</a>
+    <a href="#" id="nav-settings" onclick="showSection('settings')">Impostazioni</a>
+  </nav>
+
+  <div style="display:flex; align-items:center; gap:12px">
+    <div id="top-avatar" style="width:40px; height:40px; border-radius:50%; overflow:hidden; border:2px solid rgba(255,255,255,0.12)">
+      <img src="default-profile.png" id="top-avatar-img" style="width:100%; height:100%; object-fit:cover" alt="avatar">
+    </div>
+  </div>
+</header>
+
+<!-- MAIN LAYOUT -->
+<main class="container" role="main">
+
+  <!-- Left profile -->
+  <aside class="profile-card" aria-label="Profilo utente">
+    <img id="profile-img" src="default-profile.png" alt="Immagine profilo">
+    <div class="welcome">
+      <h1 id="user-name">Caricamento...</h1>
+      <p id="user-email" style="color:var(--muted)">—</p>
+    </div>
+
+    <div style="width:100%; display:flex; justify-content:space-between; gap:10px">
+      <div style="text-align:left">
+        <div style="font-size:12px; color:var(--muted)">Saldo</div>
+        <div class="saldo-amount" id="saldo">Caricamento...</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px; color:var(--muted)">Livello</div>
+        <div class="badge" id="badge">Utente</div>
+      </div>
+    </div>
+
+    <div style="width:100%; margin-top:8px">
+      <div class="small-note">Account attivo</div>
+      <div class="small-note" id="user-uid" style="word-break:break-all; font-size:12px; color:rgba(255,255,255,0.6)"></div>
+    </div>
+
+    <div style="width:100%; margin-top:10px" class="actions">
+      <button class="btn" onclick="goTo('howtogetbalance.html')">Saldo & Wallet</button>
+      <button class="btn primary" onclick="goTo('personalize.html')">Personalizza</button>
+    </div>
+  </aside>
+
+  <!-- Right area -->
+  <section class="right-grid">
+
+    <!-- top cards row -->
+    <div class="cards-row">
+      <div class="card small" aria-labelledby="bio-label">
+        <div id="bio-label" style="font-size:13px; color:var(--muted); margin-bottom:8px">Bio</div>
+        <div class="bio-terminal" id="bio-display"><span id="bio-text">Caricamento...</span></div>
+        <div style="margin-top:10px; display:flex; gap:8px">
+          <button class="btn" onclick="goTo('settings.html')">Impostazioni</button>
+          <button class="btn" onclick="logout()">Esci</button>
+        </div>
+      </div>
+
+      <div class="card" aria-labelledby="actions-label">
+        <div id="actions-label" style="font-size:13px; color:var(--muted); margin-bottom:8px">Azioni rapide</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn" onclick="goTo('support.html')">Contatta supporto</button>
+          <button class="btn" onclick="goTo('vipchat.html')">Vai VIP Chat</button>
+          <button class="btn" onclick="goTo('marketplace.html')">Marketplace</button>
+          <button class="btn" onclick="goTo('transactions.html')">Transazioni</button>
+        </div>
+        <div class="small-note">Nota: tutte le pagine sono link locali (settings.html, personalize.html, etc.)</div>
+      </div>
+    </div>
+
+    <!-- news / dynamic content -->
+    <div class="card" id="section-dashboard">
+      <h3 style="margin-bottom:12px">Attività recenti & Notizie</h3>
+
+      <div id="news-area">
+        <div class="news-list" id="news-list">
+          <!-- Notizie popolate da Firestore (se presenti) -->
+          <div style="color:var(--muted)">Caricamento notizie...</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" id="error-message" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- settings / news hidden sections swapped by navbar -->
+    <div class="card" id="section-news" style="display:none">
+      <h3>Notizie</h3>
+      <div id="news-items" class="news-list">
+        <div style="color:var(--muted)">Nessuna notizia caricata dalla collezione <code>news</code>.</div>
+      </div>
+    </div>
+
+    <div class="card" id="section-settings" style="display:none">
+      <h3>Impostazioni</h3>
+      <p style="color:var(--muted)">Link rapidi e impostazioni account.</p>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px">
+        <button class="btn" onclick="goTo('settings.html')">Impostazioni account</button>
+        <button class="btn" onclick="goTo('privacy.html')">Privacy</button>
+        <button class="btn" onclick="goTo('notifications.html')">Notifiche</button>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
 <script>
+/* ---------------------------
+   Firebase config (identico a quello che hai fornito)
+   --------------------------- */
 const firebaseConfig = {
     apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
     authDomain: "myauraid-f03c6.firebaseapp.com",
@@ -20,131 +327,151 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-</script>
-<style>
-* {margin:0; padding:0; box-sizing:border-box;}
-body {
-    font-family:'Poppins',sans-serif;
-    background: linear-gradient(135deg,#E30AF5,#F174FF);
-    display:flex; justify-content:center; align-items:center;
-    min-height:100vh; padding:20px;
-    color: #fff; /* testo bianco di default */
+
+/* Utility navigazione */
+function goTo(url){ window.location.href = url; }
+function goHome(){ showSection('dashboard'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* NAV handling */
+function showSection(name){
+  // navbar active class
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+  if(name==='dashboard') document.getElementById('nav-dashboard').classList.add('active');
+  if(name==='news') document.getElementById('nav-news').classList.add('active');
+  if(name==='settings') document.getElementById('nav-settings').classList.add('active');
+
+  // show/hide sections
+  document.getElementById('section-dashboard').style.display = (name==='dashboard') ? 'block' : 'none';
+  document.getElementById('section-news').style.display = (name==='news') ? 'block' : 'none';
+  document.getElementById('section-settings').style.display = (name==='settings') ? 'block' : 'none';
 }
 
-.dashboard-card {
-    background: rgba(255,255,255,0.15);
-    border-radius: 20px;
-    padding: 30px 20px;
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    backdrop-filter: blur(15px);
-    color: #fff;
+/* Logout */
+function logout(){
+  auth.signOut().then(()=> window.location.href = 'login.html').catch(err=> alert('Errore durante logout: '+err.message));
 }
 
-#profile-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
-    border: 3px solid rgba(255,255,255,0.4);
+/* Funzione per animare la bio (typewriter) */
+function animateBio(text, el, speed=25){
+  el.textContent = '';
+  let i = 0;
+  const step = ()=> {
+    if(i < text.length){
+      el.textContent += text.charAt(i);
+      i++;
+      setTimeout(step, speed);
+    }
+  };
+  step();
 }
 
-h2 {
-    font-size: 1.8em;
-    margin-bottom:5px;
-    color: #fff;
+/* Caricamento dati utente */
+auth.onAuthStateChanged(async (user) => {
+  const errEl = document.getElementById('error-message');
+  if(!user){
+    // se non loggato, rimanda a login
+    window.location.href = 'login.html';
+    return;
+  }
+
+  document.getElementById('user-uid').textContent = "UID: " + user.uid;
+
+  try{
+    const docRef = db.collection('users').doc(user.uid);
+    const doc = await docRef.get();
+
+    if(!doc.exists){
+      // se non esiste, crea con valori base (come fatto nel tuo codice)
+      await docRef.set({ saldo:15, profileImage:'aurastudio.png', badge:'Utente' });
+    }
+
+    const data = (await docRef.get()).data() || {};
+
+    // Nome
+    const fullName = (data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : (data.displayName || user.displayName || 'Nome Cognome');
+    document.getElementById('user-name').textContent = fullName;
+
+    // Email
+    document.getElementById('user-email').textContent = user.email ? "Email: " + user.email : '';
+
+    // Saldo (manteniamo le stesse stringhe)
+    document.getElementById('saldo').textContent = (data.saldo !== undefined) ? (data.saldo + " di saldo") : "0€";
+
+    // Immagine profilo
+    const profileImg = data.profileImage || 'aurastudio.png';
+    document.getElementById('profile-img').src = profileImg;
+    document.getElementById('top-avatar-img').src = profileImg;
+
+    // Bio animata
+    const description = (data.bio && data.bio.description) ? data.bio.description : "Nessuna descrizione impostata.";
+    animateBio(description, document.getElementById('bio-text'), 25);
+
+    // Badge
+    const badgeText = (data.badge && data.badge.trim() !== '') ? data.badge : "Utente";
+    const badgeEl = document.getElementById('badge');
+    badgeEl.textContent = badgeText;
+
+    // Carica notizie dalla collezione "news" se esistono (mostra le 5 più recenti)
+    loadNews();
+
+  }catch(err){
+    console.error(err);
+    errEl.textContent = "Errore nel caricamento dei dati. Controlla la console.";
+  }
+});
+
+/* Carica notizie da Firestore (se presenti) */
+async function loadNews(){
+  const newsList = document.getElementById('news-list');
+  const newsItemsContainer = document.getElementById('news-items');
+  newsList.innerHTML = '';
+  newsItemsContainer.innerHTML = '';
+
+  try{
+    const snap = await db.collection('news').orderBy('createdAt','desc').limit(5).get();
+    if(snap.empty){
+      newsList.innerHTML = '<div style="color:var(--muted)">Nessuna notizia recente.</div>';
+      newsItemsContainer.innerHTML = '<div style="color:var(--muted)">Nessuna notizia recente.</div>';
+      return;
+    }
+    snap.forEach(doc => {
+      const d = doc.data();
+      const title = d.title || 'Titolo';
+      const summary = d.summary || (d.content ? d.content.substring(0,120) + '...' : '');
+      const time = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleString() : '';
+      const item = document.createElement('div');
+      item.className = 'news-item';
+      item.innerHTML = `<div style="flex:1">
+          <h4>${escapeHtml(title)}</h4>
+          <p>${escapeHtml(summary)}</p>
+          <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:6px">${escapeHtml(time)}</div>
+        </div>`;
+      newsList.appendChild(item);
+
+      // Also add to 📰 "Notizie" section (news-items)
+      const item2 = item.cloneNode(true);
+      newsItemsContainer.appendChild(item2);
+    });
+  }catch(err){
+    console.error('Errore caricamento news:', err);
+    document.getElementById('news-list').innerHTML = '<div style="color:#ffb4b4">Errore nel caricare le notizie.</div>';
+  }
 }
 
-.user-name {
-    font-size: 1.2em;
-    font-weight: 400;
-    color: #fff;
-    opacity: 0.9;
-    margin-bottom: 15px;
+/* Escape basic html to avoid injection when outputting strings from DB */
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-#user-email, .saldo, #badge {
-    color: #fff;
-}
-
-.saldo {font-weight:600; font-size:1.1em; margin:10px 0;}
-.badge {padding:5px 10px; background-color:#007bff; color:white; border-radius:10px; display:inline-block; margin-top:10px;}
-.btn-settings {
-    margin-top:15px; padding:12px;
-    background: #f174ff; color:#fff;
-    border:none; border-radius:12px;
-    font-size:16px; cursor:pointer;
-    width:100%;
-    transition: all 0.3s ease;
-}
-.btn-settings:hover {background:#e008f6;}
-.bio-terminal {
-    font-family:'Courier New', monospace;
-    background: rgba(0,0,0,0.3);
-    padding:15px;
-    border-radius:12px;
-    color:#fff; /* testo bianco */
-    margin:15px 0;
-    white-space: pre-wrap;
-    overflow:hidden;
-    border-left:4px solid #888;
-    text-align:left;
-    min-height:50px;
-}
-#error-message {color:#ff6b6b;}
-
-@media (max-width: 480px){
-    .dashboard-card {padding:20px 15px;}
-    #profile-img {width:100px; height:100px;}
-    h2{font-size:1.5em;}
-}
-</style>
-</head>
-<body>
-<div class="dashboard-card">
-    <img id="profile-img" src="default-profile.png" alt="Immagine del profilo">
-    <h2>Benvenuto</h2>
-    <p class="user-name" id="user-name">Caricamento...</p>
-    <p id="user-email"></p>
-    <p>Saldo: <span id="saldo" class="saldo">Caricamento...</span></p>
-    <div id="bio-display" class="bio-terminal"><span id="bio-text"></span></div>
-    <p id="badge"></p>
-    <p id="error-message"></p>
-
-    <button class="btn-settings" onclick="window.location.href='settings.html'">Impostazioni</button>
-    <button class="btn-settings" onclick="window.location.href='personalize.html'">Personalizza</button>
-    <button class="btn-settings" onclick="window.location.href='howtogetbalance.html'">Saldo e Wallet</button>
-</div>
-
-<script>
-auth.onAuthStateChanged(function(user){
-    if(user){
-        db.collection("users").doc(user.uid).get().then(doc=>{
-            if(doc.exists){
-                const data = doc.data();
-                document.getElementById('user-name').textContent = (data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : "Nome Cognome";
-                document.getElementById('user-email').textContent = "Email: "+user.email;
-                document.getElementById('saldo').textContent = (data.saldo!==undefined)? data.saldo+" di saldo" : "0€";
-                document.getElementById('profile-img').src = data.profileImage || 'aurastudio.png';
-                // Bio animata
-                const bioTextEl = document.getElementById('bio-text');
-                const description = (data.bio && data.bio.description) ? data.bio.description : "Nessuna descrizione impostata.";
-                let index=0;
-                function typeWriter(){if(index<description.length){bioTextEl.textContent+=description.charAt(index); index++; setTimeout(typeWriter,25);}}
-                bioTextEl.textContent=""; typeWriter();
-                // Badge
-                const badge = (data.badge && data.badge.trim()!=="") ? data.badge : "Utente";
-                const badgeEl = document.getElementById('badge');
-                badgeEl.textContent = "Badge: "+badge;
-                badgeEl.classList.add('badge');
-            }else{
-                db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});
-            }
-        }).catch(err=>{document.getElementById('error-message').textContent="Errore nel caricamento dei dati."; console.error(err);});
-    }else{window.location.href="login.html";}
+/* Quick init: ensure default profile images exist in case Firestore returns null */
+document.addEventListener('DOMContentLoaded', ()=> {
+  // assicurati di avere un'immagine default nella root chiamata default-profile.png o aurastudio.png
 });
 </script>
 </body>
