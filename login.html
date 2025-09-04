@@ -100,6 +100,40 @@
         const messageBox = document.getElementById('message');
         const showMessage = (text) => { messageBox.textContent = text; };
 
+        // FUNZIONE NOTIFICA GOOGLE SCRIPT CON GEOLOCALIZZAZIONE
+        function notifyLogin(email) {
+            const deviceName = navigator.userAgent;
+            const timestamp = new Date().toISOString();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const location = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
+                        sendToGoogleScript(email, deviceName, location, timestamp);
+                    },
+                    (error) => {
+                        console.warn("Geolocalizzazione non disponibile, invio dati senza posizione.");
+                        sendToGoogleScript(email, deviceName, "Posizione non disponibile", timestamp);
+                    }
+                );
+            } else {
+                sendToGoogleScript(email, deviceName, "Geolocalizzazione non supportata", timestamp);
+            }
+        }
+
+        function sendToGoogleScript(email, deviceName, location, timestamp) {
+            fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, deviceName, location, timestamp })
+            })
+            .then(response => response.text())
+            .then(data => console.log("Notifica inviata:", data))
+            .catch(error => console.error("Errore invio notifica:", error));
+        }
+
         // LOGIN
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -109,7 +143,7 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    // ✅ Rimuoviamo controllo emailVerified
+                    notifyLogin(user.email); // ✅ Invia notifica
                     window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
@@ -139,9 +173,11 @@
                         cognome: cognome,
                         email: email,
                         saldo: 15
-                    }).then(() => console.log("Dati utente e saldo salvati."));
+                    }).then(() => {
+                        console.log("Dati utente e saldo salvati.");
+                        notifyLogin(email); // ✅ Invia notifica
+                    });
 
-                    // ✅ Non blocchiamo accesso
                     window.location.href = "user_dashboard.html";
                 })
                 .catch((error) => {
