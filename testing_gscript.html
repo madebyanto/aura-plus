@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test Google Script - Device reale e posizione</title>
-<style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Test Google Script - Device reale e posizione
+  </title>
+  <style>
+   body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
     input, button { padding: 10px; margin: 5px 0; width: 100%; max-width: 400px; }
     #console { background: #222; color: #0f0; padding: 10px; height: 250px; overflow-y: auto; font-family: monospace; }
-</style>
-</head>
-<body>
-
-<h2>Test Google Script</h2>
-
-<input type="email" id="email" placeholder="Inserisci la tua email">
-<button id="testButton">Invia Test Email</button>
-
-<h3>Console virtuale:</h3>
-<div id="console"></div>
-
-<script>
-const consoleDiv = document.getElementById('console');
-function log(msg) { 
-    consoleDiv.innerHTML += msg + '<br>'; 
+  </style>
+ </head>
+ <body>
+  <h2>
+   Test Google Script
+  </h2>
+  <input id="email" placeholder="Inserisci la tua email" type="email"/>
+  <button id="testButton">
+   Invia Test Email
+  </button>
+  <h3>
+   Console virtuale:
+  </h3>
+  <div id="console">
+  </div>
+  <script>
+   const consoleDiv = document.getElementById('console');
+function log(msg) {
+    consoleDiv.innerHTML += msg + '<br>';
     consoleDiv.scrollTop = consoleDiv.scrollHeight;
 }
 
@@ -86,7 +91,7 @@ document.getElementById('testButton').addEventListener('click', () => {
 });
 
 function sendTest(email, deviceName, location, timestamp) {
-    fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbxTUGexzYk9fl99phvPQfKzwgEk7kKd7DScZvjfT3B2cct8xis04G4MhkWHGs5K9PNe/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, deviceName, location, timestamp })
@@ -95,7 +100,6 @@ function sendTest(email, deviceName, location, timestamp) {
     .then(data => log("Risposta Web App: " + data))
     .catch(error => log("Errore fetch: " + error));
 }
-</script>
-
-</body>
+  </script>
+ </body>
 </html>
