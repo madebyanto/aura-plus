@@ -290,7 +290,7 @@ async function sendNyraMessage(){
       body: JSON.stringify({conversation: conversationHistory})
     });
     const data = await response.json();
-    const reply = data.reply || 'Nyra non ha risposto.';
+    const reply = data.message || data.response || 'Nyra non ha risposto.';
     conversationHistory.push({role:'nyra', content:reply});
     chatContainer.innerHTML += `<div style="margin:0.3rem 0;text-align:left;">✨ ${reply}</div>`;
     chatContainer.scrollTop = chatContainer.scrollHeight;
