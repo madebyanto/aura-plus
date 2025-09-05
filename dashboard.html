@@ -284,7 +284,7 @@ async function sendNyraMessage(){
   chatContainer.innerHTML += `<div style="margin:0.3rem 0;text-align:right;">👤 ${message}</div>`;
   input.value=''; chatContainer.scrollTop = chatContainer.scrollHeight;
   try {
-    const response = await fetch('https://api.nyra.aurastudioitalia.it', {
+    const response = await fetch('https://api.nyra.aurastudioitalia.it/nyra', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({conversation: conversationHistory})
