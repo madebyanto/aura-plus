@@ -31,18 +31,14 @@ body {
   flex-direction:column;
   color:#fff;
 }
-
-/* Container principale */
 main {
   flex:1;
   display:flex;
   justify-content:center;
   align-items:flex-start;
   padding:1rem;
-  padding-bottom:120px; /* spazio per la navbar e + */
+  padding-bottom:80px;
 }
-
-/* Card */
 .dashboard-card {
   width:100%;
   max-width:420px;
@@ -52,8 +48,6 @@ main {
   box-shadow:0 8px 25px rgba(0,0,0,0.3);
   backdrop-filter:blur(12px);
 }
-
-/* Profilo */
 .profile-header {
   display:flex;
   align-items:center;
@@ -89,213 +83,37 @@ main {
   margin-top:2px;
   word-break:break-word;
 }
-
-#user-uid {
-  font-size: 0.65rem;  /* più piccolo dell’email */
-  opacity: 0.7;
-}
-
-/* Saldo widget */
-.saldo-widget {
-  margin:1rem 0;
-  background:rgba(0,0,0,0.3);
-  border-radius:12px;
-  padding:0.8rem 1rem;
-}
-.saldo-widget small {
-  display:block;
-  font-size:0.8rem;
-  opacity:0.8;
-}
-.saldo-widget .amount {
-  font-size:1.6rem;
-  font-weight:600;
-  color:#00c3ff;
-  margin-top:0.2rem;
-  text-align:left;
-}
-
-/* Bio terminal */
-.bio-terminal {
-  font-family:'Courier New',monospace;
-  background:rgba(0,0,0,0.3);
-  padding:0.8rem;
-  border-radius:12px;
-  border-left:4px solid #888;
-  white-space:pre-wrap;
-  text-align:left;
-  min-height:60px;
-  margin-top:0.8rem;
-}
-
-/* Navbar */
-.navbar {
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:65px;
-  background:rgba(255,255,255,0.2);
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  backdrop-filter:blur(10px);
-  border-radius:20px 20px 0 0;
-  z-index:50;
-}
-.nav-item {
-  flex:1;
-  text-align:center;
-  font-size:1.6rem;
-  cursor:pointer;
-  transition:0.2s;
-}
-.nav-item.active {
-  transform:scale(1.2);
-}
-
-/* Notizie */
-#news-section {
-  display:none;
-  width:100%;
-  max-width:420px;
-}
-.news-header {
-  font-weight:600;
-  font-size:1.2rem;
-  margin-bottom:0.8rem;
-}
-.news-container {
-  display:flex;
-  overflow-x:auto;
-  gap:1rem;
-  flex-direction:row; /* da Z a A */
-  scroll-snap-type:x mandatory;
-}
-.news-card {
-  flex:0 0 260px;
-  background:rgba(255,255,255,0.15);
-  border-radius:16px;
-  padding:0.8rem;
-  scroll-snap-align:center;
-}
-.news-card img {
-  width:100%;
-  height:140px;
-  border-radius:12px;
-  object-fit:cover;
-}
-.news-card h3 {
-  margin:0.5rem 0;
-  font-size:1rem;
-}
-.news-card p {
-  font-size:0.85rem;
-  opacity:0.9;
-}
-.news-card a {
-  display:inline-block;
-  margin-top:0.4rem;
-  font-size:0.8rem;
-  color:#00c3ff;
-}
-
-/* Community */
-#community-section {
-  display:none;
-  width:100%;
-  max-width:420px;
-}
-.community-header {
-  font-weight:600;
-  font-size:1.2rem;
-  margin-bottom:0.8rem;
-}
-#posts-container {
-  display:flex;
-  flex-direction:column;
-  gap:1rem;
-  margin-bottom: 1rem;
-}
-/* post card */
-.post-card {
-  background:rgba(255,255,255,0.12);
-  border-radius:12px;
-  padding:0.8rem;
-  color:#fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-}
-.post-header {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.post-user {
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-}
-.post-user img { width:40px; height:40px; border-radius:50%; object-fit:cover; }
-.post-name { font-weight:600; }
-.post-time { color:#ccc; font-size:0.8rem; opacity:0.9; }
-
-/* + button (floating) */
-#new-post-btn {
-  position:fixed;
-  bottom:85px;
-  right:20px;
-  font-size:2rem;
-  border:none;
-  border-radius:50%;
-  width:56px;
-  height:56px;
-  background:#00c3ff;
-  color:#fff;
-  cursor:pointer;
-  z-index:60;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.3);
-}
-
-/* new post widget */
-#new-post-widget {
-  display:none;
-  position:fixed;
-  bottom:150px;
-  right:20px;
-  background:rgba(0,0,0,0.9);
-  padding:1rem;
-  border-radius:12px;
-  width:320px;
-  z-index:1000;
-  flex-direction:column;
-  gap:0.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-#new-post-widget textarea {
-  width:100%;
-  height:90px;
-  border-radius:8px;
-  padding:0.5rem;
-  resize:none;
-  border:none;
-  outline:none;
-  font-family:inherit;
-}
-#new-post-widget .btn-row { display:flex; gap:0.5rem; }
-#new-post-widget button { flex:1; padding:0.6rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
-#post-btn { background:#00c3ff; color:#fff; }
-#cancel-btn { background:#ff4b4b; color:#fff; }
-
-/* Delete button */
-.del-btn { margin-top:0.6rem; background:#ff4b4b; color:#fff; border:none; border-radius:8px; padding:0.4rem; cursor:pointer; font-weight:600; }
-
-/* Mobile */
-@media(max-width:480px){
-  .user-info h2 {font-size:1rem;}
-  .saldo-widget .amount {font-size:1.3rem;}
-  #new-post-widget { width:90%; right:5%; bottom:120px; }
-  #new-post-btn { right:16px; bottom:80px; }
-}
+#user-uid {font-size:0.65rem; opacity:0.7;}
+.saldo-widget {margin:1rem 0; background:rgba(0,0,0,0.3); border-radius:12px; padding:0.8rem 1rem;}
+.saldo-widget small {display:block; font-size:0.8rem; opacity:0.8;}
+.saldo-widget .amount {font-size:1.6rem; font-weight:600; color:#00c3ff; margin-top:0.2rem; text-align:left;}
+.bio-terminal {font-family:'Courier New',monospace; background:rgba(0,0,0,0.3); padding:0.8rem; border-radius:12px; border-left:4px solid #888; white-space:pre-wrap; text-align:left; min-height:60px; margin-top:0.8rem;}
+.navbar {position:fixed; bottom:0; left:0; width:100%; height:65px; background:rgba(255,255,255,0.2); display:flex; justify-content:space-around; align-items:center; backdrop-filter:blur(10px); border-radius:20px 20px 0 0;}
+.nav-item {flex:1; text-align:center; font-size:1.6rem; cursor:pointer; transition:0.2s;}
+.nav-item.active {transform:scale(1.2);}
+#news-section {display:none; width:100%; max-width:420px;}
+.news-header {font-weight:600; font-size:1.2rem; margin-bottom:0.8rem;}
+.news-container {display:flex; overflow-x:auto; gap:1rem; flex-direction:row; scroll-snap-type:x mandatory;}
+.news-card {flex:0 0 260px; background:rgba(255,255,255,0.15); border-radius:16px; padding:0.8rem; scroll-snap-align:center;}
+.news-card img {width:100%; height:140px; border-radius:12px; object-fit:cover;}
+.news-card h3 {margin:0.5rem 0; font-size:1rem;}
+.news-card p {font-size:0.85rem; opacity:0.9;}
+.news-card a {display:inline-block; margin-top:0.4rem; font-size:0.8rem; color:#00c3ff;}
+.channel-widget {background:rgba(0, 0, 0, 0.3); border-radius: 16px; padding: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.8rem; margin-top: 1.5rem;}
+.channel-widget img {width: 300px; height: 150px; border-radius: 5%;}
+.channel-widget h3 {font-size: 1.1rem; font-weight: 600; margin: 0;}
+.channel-widget p {font-size: 0.8rem; opacity: 0.8; margin: 0;}
+.channel-buttons {display: flex; gap: 1rem; margin-top: 0.5rem;}
+.channel-buttons a {display: flex; align-items: center; justify-content: center; padding: 0.6rem 1rem; border-radius: 12px; color: #fff; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: 0.3s;}
+.channel-buttons .whatsapp {background: #25D366;}
+.channel-buttons .telegram {background: #0088CC;}
+.channel-buttons a:hover {filter: brightness(1.2);}
+#account-section {display:none; width:100%; max-width:420px;}
+.account-header {font-weight:600; font-size:1.2rem; margin-bottom:0.8rem;}
+.account-options button {display:block; width:100%; padding:0.8rem; margin:0.5rem 0; border:none; border-radius:12px; font-size:1rem; background:#f174ff; color:#fff; font-weight:500; cursor:pointer; transition:0.3s;}
+.account-options button:hover {background:#e008f6;}
+#community-section {display:none; width:100%; max-width:420px;}
+@media(max-width:480px){ .user-info h2 {font-size:1rem;} .saldo-widget .amount {font-size:1.3rem;} }
 </style>
 </head>
 <body>
@@ -339,7 +157,7 @@ main {
         <a href="#">Leggi di più</a>
       </div>
     </div>
-    <div class="channel-widget" style="margin-top:1.5rem;">
+    <div class="channel-widget">
       <img src="https://aurastudioitalia.it/aura-grafic-2.png" alt="Aura Logo">
       <h3>Aura a portata di chat</h3>
       <p>Unisciti ai canali WhatsApp e/o Telegram per ricevere tutte le news a portata di chat!</p>
@@ -351,9 +169,10 @@ main {
   </div>
 
   <div id="community-section">
-    <div class="community-header">Community</div>
-    <div id="posts-container"></div>
-    <!-- NOTE: il bottone + è fuori (floating) -->
+    <div class="community-header" style="font-weight:600; font-size:1.2rem; margin-bottom:0.8rem;">Community</div>
+    <div id="posts-container" style="display:flex; flex-direction:column; gap:1rem;"></div>
+    <!-- Bottone + -->
+    <button id="new-post-btn" style="position:fixed; bottom:80px; right:20px; font-size:2rem; border:none; border-radius:50%; width:50px; height:50px; background:#00c3ff; color:#fff; cursor:pointer;">+</button>
   </div>
 
   <div id="account-section">
@@ -366,7 +185,6 @@ main {
   </div>
 </main>
 
-<!-- Navbar -->
 <div class="navbar">
   <div class="nav-item active" onclick="showSection('dashboard')">🏠</div>
   <div class="nav-item" onclick="showSection('news')">📰</div>
@@ -374,235 +192,125 @@ main {
   <div class="nav-item" onclick="showSection('account')">⚙️</div>
 </div>
 
-<!-- Floating + button -->
-<button id="new-post-btn" title="Nuovo post">+</button>
-
-<!-- New post widget (messo prima dello script in modo che esista) -->
-<div id="new-post-widget" aria-hidden="true">
-  <textarea id="post-text" maxlength="150" placeholder="Scrivi la tua frase... (max 150)"></textarea>
-  <div class="btn-row">
-    <button id="post-btn">Posta</button>
-    <button id="cancel-btn">Annulla</button>
+<!-- Widget nuovo post -->
+<div id="new-post-widget" style="display:none; position:fixed; bottom:80px; right:20px; background:rgba(0,0,0,0.8); padding:1rem; border-radius:12px; width:300px; z-index:1000; flex-direction:column; gap:0.5rem;">
+  <textarea id="post-text" maxlength="150" placeholder="Scrivi la tua frase..." style="width:100%; height:80px; border-radius:8px; padding:0.5rem;"></textarea>
+  <div style="display:flex; justify-content:space-between; gap:0.5rem;">
+    <button id="post-btn" style="flex:1; background:#00c3ff; color:#fff; border:none; border-radius:8px; cursor:pointer;">Posta</button>
+    <button id="cancel-btn" style="flex:1; background:#ff4b4b; color:#fff; border:none; border-radius:8px; cursor:pointer;">Annulla</button>
   </div>
 </div>
 
 <script>
-// Tutto il codice eseguito dopo che il DOM è pronto
-document.addEventListener('DOMContentLoaded', () => {
-  // ELEMENTI
-  const newPostBtn = document.getElementById('new-post-btn');
-  const newPostWidget = document.getElementById('new-post-widget');
-  const postBtn = document.getElementById('post-btn');
-  const cancelBtn = document.getElementById('cancel-btn');
-  const postText = document.getElementById('post-text');
-  const postsContainer = document.getElementById('posts-container');
+// Mostra la sezione selezionata
+function showSection(section){
+  document.getElementById("dashboard-section").style.display="none";
+  document.getElementById("news-section").style.display="none";
+  document.getElementById("account-section").style.display="none";
+  document.getElementById("community-section").style.display="none";
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
 
-  // Funzione per mostrare sezioni (unica)
-  function showSection(section){
-    document.getElementById("dashboard-section").style.display="none";
-    document.getElementById("news-section").style.display="none";
-    document.getElementById("account-section").style.display="none";
-    document.getElementById("community-section").style.display="none";
-    document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  if(section==="dashboard"){document.getElementById("dashboard-section").style.display="block"; document.querySelectorAll('.nav-item')[0].classList.add('active');}
+  else if(section==="news"){document.getElementById("news-section").style.display="block"; document.querySelectorAll('.nav-item')[1].classList.add('active');}
+  else if(section==="community"){document.getElementById("community-section").style.display="block"; document.querySelectorAll('.nav-item')[2].classList.add('active');}
+  else{document.getElementById("account-section").style.display="block"; document.querySelectorAll('.nav-item')[3].classList.add('active');}
+}
 
-    if(section==="dashboard"){
-      document.getElementById("dashboard-section").style.display="block";
-      document.querySelectorAll('.nav-item')[0].classList.add('active');
-    }else if(section==="news"){
-      document.getElementById("news-section").style.display="block";
-      document.querySelectorAll('.nav-item')[1].classList.add('active');
-    }else if(section==="community"){
-      document.getElementById("community-section").style.display="block";
-      document.querySelectorAll('.nav-item')[2].classList.add('active');
-    }else{
-      document.getElementById("account-section").style.display="block";
-      document.querySelectorAll('.nav-item')[3].classList.add('active');
-    }
-  }
-  // rendi disponibile globalmente la funzione (usata dagli onclick nel markup)
-  window.showSection = showSection;
-
-  // UTIL: formato timestamp
-  function formatTimestamp(ts){
-    if(!ts) return '';
-    try {
-      const d = (ts.toDate) ? ts.toDate() : new Date(ts);
-      return d.toLocaleString();
-    } catch(e){ return ''; }
-  }
-
-  // Cache per user info (evita chiamate ripetute)
-  const userCache = {};
-
-  // Funzione per renderizzare i post
-  function renderPosts(postItems){
-    postsContainer.innerHTML = '';
-    if(postItems.length === 0){
-      postsContainer.innerHTML = '<div style="color:#ddd; opacity:0.9; padding:0.6rem;">Nessun post ancora. Sii il primo!</div>';
-      return;
-    }
-    postItems.forEach(post => {
-      const div = document.createElement('div');
-      div.className = 'post-card';
-      div.innerHTML = `
-        <div class="post-header">
-          <div class="post-user">
-            <img src="${post.profileImage || 'aurastudio.png'}" alt="avatar">
-            <div>
-              <div class="post-name">${post.nome || 'Utente'} ${post.cognome || ''}</div>
-            </div>
-          </div>
-          <div class="post-time">${formatTimestamp(post.timestamp)}</div>
-        </div>
-        <p style="margin-top:0.6rem; white-space:pre-wrap;">${escapeHtml(post.frase)}</p>
-      `;
-      // se sei autore, aggiungi elimina
-      if(auth.currentUser && post.uid === auth.currentUser.uid){
-        const del = document.createElement('button');
-        del.className = 'del-btn';
-        del.textContent = 'Elimina post';
-        del.onclick = async () => {
-          if(confirm('Sei sicuro di voler eliminare questo post?')){
-            try{
-              await db.collection('community').doc(post._id).delete();
-            }catch(err){
-              console.error('Errore eliminazione', err);
-              alert('Errore durante l\'eliminazione');
-            }
-          }
-        };
-        div.appendChild(del);
-      }
-      postsContainer.appendChild(div);
-    });
-  }
-
-  // escape semplice per evitare HTML injection
-  function escapeHtml(str){
-    if(!str) return '';
-    return str.replace(/[&<>"'`]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[m]; });
-  }
-
-  // MOSTRA/NASCONDI widget
-  newPostBtn.addEventListener('click', () => {
-    if(newPostWidget.style.display === 'flex' || newPostWidget.style.display === 'block'){
-      newPostWidget.style.display = 'none';
-      newPostWidget.setAttribute('aria-hidden','true');
-    } else {
-      newPostWidget.style.display = 'flex';
-      newPostWidget.setAttribute('aria-hidden','false');
-      postText.focus();
-    }
-  });
-  cancelBtn.addEventListener('click', () => {
-    postText.value = '';
-    newPostWidget.style.display = 'none';
-    newPostWidget.setAttribute('aria-hidden','true');
-  });
-
-  // PUBBLICA post
-  postBtn.addEventListener('click', async () => {
-    const frase = postText.value.trim();
-    if(!auth.currentUser) return alert('Devi essere loggato per postare.');
-    if(frase.length === 0 || frase.length > 150) return alert('Scrivi una frase valida (1-150 caratteri).');
-
-    try{
-      // calcola id progressivo (semplice)
-      const snapshot = await db.collection('community').get();
-      const numero = snapshot.size + 1;
-      const idPost = `post#${String(numero).padStart(3,'0')}`;
-
-      await db.collection('community').doc(idPost).set({
-        uid: auth.currentUser.uid,
-        frase,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      postText.value = '';
-      newPostWidget.style.display = 'none';
-    }catch(err){
-      console.error('Errore pubblicazione', err);
-      alert('Errore durante la pubblicazione.');
-    }
-  });
-
-  // Listener firebase: unisce caricamento dati utente e feed in realtime
-  let unsubscribePosts = null;
-
-  auth.onAuthStateChanged(async (user) => {
-    if(!user){
-      // se non loggato, rimanda al login (come prima)
-      window.location.href = "login.html";
-      return;
-    }
-
-    // Carica dati utente e mostra sulla dashboard
-    try{
-      const doc = await db.collection('users').doc(user.uid).get();
+// Firebase user data
+auth.onAuthStateChanged(user=>{
+  if(user){
+    db.collection("users").doc(user.uid).get().then(doc=>{
       if(doc.exists){
-        const data = doc.data();
-        // user-name: sostituisce SOLO il testo (mantiene badge span)
-        const userNameEl = document.getElementById('user-name');
-        userNameEl.childNodes[0].nodeValue = (data.nome && data.cognome) ? `${data.nome} ${data.cognome} ` : 'Nome Cognome ';
-        document.getElementById('user-email').textContent = " " + (user.email || '');
-        document.getElementById('user-uid').textContent = "UID: " + user.uid;
-        document.getElementById('saldo').textContent = (data.saldo !== undefined) ? data.saldo + " €" : "0 €";
-        document.getElementById('profile-img').src = data.profileImage || 'aurastudio.png';
-
-        const bioTextEl = document.getElementById('bio-text');
-        const description = (data.bio && data.bio.description) ? data.bio.description : "Nessuna descrizione impostata.";
-        // typewriter (semplice)
-        bioTextEl.textContent = "";
-        let idx = 0;
-        (function typeWriter(){
-          if(idx < description.length){ bioTextEl.textContent += description.charAt(idx); idx++; setTimeout(typeWriter, 8); }
-        })();
-
-        document.getElementById('badge').textContent = (data.badge && data.badge.trim() !== "") ? data.badge : "Utente";
-      } else {
-        // doc non esiste: crea doc minimale
-        await db.collection('users').doc(user.uid).set({ saldo:15, profileImage:'aurastudio.png', badge:'' }, { merge: true });
+        const data=doc.data();
+        document.getElementById('user-name').childNodes[0].textContent = 
+          (data.nome&&data.cognome)?`${data.nome} ${data.cognome} `:"Nome Cognome ";
+        document.getElementById('user-email').textContent=" "+user.email;
+        document.getElementById('user-uid').textContent="UID: "+user.uid;
+        document.getElementById('saldo').textContent=(data.saldo!==undefined)?data.saldo+" €":"0 €";
+        document.getElementById('profile-img').src=data.profileImage||'aurastudio.png';
+        const bioTextEl=document.getElementById('bio-text');
+        const description=(data.bio&&data.bio.description)?data.bio.description:"Nessuna descrizione impostata.";
+        let index=0;
+        function typeWriter(){if(index<description.length){bioTextEl.textContent+=description.charAt(index);index++;setTimeout(typeWriter,25);}}
+        bioTextEl.textContent=""; typeWriter();
+        document.getElementById('badge').textContent=(data.badge&&data.badge.trim()!=="")?data.badge:"Utente";
+      }else{
+        db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});
       }
-    }catch(e){
-      console.error('Errore caricamento user doc', e);
+    });
+    loadPosts();
+  }else{window.location.href="login.html";}
+});
+
+// Community logic
+const newPostBtn = document.getElementById('new-post-btn');
+const newPostWidget = document.getElementById('new-post-widget');
+const postBtn = document.getElementById('post-btn');
+const cancelBtn = document.getElementById('cancel-btn');
+const postText = document.getElementById('post-text');
+const postsContainer = document.getElementById('posts-container');
+
+newPostBtn.onclick = ()=> newPostWidget.style.display='flex';
+cancelBtn.onclick = ()=> { postText.value=''; newPostWidget.style.display='none'; }
+
+// Carica i post
+async function loadPosts(){
+  postsContainer.innerHTML='';
+  const snapshot = await db.collection("community").orderBy("timestamp","desc").get();
+  snapshot.forEach(async docSnap=>{
+    const data = docSnap.data();
+    const userSnap = await db.collection("users").doc(data.uid).get();
+    const {nome, cognome, profileImage} = userSnap.exists ? userSnap.data() : {nome:"Utente", cognome:"", profileImage:"aurastudio.png"};
+    const postEl = document.createElement('div');
+    postEl.style.background='rgba(255,255,255,0.15)';
+    postEl.style.padding='0.8rem';
+    postEl.style.borderRadius='12px';
+    postEl.style.display='flex';
+    postEl.style.flexDirection='column';
+    postEl.style.gap='0.3rem';
+    postEl.innerHTML=`
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <img src="${profileImage||'aurastudio.png'}" style="width:40px; height:40px; border-radius:50%;">
+          <strong>${nome} ${cognome}</strong>
+        </div>
+        <small style="color:#ccc;">${data.timestamp?.toDate().toLocaleString()||''}</small>
+      </div>
+      <p style="margin:0.3rem 0;">${data.frase}</p>
+    `;
+    if(data.uid===auth.currentUser.uid){
+      const delBtn = document.createElement('button');
+      delBtn.textContent='Elimina post';
+      delBtn.style.background='#ff4b4b';
+      delBtn.style.color='#fff';
+      delBtn.style.border='none';
+      delBtn.style.borderRadius='8px';
+      delBtn.style.padding='0.3rem';
+      delBtn.style.cursor='pointer';
+      delBtn.onclick=async ()=>{
+        if(confirm('Sei sicuro di voler eliminare questo post?')){
+          await db.collection("community").doc(docSnap.id).delete();
+          loadPosts();
+        }
+      };
+      postEl.appendChild(delBtn);
     }
-
-    // Iscrizione realtime ai post ordinati per timestamp desc (i più recenti prima)
-    if(unsubscribePosts) unsubscribePosts();
-    unsubscribePosts = db.collection('community')
-      .orderBy('timestamp', 'desc')
-      .onSnapshot(async snapshot => {
-        // raccogli docs e per ognuno prendi user (cache)
-        const docs = snapshot.docs;
-        const items = await Promise.all(docs.map(async d => {
-          const data = d.data();
-          const uid = data.uid;
-          if(uid && !userCache[uid]){
-            try{
-              const udoc = await db.collection('users').doc(uid).get();
-              userCache[uid] = udoc.exists ? udoc.data() : { nome: 'Utente', cognome: '', profileImage: 'aurastudio.png' };
-            }catch(e){
-              userCache[uid] = { nome: 'Utente', cognome: '', profileImage: 'aurastudio.png' };
-            }
-          }
-          const u = userCache[uid] || { nome: 'Utente', cognome: '', profileImage: 'aurastudio.png' };
-          return {
-            _id: d.id,
-            uid: uid,
-            frase: data.frase || '',
-            timestamp: data.timestamp || null,
-            nome: u.nome,
-            cognome: u.cognome,
-            profileImage: u.profileImage
-          };
-        }));
-        renderPosts(items);
-      }, err => {
-        console.error('Errore snapshot posts', err);
-      });
+    postsContainer.appendChild(postEl);
   });
+}
 
-}); // DOMContentLoaded
+// Pubblica post
+postBtn.onclick = async ()=>{
+  const frase = postText.value.trim();
+  if(frase.length===0 || frase.length>150) return alert('Scrivi una frase valida (max 150 caratteri)');
+  await db.collection("community").add({
+    uid: auth.currentUser.uid,
+    frase,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  postText.value=''; newPostWidget.style.display='none';
+  loadPosts();
+}
 </script>
-
 </body>
 </html>
