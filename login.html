@@ -1,184 +1,213 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login / Signup</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-        authDomain: "myauraid-f03c6.firebaseapp.com",
-        projectId: "myauraid-f03c6",
-        storageBucket: "myauraid-f03c6.appspot.com",
-        messagingSenderId: "190478237725",
-        appId: "1:190478237725:web:0d39907473f511b85a06f4"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => console.log("Persistenza attivata."))
-        .catch((error) => console.error("Errore persistenza:", error.message));
-</script>
-<style>
-* {margin:0; padding:0; box-sizing:border-box;}
-body {
-    font-family:'Poppins',sans-serif;
-    background: linear-gradient(135deg, #6a0dad, #d147ff);
-    color:#fff;
-    display:flex; justify-content:center; align-items:center;
-    height:100vh;
-}
-.container {
-    background: rgba(0,0,0,0.6);
-    padding:40px;
-    border-radius:25px;
-    width:100%; max-width:450px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.4);
-    text-align:center;
-}
-.logo {width:140px; margin-bottom:25px;}
-h1 {font-size:2em; margin-bottom:20px; font-weight:600;}
-h2 {margin-bottom:20px; font-weight:400; color:#ffd6ff;}
-form {display:flex; flex-direction:column;}
-input {
-    padding:14px; margin:8px 0;
-    border:none; border-radius:10px;
-    font-size:15px;
-    background: rgba(255,255,255,0.15);
-    color:#fff;
-}
-input:focus {outline:none; border:2px solid #ff95ff;}
-button {
-    background:#ff95ff; color:#000;
-    padding:14px; border:none; border-radius:10px;
-    font-size:15px; cursor:pointer; margin-top:10px;
-    transition:0.3s;
-}
-button:hover {background:#ff6cff;}
-.login-link {margin-top:20px; font-size:14px;}
-.login-link a {color:#ff6cff; text-decoration:none;}
-.login-link a:hover {text-decoration:underline;}
-#message {margin:15px 0; color:#ffb3d9; font-weight:600;}
-hr {border:none; height:30px; background:transparent;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Signup Separati</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+            authDomain: "myauraid-f03c6.firebaseapp.com",
+            projectId: "myauraid-f03c6",
+            storageBucket: "myauraid-f03c6.appspot.com",
+            messagingSenderId: "190478237725",
+            appId: "1:190478237725:web:0d39907473f511b85a06f4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => console.log("Persistenza attivata."))
+            .catch((error) => console.error("Errore persistenza:", error.message));
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E30AF5, #F174FF);
+            color: #fff;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; text-align: center;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px; border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%; max-width: 400px;
+        }
+        .logo { width: 150px; margin-bottom: 20px; }
+        h1 { font-size: 1.8em; margin-bottom: 15px; font-weight: 600; }
+        h2 { margin-bottom: 20px; font-weight: 300; }
+        form { display: flex; flex-direction: column; }
+        input {
+            padding: 12px; margin: 10px 0; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.3); color: #fff;
+        }
+        input:focus { outline: none; border-color: #F174FF; }
+        button {
+            background-color: #F174FF; color: white;
+            padding: 12px; border: none; border-radius: 8px;
+            font-size: 14px; cursor: pointer; transition: background-color 0.3s ease;
+        }
+        button:hover { background-color: #e008f6; }
+        .login-link { margin-top: 20px; font-size: 14px; }
+        .login-link a { color: #e008f6; text-decoration: none; }
+        .login-link a:hover { text-decoration: underline; }
+        #message { margin: 15px 0; color: #ffb3d9; font-weight: 600; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <img src="auraaccount.png" alt="Aura Account" class="logo">
-    <h1>Benvenuto nel tuo profilo Aura</h1>
+    <!-- LOGIN -->
+    <div class="container" id="login-container">
+        <img src="auraaccount.png" alt="Aura Account" class="logo">
+        <h1>Accedi al tuo profilo Aura</h1>
 
-    <div id="message"></div>
+        <div id="message-login"></div>
 
-    <h2>Accedi</h2>
-    <form id="login-form">
-        <input type="email" id="login-email" placeholder="Email" required>
-        <input type="password" id="login-password" placeholder="Password" required>
-        <button type="submit">Accedi</button>
-    </form>
-    <p style="margin-top:10px; font-size:14px;">
-        <a href="#" id="forgot-password">Ho dimenticato la password</a>
-    </p>
-
-    <hr>
-
-    <h2>Registrati</h2>
-    <form id="signup-form">
-        <input type="text" id="signup-nome" placeholder="Nome" required>
-        <input type="text" id="signup-cognome" placeholder="Cognome" required>
-        <input type="email" id="signup-email" placeholder="Email" required>
-        <input type="password" id="signup-password" placeholder="Password" required>
-        <button type="submit">Registrati</button>
-    </form>
-
-    <div class="login-link">
-        <p>Creando un account Aura, dichiari di aver letto i nostri <a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a> e la nostra <a href="https://privacy.aurastudioitalia.it/privacypolicy.html">Privacy Policy</a>.</p>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button type="submit">Accedi</button>
+        </form>
+        <p style="margin-top:10px; font-size:14px;">
+            <a href="#" id="forgot-password" style="color:#ffffff;">Ho dimenticato la password</a>
+        </p>
     </div>
-</div>
 
-<script>
-const messageBox = document.getElementById('message');
-const showMessage = (text) => { messageBox.textContent = text; };
+    <hr style="border: none; height: 30px; background: transparent;">
 
-// Funzione notifiche con geolocalizzazione
-function notifyLogin(email){
-    const deviceName = navigator.userAgent;
-    const timestamp = new Date().toISOString();
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(
-            (pos)=>{sendToGoogleScript(email,deviceName,`Lat:${pos.coords.latitude.toFixed(4)}, Lon:${pos.coords.longitude.toFixed(4)}`,timestamp);},
-            ()=>{sendToGoogleScript(email,deviceName,"Posizione non disponibile",timestamp);}
-        );
-    } else sendToGoogleScript(email,deviceName,"Geolocalizzazione non supportata",timestamp);
-}
+    <!-- SIGNUP -->
+    <div class="container" id="signup-container">
+        <img src="auraaccount.png" alt="Aura Account" class="logo">
+        <h1>Registrati su Aura</h1>
 
-function sendToGoogleScript(email,deviceName,location,timestamp){
-    fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({email,deviceName,location,timestamp})
-    }).then(res=>res.text()).then(data=>console.log("Notifica inviata:",data)).catch(err=>console.error("Errore invio notifica:",err));
-}
+        <div id="message-signup"></div>
 
-// LOGIN
-document.getElementById('login-form').addEventListener('submit', function(event){
-    event.preventDefault();
-    const email=document.getElementById('login-email').value;
-    const password=document.getElementById('login-password').value;
+        <form id="signup-form">
+            <input type="text" id="signup-nome" placeholder="Nome" required>
+            <input type="text" id="signup-cognome" placeholder="Cognome" required>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button type="submit">Registrati</button>
+        </form>
 
-    auth.signInWithEmailAndPassword(email,password)
-        .then(userCredential=>{
-            const user=userCredential.user;
-            notifyLogin(user.email);
-            window.location.href="user_dashboard.html";
-        }).catch(error=>{
-            if(error.code==='auth/user-disabled') window.location.href="account_disabled.html";
-            else showMessage("Errore: "+error.message);
+        <div class="login-link">
+            <p>Creando un account Aura, dichiari di aver letto i nostri <a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a> e la nostra <a href="https://privacy.aurastudioitalia.it/privacypolicy.html">Privacy Policy</a>.</p>
+        </div>
+    </div>
+
+    <script>
+        const messageLogin = document.getElementById('message-login');
+        const messageSignup = document.getElementById('message-signup');
+        const showLoginMessage = (text) => { messageLogin.textContent = text; };
+        const showSignupMessage = (text) => { messageSignup.textContent = text; };
+
+        function notifyLogin(email) {
+            const deviceName = navigator.userAgent;
+            const timestamp = new Date().toISOString();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const location = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
+                        sendToGoogleScript(email, deviceName, location, timestamp);
+                    },
+                    (error) => {
+                        sendToGoogleScript(email, deviceName, "Posizione non disponibile", timestamp);
+                    }
+                );
+            } else {
+                sendToGoogleScript(email, deviceName, "Geolocalizzazione non supportata", timestamp);
+            }
+        }
+
+        function sendToGoogleScript(email, deviceName, location, timestamp) {
+            fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, deviceName, location, timestamp })
+            })
+            .then(response => response.text())
+            .then(data => console.log("Notifica inviata:", data))
+            .catch(error => console.error("Errore invio notifica:", error));
+        }
+
+        // LOGIN
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    notifyLogin(userCredential.user.email);
+                    window.location.href = "user_dashboard.html";
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/user-disabled') {
+                        window.location.href = "account_disabled.html";
+                    } else {
+                        showLoginMessage("Errore: " + error.message);
+                    }
+                });
         });
-});
 
-// SIGNUP
-document.getElementById('signup-form').addEventListener('submit', function(event){
-    event.preventDefault();
-    const nome=document.getElementById('signup-nome').value;
-    const cognome=document.getElementById('signup-cognome').value;
-    const email=document.getElementById('signup-email').value;
-    const password=document.getElementById('signup-password').value;
+        // SIGNUP
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nome = document.getElementById('signup-nome').value;
+            const cognome = document.getElementById('signup-cognome').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
 
-    auth.createUserWithEmailAndPassword(email,password)
-        .then(userCredential=>{
-            const user=userCredential.user;
-            db.collection("users").doc(user.uid).set({
-                nome:nome,
-                cognome:cognome,
-                saldo:15
-            }).then(()=>{console.log("Dati utente e saldo salvati."); notifyLogin(email);});
-            window.location.href="user_dashboard.html";
-        }).catch(error=>{
-            showMessage("Errore: "+error.message);
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+
+                    db.collection("users").doc(user.uid).set({
+                        nome: nome,
+                        cognome: cognome,
+                        email: email,
+                        saldo: 15
+                    }).then(() => notifyLogin(email));
+
+                    window.location.href = "user_dashboard.html";
+                })
+                .catch((error) => {
+                    showSignupMessage("Errore: " + error.message);
+                });
         });
-});
 
-// RECUPERO PASSWORD
-document.getElementById('forgot-password').addEventListener('click', function(e){
-    e.preventDefault();
-    const email=document.getElementById('login-email').value;
-    if(!email){showMessage("Inserisci l'email nel campo sopra per recuperare la password."); return;}
-    auth.sendPasswordResetEmail(email)
-        .then(()=>showMessage("Email di recupero inviata."))
-        .catch(error=>showMessage("Errore: "+error.message));
-});
+        // RECUPERO PASSWORD
+        document.getElementById('forgot-password').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            if (!email) {
+                showLoginMessage("Inserisci l'email nel campo sopra per recuperare la password.");
+                return;
+            }
+            auth.sendPasswordResetEmail(email)
+                .then(() => showLoginMessage("Email di recupero inviata."))
+                .catch((error) => showLoginMessage("Errore: " + error.message));
+        });
 
-// Mantieni login dopo refresh
-auth.onAuthStateChanged(user=>{
-    if(user) window.location.href="user_dashboard.html";
-});
-</script>
+        // Mantieni login utente dopo refresh
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = "user_dashboard.html";
+            }
+        });
+    </script>
 
 </body>
 </html>
