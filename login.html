@@ -3,153 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aura Login / Signup</title>
+<title>Login / Signup Aura</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+    authDomain: "myauraid-f03c6.firebaseapp.com",
+    projectId: "myauraid-f03c6",
+    storageBucket: "myauraid-f03c6.appspot.com",
+    messagingSenderId: "190478237725",
+    appId: "1:190478237725:web:0d39907473f511b85a06f4"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(()=>console.log("Persistenza attivata."))
+    .catch(e=>console.error("Errore persistenza:", e.message));
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#E30AF5,#F174FF);color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;text-align:center;}
-.container{background-color:rgba(255,255,255,0.1);padding:30px;border-radius:15px;box-shadow:0px 10px 30px rgba(0,0,0,0.15);width:100%;max-width:400px;display:none;}
-.container.active{display:block;}
-.logo{width:120px;margin-bottom:15px;}
-h1{font-size:1.6em;margin-bottom:15px;font-weight:600;}
-h2{margin-bottom:15px;font-weight:400;}
+.container{background-color:rgba(255,255,255,0.1);padding:30px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.15);width:100%;max-width:400px;}
+.logo{width:150px;margin-bottom:20px;}
+h1{font-size:1.8em;margin-bottom:15px;font-weight:600;}
+h2{margin:15px 0;font-weight:300;}
 form{display:flex;flex-direction:column;}
-input{padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;font-size:14px;background-color:rgba(255,255,255,0.25);color:#fff;}
-input::placeholder{color:#eee;}
+input{padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:8px;font-size:14px;background-color:rgba(255,255,255,0.3);color:#fff;}
 input:focus{outline:none;border-color:#F174FF;}
-button{background-color:#F174FF;color:white;padding:12px;border:none;border-radius:8px;font-size:15px;cursor:pointer;transition:0.3s;margin-top:10px;}
+button{background-color:#F174FF;color:white;padding:12px;border:none;border-radius:8px;font-size:14px;cursor:pointer;transition:0.3s;}
 button:hover{background-color:#e008f6;}
-.link{margin-top:15px;font-size:14px;}
-.link a{color:#fff;text-decoration:underline;cursor:pointer;}
-#message{margin:12px 0;font-size:14px;font-weight:500;color:#ffb3d9;}
+#message{margin:15px 0;color:#ffb3d9;font-weight:600;}
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}
+.tabs button{flex:1;margin:0 5px;}
+.tabs button.active{background-color:#fff;color:#F174FF;font-weight:600;}
+.hidden{display:none;}
+.link{margin-top:10px;font-size:14px;}
+.link a{color:#e008f6;text-decoration:none;}
+.link a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
+<div class="container">
+    <img src="auraaccount.png" alt="Aura Account" class="logo">
+    <h1>Benvenuto nel tuo profilo Aura</h1>
 
-<!-- LOGIN -->
-<div id="login-container" class="container active">
-<img src="auraaccount.png" alt="Aura Account" class="logo">
-<h1>Accedi al tuo Account Aura</h1>
-<div id="message"></div>
-<form id="login-form">
-<input type="email" id="login-email" placeholder="Email" required>
-<input type="password" id="login-password" placeholder="Password" required>
-<button type="submit">Accedi</button>
-</form>
-<p class="link"><a href="#" id="forgot-password">Ho dimenticato la password</a></p>
-<p class="link">Non hai un account? <a id="show-signup">Clicca qui</a></p>
-</div>
+    <div class="tabs">
+        <button id="tab-login" class="active">Login</button>
+        <button id="tab-signup">Registrati</button>
+    </div>
 
-<!-- SIGNUP -->
-<div id="signup-container" class="container">
-<img src="auraaccount.png" alt="Aura Account" class="logo">
-<h1>Crea un Account Aura</h1>
-<h2>Immergiti in una nuova esperienza</h2>
-<form id="signup-form">
-<input type="text" id="signup-nome" placeholder="Nome" required>
-<input type="text" id="signup-cognome" placeholder="Cognome" required>
-<input type="email" id="signup-email" placeholder="Email" required>
-<input type="password" id="signup-password" placeholder="Password" required>
-<button type="submit">Registrati</button>
-</form>
-<p class="link">Hai già un account? <a id="show-login">Accedi</a></p>
-<p style="font-size:12px;margin-top:10px;">Creando un account, dichiari di aver letto i nostri <a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a> e la <a href="https://privacy.aurastudioitalia.it/privacypolicy.html">Privacy Policy</a>.</p>
-</div>
+    <div id="message"></div>
 
-<!-- WELCOME -->
-<div id="welcome-container" class="container">
-<img src="auraaccount.png" alt="Aura Account" class="logo">
-<h1>È tutto pronto!</h1>
-<h2>Grazie per aver creato un account Aura.<br>Ti ricordiamo che i tuoi dati non verranno mai rivenduti senza il tuo consenso.</h2>
-<button onclick="window.location.href='user_dashboard.html'">Inizia</button>
+    <!-- LOGIN FORM -->
+    <form id="login-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button type="submit">Accedi</button>
+        <p class="link"><a href="#" id="forgot-password">Ho dimenticato la password</a></p>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="signup-form" class="hidden">
+        <input type="text" id="signup-nome" placeholder="Nome" required>
+        <input type="text" id="signup-cognome" placeholder="Cognome" required>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button type="submit">Registrati</button>
+        <p class="link">Creando un account Aura, dichiari di aver letto i nostri <a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a> e la <a href="https://privacy.aurastudioitalia.it/privacypolicy.html">Privacy Policy</a>.</p>
+    </form>
 </div>
 
 <script>
-// Firebase
-const firebaseConfig = {
-apiKey:"AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
-authDomain:"myauraid-f03c6.firebaseapp.com",
-projectId:"myauraid-f03c6",
-storageBucket:"myauraid-f03c6.appspot.com",
-messagingSenderId:"190478237725",
-appId:"1:190478237725:web:0d39907473f511b85a06f4"
-};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+const messageBox = document.getElementById('message');
+const showMessage = text => { messageBox.textContent = text; };
 
-// Containers
-const loginContainer=document.getElementById('login-container');
-const signupContainer=document.getElementById('signup-container');
-const welcomeContainer=document.getElementById('welcome-container');
-const messageBox=document.getElementById('message');
-const showMessage=(t)=>messageBox.textContent=t;
+// SWITCH TAB
+const loginTab = document.getElementById('tab-login');
+const signupTab = document.getElementById('tab-signup');
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
 
-// Switch
-document.getElementById('show-signup').onclick=()=>{loginContainer.classList.remove('active');signupContainer.classList.add('active');};
-document.getElementById('show-login').onclick=()=>{signupContainer.classList.remove('active');loginContainer.classList.add('active');};
+loginTab.addEventListener('click', ()=>{
+    loginTab.classList.add('active'); signupTab.classList.remove('active');
+    loginForm.classList.remove('hidden'); signupForm.classList.add('hidden');
+});
+signupTab.addEventListener('click', ()=>{
+    signupTab.classList.add('active'); loginTab.classList.remove('active');
+    signupForm.classList.remove('hidden'); loginForm.classList.add('hidden');
+});
 
-// Notifica
+// NOTIFICA GOOGLE SCRIPT
 function notifyLogin(email){
-const deviceName=navigator.userAgent;
-const timestamp=new Date().toISOString();
-if(navigator.geolocation){
-navigator.geolocation.getCurrentPosition(
-pos=>sendToGoogleScript(email,deviceName,`Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)}`,timestamp),
-()=>sendToGoogleScript(email,deviceName,"Posizione non disponibile",timestamp)
-);}else sendToGoogleScript(email,deviceName,"Geolocalizzazione non supportata",timestamp);}
-function sendToGoogleScript(email,deviceName,location,timestamp){
-fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,deviceName,location,timestamp})});}
+    const deviceName = navigator.userAgent;
+    const timestamp = new Date().toISOString();
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(pos=>{
+            const loc = `Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)}`;
+            sendToGoogleScript(email, deviceName, loc, timestamp);
+        },()=>{sendToGoogleScript(email, deviceName,"Posizione non disponibile",timestamp);});
+    } else sendToGoogleScript(email, deviceName,"Geolocalizzazione non supportata",timestamp);
+}
+
+function sendToGoogleScript(email, deviceName, location, timestamp){
+    fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email,deviceName,location,timestamp})
+    }).then(r=>r.text()).then(data=>console.log("Notifica inviata:",data))
+    .catch(e=>console.error("Errore invio notifica:",e));
+}
 
 // LOGIN
-document.getElementById('login-form').addEventListener('submit',e=>{
-e.preventDefault();
-const email=document.getElementById('login-email').value;
-const password=document.getElementById('login-password').value;
-auth.signInWithEmailAndPassword(email,password)
-.then(cred=>{
-if(!cred.user.emailVerified){
-cred.user.sendEmailVerification();
-showMessage("Controlla la tua email per verificare l'account.");
-return;
-}
-notifyLogin(cred.user.email);
-window.location.href="user_dashboard.html";
-})
-.catch(err=>err.code==='auth/user-disabled'?window.location.href="account_disabled.html":showMessage("Errore: "+err.message));
+loginForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    auth.signInWithEmailAndPassword(email,password)
+        .then(userCred=>{
+            const user = userCred.user;
+            notifyLogin(user.email);
+            window.location.href = "user_dashboard.html";
+        })
+        .catch(error=>{
+            console.error("Errore login:",error.message);
+            if(error.code==='auth/user-disabled'){window.location.href="account_disabled.html";}
+            else showMessage("Errore: "+error.message);
+        });
 });
 
 // SIGNUP
-document.getElementById('signup-form').addEventListener('submit',e=>{
-e.preventDefault();
-const nome=document.getElementById('signup-nome').value;
-const cognome=document.getElementById('signup-cognome').value;
-const email=document.getElementById('signup-email').value;
-const password=document.getElementById('signup-password').value;
-auth.createUserWithEmailAndPassword(email,password)
-.then(cred=>{
-cred.user.sendEmailVerification();
-db.collection("users").doc(cred.user.uid).set({nome,cognome,email,saldo:15})
-.then(()=>{notifyLogin(email);signupContainer.classList.remove('active');welcomeContainer.classList.add('active');});
-})
-.catch(err=>showMessage("Errore: "+err.message));
+signupForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const nome = document.getElementById('signup-nome').value;
+    const cognome = document.getElementById('signup-cognome').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    auth.createUserWithEmailAndPassword(email,password)
+        .then(userCred=>{
+            const user = userCred.user;
+            db.collection("users").doc(user.uid).set({
+                nome: nome,
+                cognome: cognome,
+                email: email,
+                saldo: 15
+            }).then(()=>console.log("Dati utente e saldo salvati."));
+            notifyLogin(email);
+            window.location.href="user_dashboard.html";
+        })
+        .catch(error=>{
+            console.error("Errore registrazione:",error.message);
+            showMessage("Errore: "+error.message);
+        });
 });
 
-// RESET PASSWORD
-document.getElementById('forgot-password').onclick=e=>{
-e.preventDefault();
-const email=document.getElementById('login-email').value;
-if(!email)return showMessage("Inserisci l'email per recuperare la password.");
-auth.sendPasswordResetEmail(email).then(()=>showMessage("Email di recupero inviata.")).catch(err=>showMessage("Errore: "+err.message));
-};
+// RECUPERO PASSWORD
+document.getElementById('forgot-password').addEventListener('click', e=>{
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    if(!email){showMessage("Inserisci l'email nel campo sopra per recuperare la password."); return;}
+    auth.sendPasswordResetEmail(email)
+        .then(()=>showMessage("Email di recupero inviata."))
+        .catch(err=>{console.error(err.message); showMessage("Errore: "+err.message);});
+});
 
-// Mantieni login
-auth.onAuthStateChanged(user=>{if(user)window.location.href="user_dashboard.html";});
+// MANTIENI LOGIN DOPO REFRESH
+auth.onAuthStateChanged(user=>{
+    if(user){window.location.href="user_dashboard.html";}
+});
 </script>
-
 </body>
 </html>
