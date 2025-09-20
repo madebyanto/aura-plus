@@ -213,7 +213,7 @@
 
                     // Invia email di verifica
                     user.sendEmailVerification()
-                        .then(() => showSignupMessage("Email di verifica inviata. Controlla la tua casella di posta."))
+                        .then(() => showSignupMessage("Email di verifica inviata. Controlla la tua casella di posta, poi, vai su Login e accedi."))
                         .catch((error) => console.error("Errore invio email verifica:", error.message));
 
                     // Salva dati utente su Firestore
