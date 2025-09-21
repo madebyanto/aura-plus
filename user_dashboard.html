@@ -214,8 +214,6 @@ main {
 </div>
 
 <script>
-console.log('v7 Community testing - Debug unificato')
-
 function showSection(section){
   document.getElementById("dashboard-section").style.display="none";
   document.getElementById("news-section").style.display="none";
@@ -314,7 +312,7 @@ async function loadPosts() {
       `;
 
       // Mostra il pulsante elimina solo se il post è del corrente utente
-      if (data.uid === auth.currentUser.uid) {
+      if (data.uid === auth.currentUser?.uid) {
         const delBtn = document.createElement('button');
         delBtn.textContent = 'Elimina post';
         delBtn.style.cssText = `
@@ -347,9 +345,9 @@ async function loadPosts() {
   }
 }
 
-// UNICA DEFINIZIONE DEL postBtn.onclick CON DEBUG COMPLETO
+// FUNZIONE PRINCIPALE PER POSTARE CON DEBUG
 postBtn.onclick = async () => {
-  console.log('=== DEBUG DATI POST ===');
+  console.log('=== DEBUG POST CLICK ===');
   console.log('Current User:', auth.currentUser);
   
   if (!auth.currentUser) {
@@ -368,6 +366,17 @@ postBtn.onclick = async () => {
   if (!frase || frase.length > 150) {
     console.log('❌ Frase non valida');
     return alert("Scrivi una frase valida (max 150 caratteri)");
+  }
+
+  // Prova prima a refreshare il token di autenticazione
+  try {
+    console.log('🔄 Refreshing auth token...');
+    await auth.currentUser.getIdToken(true);
+    console.log('✅ Token refreshed');
+  } catch (tokenErr) {
+    console.error('❌ Errore refresh token:', tokenErr);
+    alert('Errore di autenticazione. Riprova.');
+    return;
   }
 
   const postData = {
@@ -395,10 +404,20 @@ postBtn.onclick = async () => {
     console.error('❌ Errore creando post:', err);
     console.error('Codice errore:', err.code);
     console.error('Messaggio errore:', err.message);
-    alert("Errore: " + err.message);
+    console.error('Stack trace:', err.stack);
+    
+    // Gestione errori specifici
+    if (err.code === 'permission-denied') {
+      alert("Errore: permessi insufficienti. Controlla le regole Firestore.");
+    } else if (err.code === 'unauthenticated') {
+      alert("Errore: autenticazione scaduta. Ricarica la pagina.");
+    } else {
+      alert("Errore: " + err.message);
+    }
   }
 };
 
+console.log('v7 Community testing - JavaScript corretto con debug completo');
 </script>
 </body>
 </html>
