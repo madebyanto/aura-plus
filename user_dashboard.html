@@ -214,30 +214,8 @@ main {
 </div>
 
 <script>
-  
-    console.log('v6 Community testing')
-postBtn.onclick = async () => {
-  console.log('=== DEBUG DATI POST ===');
-  console.log('Current User:', auth.currentUser);
-  console.log('Current User UID:', auth.currentUser?.uid);
-  console.log('Current User UID type:', typeof auth.currentUser?.uid);
-  
-  const frase = postText.value.trim();
-  
-  const postData = {
-    uid: auth.currentUser.uid,
-    frase: String(frase),
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  };
-  
-  console.log('Post data:', postData);
-  console.log('Post data uid:', postData.uid);
-  console.log('Post data uid type:', typeof postData.uid);
-  console.log('Post data frase:', postData.frase);
-  console.log('Post data frase type:', typeof postData.frase);
-  
-  
-};
+console.log('v7 Community testing - Debug unificato')
+
 function showSection(section){
   document.getElementById("dashboard-section").style.display="none";
   document.getElementById("news-section").style.display="none";
@@ -251,7 +229,13 @@ function showSection(section){
 }
 
 auth.onAuthStateChanged(user=>{
+  console.log('=== AUTH STATE CHANGED ===');
+  console.log('User:', user);
+  
   if(user){
+    console.log('User UID:', user.uid);
+    console.log('User email:', user.email);
+    
     db.collection("users").doc(user.uid).get().then(doc=>{
       if(doc.exists){
         const data=doc.data();
@@ -266,10 +250,18 @@ auth.onAuthStateChanged(user=>{
         function typeWriter(){if(index<description.length){bioTextEl.textContent+=description.charAt(index);index++;setTimeout(typeWriter,25);}}
         bioTextEl.textContent=""; typeWriter();
         document.getElementById('badge').textContent=(data.badge&&data.badge.trim()!=="")?data.badge:"Utente";
-      }else{db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});}
+      }else{
+        db.collection("users").doc(user.uid).set({saldo:15,profileImage:'aurastudio.png',badge:''});
+      }
+    }).catch(err => {
+      console.error('❌ Errore caricamento dati utente:', err);
     });
+    
     loadPosts();
-  }else{window.location.href="login.html";}
+  }else{
+    console.log('User not authenticated - redirecting to login');
+    window.location.href="login.html";
+  }
 });
 
 const newPostBtn = document.getElementById('new-post-btn');
@@ -283,11 +275,15 @@ newPostBtn.onclick = () => newPostWidget.style.display = 'flex';
 cancelBtn.onclick = () => { postText.value = ''; newPostWidget.style.display = 'none'; }
 
 async function loadPosts() {
+  console.log('=== LOADING POSTS ===');
   postsContainer.innerHTML = '';
+  
   try {
     const snapshot = await db.collection("community")
       .orderBy("timestamp", "desc")
       .get();
+    
+    console.log('Posts found:', snapshot.size);
 
     snapshot.forEach(async docSnap => {
       const data = docSnap.data();
@@ -347,27 +343,59 @@ async function loadPosts() {
     });
 
   } catch (err) {
-    console.error('Errore caricando i post:', err);
+    console.error('❌ Errore caricando i post:', err);
   }
 }
 
+// UNICA DEFINIZIONE DEL postBtn.onclick CON DEBUG COMPLETO
 postBtn.onclick = async () => {
+  console.log('=== DEBUG DATI POST ===');
+  console.log('Current User:', auth.currentUser);
+  
+  if (!auth.currentUser) {
+    console.error('❌ Utente non autenticato');
+    alert('Errore: utente non autenticato');
+    return;
+  }
+  
+  console.log('Current User UID:', auth.currentUser.uid);
+  console.log('Current User UID type:', typeof auth.currentUser.uid);
+  
   const frase = postText.value.trim();
-  if (!frase || frase.length > 150) return alert("Scrivi una frase valida (max 150 caratteri)");
+  console.log('Frase da postare:', frase);
+  console.log('Lunghezza frase:', frase.length);
+  
+  if (!frase || frase.length > 150) {
+    console.log('❌ Frase non valida');
+    return alert("Scrivi una frase valida (max 150 caratteri)");
+  }
+
+  const postData = {
+    uid: auth.currentUser.uid,
+    frase: String(frase),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  
+  console.log('Post data:', postData);
+  console.log('Post data uid:', postData.uid);
+  console.log('Post data uid type:', typeof postData.uid);
+  console.log('Post data frase:', postData.frase);
+  console.log('Post data frase type:', typeof postData.frase);
 
   try {
-    const docRef = await db.collection("community").add({
-      uid: auth.currentUser.uid,                      // deve combaciare con regole
-      frase: String(frase),                           // forza a stringa
-      timestamp: firebase.firestore.FieldValue.serverTimestamp() // obbligatorio
-    });
-    console.log("Post creato ID:", docRef.id);
+    console.log('⏳ Tentativo creazione post...');
+    const docRef = await db.collection("community").add(postData);
+    console.log('✅ Post creato con successo! ID:', docRef.id);
+    
     postText.value = '';
     newPostWidget.style.display = 'none';
     loadPosts();
+    
   } catch (err) {
-    console.error("Errore creando post:", err);
-    alert("Errore: non hai i permessi per creare questo post.");
+    console.error('❌ Errore creando post:', err);
+    console.error('Codice errore:', err.code);
+    console.error('Messaggio errore:', err.message);
+    alert("Errore: " + err.message);
   }
 };
 
