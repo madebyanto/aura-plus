@@ -255,8 +255,9 @@ const cancelBtn = document.getElementById('cancel-btn');
 const postText = document.getElementById('post-text');
 const postsContainer = document.getElementById('posts-container');
 
-newPostBtn.onclick = ()=> newPostWidget.style.display='flex';
-cancelBtn.onclick = ()=> { postText.value=''; newPostWidget.style.display='none'; }
+newPostBtn.onclick = () => newPostWidget.style.display = 'flex';
+cancelBtn.onclick = () => { postText.value = ''; newPostWidget.style.display = 'none'; }
+
 async function loadPosts() {
   postsContainer.innerHTML = '';
   try {
@@ -272,12 +273,14 @@ async function loadPosts() {
         : { nome: "Utente", cognome: "", profileImage: "aurastudio.png" };
 
       const postEl = document.createElement('div');
-      postEl.style.background = 'rgba(255,255,255,0.15)';
-      postEl.style.padding = '0.8rem';
-      postEl.style.borderRadius = '12px';
-      postEl.style.display = 'flex';
-      postEl.style.flexDirection = 'column';
-      postEl.style.gap = '0.3rem';
+      postEl.style.cssText = `
+        background: rgba(255,255,255,0.15);
+        padding: 0.8rem;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      `;
 
       postEl.innerHTML = `
         <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -290,24 +293,26 @@ async function loadPosts() {
         <p style="margin:0.3rem 0;">${data.frase}</p>
       `;
 
-      // Bottone elimina solo se il post è del corrente utente
+      // Mostra il pulsante elimina solo se il post è del corrente utente
       if (data.uid === auth.currentUser.uid) {
         const delBtn = document.createElement('button');
         delBtn.textContent = 'Elimina post';
-        delBtn.style.background = '#ff4b4b';
-        delBtn.style.color = '#fff';
-        delBtn.style.border = 'none';
-        delBtn.style.borderRadius = '8px';
-        delBtn.style.padding = '0.3rem';
-        delBtn.style.cursor = 'pointer';
+        delBtn.style.cssText = `
+          background: #ff4b4b;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 0.3rem;
+          cursor: pointer;
+        `;
         delBtn.onclick = async () => {
           if (confirm('Sei sicuro di voler eliminare questo post?')) {
             try {
               await db.collection("community").doc(docSnap.id).delete();
               loadPosts();
             } catch (err) {
-              alert('Errore: impossibile eliminare il post.');
-              console.error(err);
+              console.error("Errore eliminando post:", err);
+              alert("Impossibile eliminare il post.");
             }
           }
         };
@@ -324,7 +329,7 @@ async function loadPosts() {
 
 postBtn.onclick = async () => {
   const frase = postText.value.trim();
-  if(!frase || frase.length>150) return alert("Scrivi una frase valida");
+  if (!frase || frase.length > 150) return alert("Scrivi una frase valida (max 150 caratteri)");
 
   try {
     const docRef = await db.collection("community").add({
@@ -333,13 +338,14 @@ postBtn.onclick = async () => {
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     console.log("Post creato ID:", docRef.id);
-    postText.value='';
-    newPostWidget.style.display='none';
+    postText.value = '';
+    newPostWidget.style.display = 'none';
     loadPosts();
-  } catch(err) {
+  } catch (err) {
     console.error("Errore creando post:", err);
+    alert("Errore creando il post.");
   }
-}
+};
 
 </script>
 </body>
