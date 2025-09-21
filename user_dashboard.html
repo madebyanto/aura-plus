@@ -257,64 +257,90 @@ const postsContainer = document.getElementById('posts-container');
 
 newPostBtn.onclick = ()=> newPostWidget.style.display='flex';
 cancelBtn.onclick = ()=> { postText.value=''; newPostWidget.style.display='none'; }
+async function loadPosts() {
+  postsContainer.innerHTML = '';
+  try {
+    const snapshot = await db.collection("community")
+      .orderBy("timestamp", "desc")
+      .get();
 
-async function loadPosts(){
-  postsContainer.innerHTML='';
-  const snapshot = await db.collection("community").orderBy("timestamp","desc").get();
-  snapshot.forEach(async docSnap=>{
-    const data = docSnap.data();
-    const userSnap = await db.collection("users").doc(data.uid).get();
-    const {nome, cognome, profileImage} = userSnap.exists ? userSnap.data() : {nome:"Utente", cognome:"", profileImage:"aurastudio.png"};
-    const postEl = document.createElement('div');
-    postEl.style.background='rgba(255,255,255,0.15)';
-    postEl.style.padding='0.8rem';
-    postEl.style.borderRadius='12px';
-    postEl.style.display='flex';
-    postEl.style.flexDirection='column';
-    postEl.style.gap='0.3rem';
-    postEl.innerHTML=`
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:0.5rem;">
-          <img src="${profileImage||'aurastudio.png'}" style="width:40px; height:40px; border-radius:50%;">
-          <strong>${nome} ${cognome}</strong>
+    snapshot.forEach(async docSnap => {
+      const data = docSnap.data();
+      const userSnap = await db.collection("users").doc(data.uid).get();
+      const { nome, cognome, profileImage } = userSnap.exists
+        ? userSnap.data()
+        : { nome: "Utente", cognome: "", profileImage: "aurastudio.png" };
+
+      const postEl = document.createElement('div');
+      postEl.style.background = 'rgba(255,255,255,0.15)';
+      postEl.style.padding = '0.8rem';
+      postEl.style.borderRadius = '12px';
+      postEl.style.display = 'flex';
+      postEl.style.flexDirection = 'column';
+      postEl.style.gap = '0.3rem';
+
+      postEl.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <img src="${profileImage || 'aurastudio.png'}" style="width:40px; height:40px; border-radius:50%;">
+            <strong>${nome} ${cognome}</strong>
+          </div>
+          <small style="color:#ccc;">${data.timestamp?.toDate().toLocaleString() || ''}</small>
         </div>
-        <small style="color:#ccc;">${data.timestamp?.toDate().toLocaleString()||''}</small>
-      </div>
-      <p style="margin:0.3rem 0;">${data.frase}</p>
-    `;
-    if(data.uid===auth.currentUser.uid){
-      const delBtn = document.createElement('button');
-      delBtn.textContent='Elimina post';
-      delBtn.style.background='#ff4b4b';
-      delBtn.style.color='#fff';
-      delBtn.style.border='none';
-      delBtn.style.borderRadius='8px';
-      delBtn.style.padding='0.3rem';
-      delBtn.style.cursor='pointer';
-      delBtn.onclick=async ()=>{
-        if(confirm('Sei sicuro di voler eliminare questo post?')){
-          await db.collection("community").doc(docSnap.id).delete();
-          loadPosts();
-        }
-      };
-      postEl.appendChild(delBtn);
-    }
-    postsContainer.appendChild(postEl);
-  });
+        <p style="margin:0.3rem 0;">${data.frase}</p>
+      `;
+
+      // Bottone elimina solo se il post è del corrente utente
+      if (data.uid === auth.currentUser.uid) {
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Elimina post';
+        delBtn.style.background = '#ff4b4b';
+        delBtn.style.color = '#fff';
+        delBtn.style.border = 'none';
+        delBtn.style.borderRadius = '8px';
+        delBtn.style.padding = '0.3rem';
+        delBtn.style.cursor = 'pointer';
+        delBtn.onclick = async () => {
+          if (confirm('Sei sicuro di voler eliminare questo post?')) {
+            try {
+              await db.collection("community").doc(docSnap.id).delete();
+              loadPosts();
+            } catch (err) {
+              alert('Errore: impossibile eliminare il post.');
+              console.error(err);
+            }
+          }
+        };
+        postEl.appendChild(delBtn);
+      }
+
+      postsContainer.appendChild(postEl);
+    });
+
+  } catch (err) {
+    console.error('Errore caricando i post:', err);
+  }
 }
 
-postBtn.onclick = async ()=>{
+postBtn.onclick = async () => {
   const frase = postText.value.trim();
-  if(frase.length===0 || frase.length>150) return alert('Scrivi una frase valida (max 150 caratteri)');
-  await db.collection("community").add({
-    uid:auth.currentUser.uid,
-    frase:frase,
-    timestamp:firebase.firestore.FieldValue.serverTimestamp()
-  });
-  postText.value='';
-  newPostWidget.style.display='none';
-  loadPosts();
-}
+  if (frase.length === 0 || frase.length > 150) return alert('Scrivi una frase valida (max 150 caratteri)');
+
+  try {
+    await db.collection("community").add({
+      uid: auth.currentUser.uid,
+      frase: frase,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    postText.value = '';
+    newPostWidget.style.display = 'none';
+    loadPosts();
+  } catch (err) {
+    alert('Errore creando il post.');
+    console.error(err);
+  }
+};
+
 </script>
 </body>
 </html>
