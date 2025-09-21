@@ -214,6 +214,30 @@ main {
 </div>
 
 <script>
+  
+    console.log('v6 Community testing')
+postBtn.onclick = async () => {
+  console.log('=== DEBUG DATI POST ===');
+  console.log('Current User:', auth.currentUser);
+  console.log('Current User UID:', auth.currentUser?.uid);
+  console.log('Current User UID type:', typeof auth.currentUser?.uid);
+  
+  const frase = postText.value.trim();
+  
+  const postData = {
+    uid: auth.currentUser.uid,
+    frase: String(frase),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  
+  console.log('Post data:', postData);
+  console.log('Post data uid:', postData.uid);
+  console.log('Post data uid type:', typeof postData.uid);
+  console.log('Post data frase:', postData.frase);
+  console.log('Post data frase type:', typeof postData.frase);
+  
+  
+};
 function showSection(section){
   document.getElementById("dashboard-section").style.display="none";
   document.getElementById("news-section").style.display="none";
@@ -347,29 +371,6 @@ postBtn.onclick = async () => {
   }
 };
 
-    console.log('v6 Community testing')
-postBtn.onclick = async () => {
-  console.log('=== DEBUG DATI POST ===');
-  console.log('Current User:', auth.currentUser);
-  console.log('Current User UID:', auth.currentUser?.uid);
-  console.log('Current User UID type:', typeof auth.currentUser?.uid);
-  
-  const frase = postText.value.trim();
-  
-  const postData = {
-    uid: auth.currentUser.uid,
-    frase: String(frase),
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  };
-  
-  console.log('Post data:', postData);
-  console.log('Post data uid:', postData.uid);
-  console.log('Post data uid type:', typeof postData.uid);
-  console.log('Post data frase:', postData.frase);
-  console.log('Post data frase type:', typeof postData.frase);
-  
-  // Il resto del codice...
-};
 </script>
 </body>
 </html>
