@@ -333,9 +333,9 @@ postBtn.onclick = async () => {
 
   try {
     const docRef = await db.collection("community").add({
-      uid: auth.currentUser.uid,
-      frase,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      uid: auth.currentUser.uid,                      // deve combaciare con regole
+      frase: String(frase),                           // forza a stringa
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() // obbligatorio
     });
     console.log("Post creato ID:", docRef.id);
     postText.value = '';
@@ -343,9 +343,11 @@ postBtn.onclick = async () => {
     loadPosts();
   } catch (err) {
     console.error("Errore creando post:", err);
-    alert("Errore creando il post.");
+    alert("Errore: non hai i permessi per creare questo post.");
   }
 };
+
+    console.log('v6 Community testing')
 
 </script>
 </body>
