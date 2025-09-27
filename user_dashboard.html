@@ -419,5 +419,67 @@ postBtn.onclick = async () => {
 
 console.log('v7 Community testing - JavaScript corretto con debug completo');
 </script>
+<!-- MODALE PROFILO UTENTE -->
+<div id="user-profile-modal" style="
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.85);
+  padding:1rem;
+  border-radius:12px;
+  width:300px;
+  z-index:10000;
+  flex-direction:column;
+  gap:0.5rem;
+  color:#fff;
+">
+  <img id="modal-profile-img" src="aurastudio.png" alt="Profile" style="width:80px; height:80px; border-radius:50%; margin:0 auto;">
+  <h2 id="modal-name" style="text-align:center; margin:0.5rem 0;">Nome Cognome</h2>
+  <p id="modal-badge" style="text-align:center; background:rgba(109,40,217,0.8); color:#fff; padding:2px 8px; border-radius:8px; display:inline-block;">Badge</p>
+  <div id="modal-bio" style="background:rgba(255,255,255,0.1); padding:0.5rem; border-radius:8px; min-height:50px; margin-top:0.5rem; text-align:center;">Bio...</div>
+  <button onclick="document.getElementById('user-profile-modal').style.display='none'" style="margin-top:0.5rem; width:100%; padding:0.5rem; border:none; border-radius:8px; background:#ff4b4b; color:#fff; cursor:pointer;">Chiudi</button>
+</div>
+
+<script>
+// FUNZIONE PER APRIRE LA MODALE PROFILO
+async function openUserProfile(uid) {
+  try {
+    const doc = await db.collection("users").doc(uid).get();
+    if(doc.exists){
+      const data = doc.data();
+      document.getElementById('modal-profile-img').src = data.profileImage || 'aurastudio.png';
+      document.getElementById('modal-name').textContent = (data.nome || 'Nome') + ' ' + (data.cognome || 'Cognome');
+      document.getElementById('modal-badge').textContent = data.badge?.trim() || 'Utente';
+      document.getElementById('modal-bio').textContent = data.bio?.description || 'Nessuna descrizione.';
+      document.getElementById('user-profile-modal').style.display = 'flex';
+    }
+  } catch(err) {
+    console.error('Errore caricando profilo:', err);
+  }
+}
+
+// AGGIUNGI EVENTO AI POST ESISTENTI
+function enableProfileClicks() {
+  document.querySelectorAll('#posts-container div').forEach(postEl => {
+    const profileDiv = postEl.querySelector('div > div'); // div contenente immagine+nome
+    if(profileDiv){
+      profileDiv.style.cursor = 'pointer';
+      profileDiv.onclick = () => {
+        const uid = postEl.getAttribute('data-uid');
+        if(uid) openUserProfile(uid);
+      }
+    }
+  });
+}
+
+// Richiamalo subito dopo il caricamento dei post
+const originalLoadPosts = loadPosts;
+loadPosts = async () => {
+  await originalLoadPosts();
+  enableProfileClicks();
+};
+</script>
 </body>
 </html>
