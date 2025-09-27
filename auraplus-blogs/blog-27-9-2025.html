@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un Titolo - Pagina Simile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Stili per il corpo della pagina */
+        body {
+            /* Rimuove margini e padding predefiniti */
+            margin: 0;
+            padding: 0;
+            /* Altezza minima al 100% della viewport per l'effetto gradiente */
+            min-height: 100vh;
+            /* Imposta il font Poppins come predefinito */
+            font-family: 'Poppins', sans-serif;
+            /* Centra il contenuto e lo allinea in alto */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            /* Applica lo sfondo sfumato (gradiente) */
+            background: linear-gradient(
+                to bottom,
+                #e008f6 0%, /* Inizia con un viola/magenta acceso */
+                #f3a9fe 100% /* Finisce con un viola più scuro/bluastro */
+            );
+            /* Colore del testo generale (non influenzerà il titolo e la data, ma buona pratica) */
+            color: white;
+            /* Aggiunge padding interno per allontanare il contenuto dai bordi */
+            padding: 40px 20px; 
+            box-sizing: border-box; /* Assicura che il padding sia incluso nell'altezza/larghezza */
+        }
+
+        /* Stili per l'area del contenuto (data, titolo, testo) */
+        .content-container {
+            /* Assicura che il contenuto sia allineato correttamente */
+            width: 100%;
+            /* Limita la larghezza massima per una migliore leggibilità su schermi molto grandi (opzionale) */
+            max-width: 600px;
+        }
+
+        /* Stile per la data */
+        .date {
+            font-size: 14px; /* Dimensione del testo per la data */
+            font-weight: 400; /* Peso del font normale */
+            color: rgba(255, 255, 255, 0.7); /* Grigio chiaro semi-trasparente */
+            margin-bottom: 5px; /* Spazio sotto la data */
+        }
+
+        /* Stile per il titolo principale */
+        h1 {
+            font-size: 48px; /* Dimensione del testo molto grande */
+            font-weight: 700; /* Peso del font in grassetto */
+            color: white; /* Testo bianco puro */
+            margin: 0; /* Rimuove margini predefiniti di h1 */
+            line-height: 1.2; /* Altezza della linea per una migliore leggibilità */
+        }
+
+        /* Stile per il testo sottostante */
+        p {
+            font-size: 18px; /* Dimensione del testo più grande del normale */
+            font-weight: 400; /* Peso del font normale */
+            color: rgba(255, 255, 255, 0.9); /* Bianco quasi puro */
+            margin-top: 15px; /* Spazio sopra il testo */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="date">27/Set/2025</div>
+        <h1>Update e Annuncio sulla funzione Community di Aura+</h1>
+        <p>
+  Una settimana fa abbiamo lanciato la funzione <b>Community</b>, che permette agli utenti di condividere post con tutti.  
+  Oggi abbiamo un piccolo update e un annuncio importante su <b>Aura+ Community</b>.
+  <div style="height: 10px"></div>
+</p>
+
+<h2>UPDATE</h2>
+<p>
+  Abbiamo esteso il limite dei caratteri nei post:  
+  prima era di 150, ora è di 800.
+  <div style="height: 10px"></div>
+</p>
+
+<h2>ANNUNCIO</h2>
+<p>
+  A breve saranno disponibili le regole della sezione Community.  
+  Ogni post che non le rispetta verrà rimosso per mantenere lo spazio sano e pulito.  
+  Se pensi di usare la Community per dare fastidio, sappi che è solo tempo perso:  
+  usa le tue energie per qualcosa di più importante.
+</p>
+    </div>
+</body>
+</html>
