@@ -363,9 +363,9 @@ postBtn.onclick = async () => {
   console.log('Frase da postare:', frase);
   console.log('Lunghezza frase:', frase.length);
   
-  if (!frase || frase.length > 450) {
+  if (!frase || frase.length > 800) {
     console.log('❌ Frase non valida');
-    return alert("Scrivi una frase valida (max 450 caratteri)");
+    return alert("Scrivi una frase valida (max 800 caratteri)");
   }
 
   // Prova prima a refreshare il token di autenticazione
