@@ -229,11 +229,11 @@ function showSection(section){
 auth.onAuthStateChanged(user=>{
   console.log('=== AUTH STATE CHANGED ===');
   console.log('User:', user);
-  
+
   if(user){
     console.log('User UID:', user.uid);
     console.log('User email:', user.email);
-    
+
     db.collection("users").doc(user.uid).get().then(doc=>{
       if(doc.exists){
         const data=doc.data();
@@ -254,7 +254,7 @@ auth.onAuthStateChanged(user=>{
     }).catch(err => {
       console.error('❌ Errore caricamento dati utente:', err);
     });
-    
+
     loadPosts();
   }else{
     console.log('User not authenticated - redirecting to login');
@@ -275,12 +275,12 @@ cancelBtn.onclick = () => { postText.value = ''; newPostWidget.style.display = '
 async function loadPosts() {
   console.log('=== LOADING POSTS ===');
   postsContainer.innerHTML = '';
-  
+
   try {
     const snapshot = await db.collection("community")
       .orderBy("timestamp", "desc")
       .get();
-    
+
     console.log('Posts found:', snapshot.size);
 
     snapshot.forEach(async docSnap => {
@@ -323,12 +323,6 @@ async function loadPosts() {
           padding: 0.3rem;
           cursor: pointer;
         `;
-
-// Rendi cliccabile il blocco immagine + nome-cognome
-const userBlock = postEl.querySelector('div > div'); // l'immagine + nome-cognome
-userBlock.style.cursor = 'pointer';
-userBlock.onclick = () => openUserProfile(data.uid);
-
         delBtn.onclick = async () => {
           if (confirm('Sei sicuro di voler eliminare questo post?')) {
             try {
@@ -342,8 +336,9 @@ userBlock.onclick = () => openUserProfile(data.uid);
         };
         postEl.appendChild(delBtn);
       }
+
+      postsContainer.appendChild(postEl);
     });
-postsContainer.appendChild(postEl);
 
   } catch (err) {
     console.error('❌ Errore caricando i post:', err);
@@ -354,20 +349,20 @@ postsContainer.appendChild(postEl);
 postBtn.onclick = async () => {
   console.log('=== DEBUG POST CLICK ===');
   console.log('Current User:', auth.currentUser);
-  
+
   if (!auth.currentUser) {
     console.error('❌ Utente non autenticato');
     alert('Errore: utente non autenticato');
     return;
   }
-  
+
   console.log('Current User UID:', auth.currentUser.uid);
   console.log('Current User UID type:', typeof auth.currentUser.uid);
-  
+
   const frase = postText.value.trim();
   console.log('Frase da postare:', frase);
   console.log('Lunghezza frase:', frase.length);
-  
+
   if (!frase || frase.length > 800) {
     console.log('❌ Frase non valida');
     return alert("Scrivi una frase valida (max 800 caratteri)");
@@ -389,7 +384,7 @@ postBtn.onclick = async () => {
     frase: String(frase),
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   };
-  
+
   console.log('Post data:', postData);
   console.log('Post data uid:', postData.uid);
   console.log('Post data uid type:', typeof postData.uid);
@@ -400,17 +395,17 @@ postBtn.onclick = async () => {
     console.log('⏳ Tentativo creazione post...');
     const docRef = await db.collection("community").add(postData);
     console.log('✅ Post creato con successo! ID:', docRef.id);
-    
+
     postText.value = '';
     newPostWidget.style.display = 'none';
     loadPosts();
-    
+
   } catch (err) {
     console.error('❌ Errore creando post:', err);
     console.error('Codice errore:', err.code);
     console.error('Messaggio errore:', err.message);
     console.error('Stack trace:', err.stack);
-    
+
     // Gestione errori specifici
     if (err.code === 'permission-denied') {
       alert("Errore: permessi insufficienti. Controlla le regole Firestore.");
@@ -423,40 +418,6 @@ postBtn.onclick = async () => {
 };
 
 console.log('v7 Community testing - JavaScript corretto con debug completo');
-
-function openUserProfile(uid) {
-  db.collection("users").doc(uid).get().then(doc => {
-    if(doc.exists){
-      const data = doc.data();
-      document.getElementById('modal-profile-img').src = data.profileImage || 'aurastudio.png';
-      document.getElementById('modal-name').textContent = (data.nome && data.cognome) ? `${data.nome} ${data.cognome}` : 'Utente';
-      document.getElementById('modal-badge').textContent = data.badge || 'Utente';
-      document.getElementById('modal-description').textContent = (data.bio && data.bio.description) ? data.bio.description : 'Nessuna descrizione impostata';
-      document.getElementById('profile-modal').style.display = 'flex';
-    }
-  }).catch(err => console.error('Errore caricando profilo utente:', err));
-}
 </script>
-<div id="profile-modal" style="
-  display:none;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.85);
-  padding:1rem;
-  border-radius:12px;
-  width:300px;
-  z-index:1000;
-  flex-direction:column;
-  gap:0.5rem;
-  color:#fff;
-">
-  <img id="modal-profile-img" src="" style="width:70px; height:70px; border-radius:50%; margin:0 auto;">
-  <h2 id="modal-name" style="text-align:center; margin:0.5rem 0;"></h2>
-  <p id="modal-badge" style="text-align:center; background:purple; opacity:0.8; border-radius:8px; padding:2px 6px;"></p>
-  <p id="modal-description" style="text-align:center; font-size:0.85rem;"></p>
-  <button onclick="document.getElementById('profile-modal').style.display='none'" style="background:#ff4b4b; border:none; border-radius:8px; padding:0.5rem; cursor:pointer;">Chiudi</button>
-</div>
 </body>
 </html>
