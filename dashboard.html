@@ -114,6 +114,97 @@ main {
 .account-options button:hover {background:#e008f6;}
 #community-section {display:none; width:100%; max-width:420px;}
 @media(max-width:480px){ .user-info h2 {font-size:1rem;} .saldo-widget .amount {font-size:1.3rem;} }
+
+.friend-request-btn {
+  background: #00c3ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.friend-request-btn:hover {
+  background: #00a0d6;
+}
+.profile-popup, .requests-popup {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+  z-index:2000;
+  justify-content:center;
+  align-items:center;
+}
+.profile-popup-content, .requests-popup-content {
+  background: linear-gradient(135deg,#E30AF5,#F174FF);
+  padding:2rem;
+  border-radius:20px;
+  width:90%;
+  max-width:350px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  text-align:center;
+}
+.profile-popup-content img {
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #fff;
+  margin-bottom:1rem;
+}
+.profile-popup-content h3 {font-size:1.5rem; margin-bottom:0.3rem;}
+.profile-popup-content p {font-size:0.9rem; opacity:0.9; margin-bottom:1rem; min-height:30px;}
+.profile-popup-content .bio-terminal {
+  background:rgba(0,0,0,0.3);
+  padding:0.8rem;
+  border-radius:12px;
+  border-left:4px solid #888;
+  white-space:pre-wrap;
+  text-align:left;
+  min-height:60px;
+  margin-top:0.8rem;
+  margin-bottom:1rem;
+}
+.requests-list {
+  max-height:300px;
+  overflow-y:auto;
+  margin-top:1rem;
+  padding: 0 0.5rem;
+  max-width:300px;
+  margin: 1rem auto;
+}
+.request-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0.6rem 0;
+  border-bottom:1px solid rgba(255,255,255,0.2);
+}
+.request-item:last-child {border-bottom:none;}
+.request-info {display:flex; align-items:center; gap:0.5rem; cursor:pointer;}
+.request-info img {width:40px; height:40px; border-radius:50%; object-fit:cover;}
+.request-actions button {
+  padding:5px 10px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  margin-left:5px;
+  font-size:0.8rem;
+}
+.request-actions .accept {background:#28a745; color:#fff;}
+.request-actions .reject {background:#dc3545; color:#fff;}
+.friend-images {display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; justify-content:flex-start;}
+.friend-images img {width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.6); cursor:pointer;}
+.home-friends-container {margin-top:1rem; padding:0.8rem 0; border-top:1px solid rgba(255,255,255,0.2);}
+.home-friends-container h4 {font-size:1rem; margin-bottom:0.5rem;}
+
+.pointer-on-hover {cursor: pointer;}
+
 </style>
 </head>
 <body>
@@ -181,9 +272,30 @@ main {
       <button onclick="window.location.href='settings.html'">👤 Account</button>
       <button onclick="window.location.href='personalize.html'">🎨 Personalizza</button>
       <button onclick="window.location.href='howtogetbalance.html'">💰 Saldo & Wallet</button>
+      <button id="friend-requests-btn">👥️ Richieste amicizia</button>
     </div>
   </div>
+
 </main>
+<div id="profile-popup" class="profile-popup">
+  <div class="profile-popup-content">
+    <button onclick="document.getElementById('profile-popup').style.display='none';" style="position:absolute; top:10px; right:10px; background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+    <img id="popup-profile-img" src="default-profile.png" alt="Profile">
+    <h3 id="popup-user-name">Nome Cognome</h3>
+    <p><span id="popup-badge" class="badge">badge</span></p>
+    <div id="popup-bio-display" class="bio-terminal"><span id="popup-bio-text"></span></div>
+    <button id="send-friend-request-btn" class="friend-request-btn">Invia Richiesta di Amicizia</button>
+  </div>
+</div>
+
+<div id="requests-popup" class="requests-popup">
+  <div class="requests-popup-content">
+    <button onclick="document.getElementById('requests-popup').style.display='none';" style="position:absolute; top:10px; right:10px; background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+    <h3>👥️ Richieste Amicizia</h3>
+    <div id="requests-list" class="requests-list">
+      </div>
+  </div>
+</div>
 
 <div class="navbar">
   <div class="nav-item active" onclick="showSection('dashboard')">🏠</div>
@@ -256,6 +368,7 @@ auth.onAuthStateChanged(user=>{
     });
 
     loadPosts();
+    loadFriendsListInHome();
   }else{
     console.log('User not authenticated - redirecting to login');
     window.location.href="login.html";
@@ -300,9 +413,9 @@ async function loadPosts() {
         gap: 0.3rem;
       `;
 
-      postEl.innerHTML = `
+                  postEl.innerHTML = `
         <div style="display:flex; align-items:center; justify-content:space-between;">
-          <div style="display:flex; align-items:center; gap:0.5rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;" onclick="showUserProfile('${data.uid}')">
             <img src="${profileImage || 'aurastudio.png'}" style="width:40px; height:40px; border-radius:50%;">
             <strong>${nome} ${cognome}</strong>
           </div>
@@ -310,6 +423,7 @@ async function loadPosts() {
         </div>
         <p style="margin:0.3rem 0;">${data.frase}</p>
       `;
+
 
       // Mostra il pulsante elimina solo se il post è del corrente utente
       if (data.uid === auth.currentUser?.uid) {
@@ -336,7 +450,6 @@ async function loadPosts() {
         };
         postEl.appendChild(delBtn);
       }
-
       postsContainer.appendChild(postEl);
     });
 
@@ -419,168 +532,254 @@ postBtn.onclick = async () => {
 
 console.log('v7 Community testing - JavaScript corretto con debug completo');
 
-<!-- POPUP PROFILO UTENTE -->
-<div id="user-popup" style="
-  display:none;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.9);
-  padding:1rem;
-  border-radius:12px;
-  width:300px;
-  z-index:1001;
-  flex-direction:column;
-  gap:0.5rem;
-  color:#fff;
-">
-  <img id="popup-img" src="aurastudio.png" style="width:80px;height:80px;border-radius:50%;margin:0 auto;">
-  <h2 id="popup-name" style="text-align:center">Nome Cognome</h2>
-  <p id="popup-desc" style="font-size:0.85rem;text-align:center">Descrizione</p>
-  <div id="popup-badge" style="text-align:center;background:#007bff;padding:2px 8px;border-radius:8px;font-size:0.75rem;margin:0.5rem auto;"></div>
-  <button id="add-friend-btn" style="background:#00c3ff;color:#fff;border:none;border-radius:8px;padding:0.5rem;margin-top:0.5rem;cursor:pointer;">Invia richiesta amicizia</button>
-  <button onclick="document.getElementById('user-popup').style.display='none'" style="background:#ff4b4b;color:#fff;border:none;border-radius:8px;padding:0.5rem;margin-top:0.5rem;cursor:pointer;">Chiudi</button>
-</div>
+const profilePopup = document.getElementById('profile-popup');
+const requestsPopup = document.getElementById('requests-popup');
+const friendsRequestsBtn = document.getElementById('friend-requests-btn');
+const sendFriendRequestBtn = document.getElementById('send-friend-request-btn');
+let targetProfileUid = null; // UID dell'utente nel popup
 
-<!-- POPUP RICHIESTE AMICIZIA -->
-<div id="friend-requests-popup" style="
-  display:none;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.9);
-  padding:1rem;
-  border-radius:12px;
-  width:320px;
-  z-index:1001;
-  color:#fff;
-">
-  <h2 style="text-align:center;margin-bottom:0.5rem;">Richieste Amicizia</h2>
-  <div id="friend-requests-container" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
-  <button onclick="document.getElementById('friend-requests-popup').style.display='none'" style="background:#ff4b4b;color:#fff;border:none;border-radius:8px;padding:0.5rem;margin-top:0.5rem;width:100%;cursor:pointer;">Chiudi</button>
-</div>
+// Listener per aprire il popup delle richieste
+friendsRequestsBtn.onclick = () => {
+  if (auth.currentUser) {
+    loadFriendRequests();
+    requestsPopup.style.display = 'flex';
+  } else {
+    alert('Autenticazione richiesta.');
+  }
+};
 
-// --- VISUALIZZAZIONE PROFILO UTENTE ---
-async function showUserProfile(uid){
-  const docSnap = await db.collection('users').doc(uid).get();
-  if(!docSnap.exists) return;
-  const data = docSnap.data();
-  document.getElementById('popup-img').src = data.profileImage || 'aurastudio.png';
-  document.getElementById('popup-name').textContent = (data.nome||"Utente")+" "+(data.cognome||"");
-  document.getElementById('popup-desc').textContent = (data.bio?.description)||"Nessuna descrizione.";
-  document.getElementById('popup-badge').textContent = data.badge || "Utente";
-  const addBtn = document.getElementById('add-friend-btn');
-  addBtn.style.display = 'block';
-  addBtn.onclick = async ()=>{
+// Listener per inviare la richiesta di amicizia dal popup profilo
+sendFriendRequestBtn.onclick = async () => {
+  if (auth.currentUser && targetProfileUid) {
+    await sendFriendRequest(targetProfileUid);
+  }
+};
+
+// Funzione per mostrare il popup del profilo di un utente
+async function showUserProfile(uid) {
+  if (uid === auth.currentUser?.uid) {
+    // Non mostrare il popup se è il profilo dell'utente corrente
+    return;
+  }
+
+  try {
+    const userSnap = await db.collection("users").doc(uid).get();
+    if (userSnap.exists) {
+      const data = userSnap.data();
+      targetProfileUid = uid;
+
+      document.getElementById('popup-profile-img').src = data.profileImage || 'default-profile.png';
+      document.getElementById('popup-user-name').textContent = `${data.nome || 'Utente'} ${data.cognome || ''}`;
+      document.getElementById('popup-badge').textContent = data.badge || 'Utente';
+      document.getElementById('popup-bio-text').textContent = (data.bio && data.bio.description) ? data.bio.description : "Nessuna descrizione impostata.";
+
+      // Controlla lo stato della relazione di amicizia
+      await updateFriendRequestButton(uid);
+
+      profilePopup.style.display = 'flex';
+    } else {
+      alert("Profilo utente non trovato.");
+    }
+  } catch (err) {
+    console.error("Errore caricamento profilo:", err);
+    alert("Errore caricamento profilo.");
+  }
+}
+
+// Funzione di utilità per il controllo e aggiornamento del pulsante di richiesta
+async function updateFriendRequestButton(targetUid) {
     const currentUid = auth.currentUser.uid;
-    const requestRef = db.collection('friendRequests').doc(uid);
-    await requestRef.set({from: currentUid, timestamp: firebase.firestore.FieldValue.serverTimestamp()});
-    alert("Richiesta inviata!");
-  };
-  document.getElementById('user-popup').style.display='flex';
-}
+    const btn = document.getElementById('send-friend-request-btn');
 
-// Aggiungi listener sui nomi della community
-function enableProfileClicking(){
-  document.querySelectorAll('#posts-container div strong').forEach(el=>{
-    el.style.cursor='pointer';
-    el.onclick=()=>{
-      const parentDiv = el.closest('div');
-      const userName = el.textContent.split(" ")[0]; // nome
-      // Trova uid corrispondente dal post
-      const postIndex = Array.from(postsContainer.children).indexOf(parentDiv);
-      db.collection('community').orderBy('timestamp','desc').get().then(snapshot=>{
-        const uid = snapshot.docs[postIndex].data().uid;
-        showUserProfile(uid);
-      });
+    if (currentUid === targetUid) {
+        btn.style.display = 'none';
+        return;
+    }
+    btn.style.display = 'block';
+
+    const currentUserDoc = await db.collection("users").doc(currentUid).get();
+    const currentUserData = currentUserDoc.data();
+
+    // 1. Controlla se sono già amici
+    if (currentUserData.friends && currentUserData.friends.includes(targetUid)) {
+        btn.textContent = 'Amici ✅';
+        btn.disabled = true;
+        btn.style.backgroundColor = '#28a745';
+        return;
+    }
+
+    // 2. Controlla se una richiesta è stata inviata (e in attesa)
+    if (currentUserData.sentRequests && currentUserData.sentRequests.includes(targetUid)) {
+        btn.textContent = 'Richiesta Inviata ⏳';
+        btn.disabled = true;
+        btn.style.backgroundColor = '#ffc107';
+        return;
+    }
+
+    // 3. Controlla se l'utente target ha inviato una richiesta a me
+    if (currentUserData.pendingRequests && currentUserData.pendingRequests.includes(targetUid)) {
+        btn.textContent = 'Accetta Richiesta';
+        btn.disabled = false;
+        btn.style.backgroundColor = '#00c3ff';
+        btn.onclick = async () => {
+            await handleFriendRequest(targetUid, 'accept');
+            profilePopup.style.display = 'none'; // Chiude dopo l'azione
+        };
+        return;
+    }
+
+    // Altrimenti, pulsante standard per l'invio
+    btn.textContent = 'Invia Richiesta di Amicizia';
+    btn.disabled = false;
+    btn.style.backgroundColor = '#00c3ff';
+    btn.onclick = async () => {
+        await sendFriendRequest(targetUid);
     };
-  });
 }
 
-// --- SISTEMA AMICI ---
-async function loadFriends(){
+// Funzione per inviare una richiesta di amicizia
+async function sendFriendRequest(targetUid) {
   const currentUid = auth.currentUser.uid;
-  const friendsSnap = await db.collection('users').doc(currentUid).collection('friends').get();
+  if (!currentUid || currentUid === targetUid) return;
+
+  try {
+    // Aggiungi la richiesta alle "sentRequests" dell'utente corrente (mittente)
+    await db.collection("users").doc(currentUid).update({
+      sentRequests: firebase.firestore.FieldValue.arrayUnion(targetUid)
+    });
+
+    // Aggiungi la richiesta alle "pendingRequests" dell'utente target (destinatario)
+    await db.collection("users").doc(targetUid).update({
+      pendingRequests: firebase.firestore.FieldValue.arrayUnion(currentUid)
+    });
+
+    alert("Richiesta di amicizia inviata!");
+    await updateFriendRequestButton(targetUid); // Aggiorna lo stato del pulsante
+  } catch (err) {
+    console.error("Errore invio richiesta:", err);
+    alert("Errore nell'invio della richiesta.");
+  }
+}
+
+// Funzione per caricare e visualizzare le richieste in attesa
+async function loadFriendRequests() {
+  const currentUid = auth.currentUser.uid;
+  const listEl = document.getElementById('requests-list');
+  listEl.innerHTML = '';
+
+  try {
+    const userDoc = await db.collection("users").doc(currentUid).get();
+    const pendingRequests = userDoc.data()?.pendingRequests || [];
+
+    if (pendingRequests.length === 0) {
+      listEl.innerHTML = '<p style="opacity:0.8; text-align:center;">Nessuna richiesta di amicizia in attesa.</p>';
+      return;
+    }
+
+    for (const senderUid of pendingRequests) {
+      const senderSnap = await db.collection("users").doc(senderUid).get();
+      const senderData = senderSnap.exists
+        ? senderSnap.data()
+        : { nome: "Utente Sconosciuto", cognome: "", profileImage: "default-profile.png" };
+
+      const itemEl = document.createElement('div');
+      itemEl.className = 'request-item';
+      itemEl.innerHTML = `
+        <div class="request-info" onclick="showUserProfile('${senderUid}'); document.getElementById('requests-popup').style.display='none';">
+          <img src="${senderData.profileImage || 'default-profile.png'}" alt="Profile">
+          <strong>${senderData.nome} ${senderData.cognome}</strong>
+        </div>
+        <div class="request-actions">
+          <button class="accept" onclick="handleFriendRequest('${senderUid}', 'accept')">Accetta</button>
+          <button class="reject" onclick="handleFriendRequest('${senderUid}', 'reject')">Rifiuta</button>
+        </div>
+      `;
+      listEl.appendChild(itemEl);
+    }
+  } catch (err) {
+    console.error("Errore caricamento richieste:", err);
+    listEl.innerHTML = '<p style="color:#ff4b4b; text-align:center;">Errore durante il caricamento delle richieste.</p>';
+  }
+}
+
+// Funzione per accettare o rifiutare una richiesta
+async function handleFriendRequest(senderUid, action) {
+  const currentUid = auth.currentUser.uid;
+
+  // 1. Rimuovi la richiesta dalle pendingRequests (ricevente)
+  await db.collection("users").doc(currentUid).update({
+    pendingRequests: firebase.firestore.FieldValue.arrayRemove(senderUid)
+  });
+
+  // 2. Rimuovi la richiesta dalle sentRequests (mittente)
+  await db.collection("users").doc(senderUid).update({
+    sentRequests: firebase.firestore.FieldValue.arrayRemove(currentUid)
+  });
+
+  if (action === 'accept') {
+    // 3. Se accettata: Aggiungi ai friends di entrambi
+    await db.collection("users").doc(currentUid).update({
+      friends: firebase.firestore.FieldValue.arrayUnion(senderUid)
+    });
+    await db.collection("users").doc(senderUid).update({
+      friends: firebase.firestore.FieldValue.arrayUnion(currentUid)
+    });
+    alert(`Amicizia con ${senderUid} accettata!`);
+  } else {
+    alert(`Richiesta di ${senderUid} rifiutata.`);
+  }
+
+  // Ricarica la lista delle richieste e degli amici in Home
+  loadFriendRequests();
+  loadFriendsListInHome();
+}
+
+// Funzione per caricare e visualizzare gli amici nella dashboard (🏠 Home)
+async function loadFriendsListInHome() {
+  const currentUid = auth.currentUser.uid;
   const dashboardCard = document.getElementById('dashboard-section');
-  let friendsContainer = document.getElementById('friends-container');
-  if(!friendsContainer){
+  let friendsContainer = document.getElementById('home-friends-container');
+
+  if (!friendsContainer) {
+    // Crea il contenitore la prima volta
     friendsContainer = document.createElement('div');
-    friendsContainer.id='friends-container';
-    friendsContainer.style.display='flex';
-    friendsContainer.style.gap='0.5rem';
-    friendsContainer.style.marginTop='1rem';
+    friendsContainer.id = 'home-friends-container';
+    friendsContainer.className = 'home-friends-container';
     dashboardCard.appendChild(friendsContainer);
   }
-  friendsContainer.innerHTML='';
-  friendsSnap.forEach(doc=>{
-    const data = doc.data();
-    const img = document.createElement('img');
-    img.src = data.profileImage||'aurastudio.png';
-    img.style.width='40px';
-    img.style.height='40px';
-    img.style.borderRadius='50%';
-    img.style.cursor='pointer';
-    img.onclick=()=>showUserProfile(doc.id);
-    friendsContainer.appendChild(img);
-  });
+
+  friendsContainer.innerHTML = '<h4>I tuoi Amici:</h4><div id="friends-images" class="friend-images"></div>';
+  const imagesContainer = document.getElementById('friends-images');
+
+  try {
+    const userDoc = await db.collection("users").doc(currentUid).get();
+    const friendUids = userDoc.data()?.friends || [];
+
+    if (friendUids.length === 0) {
+      imagesContainer.innerHTML = '<p style="font-size:0.8rem; opacity:0.8;">Nessun amico trovato.</p>';
+      return;
+    }
+
+    for (const friendUid of friendUids) {
+      const friendSnap = await db.collection("users").doc(friendUid).get();
+      const friendData = friendSnap.exists
+        ? friendSnap.data()
+        : { profileImage: "default-profile.png" };
+
+      const imgEl = document.createElement('img');
+      imgEl.src = friendData.profileImage || 'default-profile.png';
+      imgEl.alt = 'Amico';
+      imgEl.title = `${friendData.nome || 'Utente'} ${friendData.cognome || ''}`;
+      imgEl.onclick = () => showUserProfile(friendUid); // Clicca per aprire la scheda profilo
+
+      imagesContainer.appendChild(imgEl);
+    }
+  } catch (err) {
+    console.error("Errore caricamento amici:", err);
+    imagesContainer.innerHTML = '<p style="color:#ff4b4b; font-size:0.8rem;">Errore caricamento lista amici.</p>';
+  }
 }
 
-// Mostra richieste amici in ⚙️
-function showFriendRequests(){
-  const container = document.getElementById('friend-requests-container');
-  container.innerHTML='';
-  db.collection('friendRequests').where('to','==',auth.currentUser.uid).get().then(snapshot=>{
-    snapshot.forEach(doc=>{
-      const data = doc.data();
-      const requestDiv = document.createElement('div');
-      requestDiv.style.display='flex';
-      requestDiv.style.justifyContent='space-between';
-      requestDiv.style.alignItems='center';
-      requestDiv.style.background='rgba(255,255,255,0.1)';
-      requestDiv.style.padding='0.3rem';
-      requestDiv.style.borderRadius='8px';
-      const userNameEl = document.createElement('span');
-      db.collection('users').doc(data.from).get().then(userDoc=>{
-        const userData = userDoc.data();
-        userNameEl.textContent = (userData.nome||"Utente")+" "+(userData.cognome||"");
-      });
-      const acceptBtn = document.createElement('button');
-      acceptBtn.textContent='✔️';
-      acceptBtn.style.background='#00c3ff';
-      acceptBtn.style.color='#fff';
-      acceptBtn.style.border='none';
-      acceptBtn.style.borderRadius='6px';
-      acceptBtn.style.cursor='pointer';
-      acceptBtn.onclick = async ()=>{
-        // Aggiungi amici reciprocamente
-        await db.collection('users').doc(auth.currentUser.uid).collection('friends').doc(data.from).set({profileImage:'',timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-        await db.collection('users').doc(data.from).collection('friends').doc(auth.currentUser.uid).set({profileImage:'',timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-        await doc.ref.delete();
-        loadFriends();
-        showFriendRequests();
-      };
-      const rejectBtn = document.createElement('button');
-      rejectBtn.textContent='❌';
-      rejectBtn.style.background='#ff4b4b';
-      rejectBtn.style.color='#fff';
-      rejectBtn.style.border='none';
-      rejectBtn.style.borderRadius='6px';
-      rejectBtn.style.cursor='pointer';
-      rejectBtn.onclick = async ()=>{ await doc.ref.delete(); showFriendRequests(); };
-      requestDiv.appendChild(userNameEl);
-      requestDiv.appendChild(acceptBtn);
-      requestDiv.appendChild(rejectBtn);
-      container.appendChild(requestDiv);
-    });
-  });
-  document.getElementById('friend-requests-popup').style.display='flex';
-}
-
-// Chiamare dopo caricamento post
-setTimeout(enableProfileClicking,1000);
-setTimeout(loadFriends,1500);
 </script>
 </body>
 </html>
