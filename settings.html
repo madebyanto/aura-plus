@@ -11,12 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #E30AF5, #F174FF);
@@ -24,32 +19,10 @@
             text-align: center;
             padding: 20px;
         }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        header p {
-            font-size: 1.2em;
-            font-weight: 300;
-            margin-bottom: 30px;
-            animation: fadeIn 1.2s ease-in-out;
-        }
-
-        .buttons {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
+        .container { max-width: 600px; margin: 0 auto; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 600; animation: fadeIn 1s ease-in-out; }
+        header p { font-size: 1.2em; font-weight: 300; margin-bottom: 30px; animation: fadeIn 1.2s ease-in-out; }
+        .buttons { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .widget {
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
@@ -62,12 +35,11 @@
             overflow: hidden;
             border: none;
         }
-
-        .widget:hover {
+        .widget.disabled { cursor: default; opacity: 0.7; }
+        .widget:hover:not(.disabled) {
             transform: translateY(-5px);
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
         }
-
         .widget::after {
             content: '';
             position: absolute;
@@ -78,26 +50,10 @@
             background: rgba(255, 255, 255, 0.3);
             transition: left 0.4s ease;
         }
-
-        .widget:hover::after {
-            left: 100%;
-        }
-
-        .widget h2 {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .widget p {
-            font-size: 1em;
-            font-weight: 300;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .widget:hover:not(.disabled)::after { left: 100%; }
+        .widget h2 { font-size: 1.5em; margin-bottom: 5px; font-weight: 600; }
+        .widget p { font-size: 1em; font-weight: 300; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -112,6 +68,12 @@
             <div class="widget" onclick="resetPassword()">
                 <h2>Cambia Password</h2>
                 <p>Invia una email per reimpostare la tua password.</p>
+            </div>
+
+            <!-- sPassword -->
+            <div id="sPasswordWidget" class="widget">
+                <h2>Special Password</h2>
+                <p id="sPasswordStatus">Caricamento...</p>
             </div>
 
             <!-- Logout -->
@@ -137,9 +99,35 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        auth.onAuthStateChanged((user) => {
+        const sPasswordWidget = document.getElementById('sPasswordWidget');
+        const sPasswordStatus = document.getElementById('sPasswordStatus');
+
+        auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const doc = await db.collection("users").doc(user.uid).get();
+                if (doc.exists) {
+                    const userData = doc.data();
+                    if (userData.sPassword) {
+                        sPasswordStatus.textContent = "✅️ sPassword attiva";
+                        sPasswordWidget.classList.add('disabled');
+                    } else {
+                        sPasswordStatus.textContent = "❌️ sPassword non attiva";
+                        sPasswordWidget.classList.remove('disabled');
+                        sPasswordWidget.onclick = () => { window.location.href = "set_spassword.html"; };
+                    }
+                } else {
+                    sPasswordStatus.textContent = "Errore caricamento dati utente";
+                    sPasswordWidget.classList.add('disabled');
+                }
+            } catch (err) {
+                console.error("Errore lettura dati Firestore:", err);
+                sPasswordStatus.textContent = "Errore caricamento dati";
+                sPasswordWidget.classList.add('disabled');
             }
         });
 
@@ -174,7 +162,6 @@
                 alert("Nessun utente autenticato. Effettua il login per resettare la password.");
             }
         }
-
     </script>
 </body>
 </html>
