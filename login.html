@@ -141,39 +141,6 @@
             btnLogin.classList.remove('active');
         });
 
-        // FUNZIONE NOTIFICA GOOGLE SCRIPT
-        function notifyLogin(email) {
-            const deviceName = navigator.userAgent;
-            const timestamp = new Date().toISOString();
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        const location = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
-                        sendToGoogleScript(email, deviceName, location, timestamp);
-                    },
-                    (error) => {
-                        sendToGoogleScript(email, deviceName, "Posizione non disponibile", timestamp);
-                    }
-                );
-            } else {
-                sendToGoogleScript(email, deviceName, "Geolocalizzazione non supportata", timestamp);
-            }
-        }
-
-        function sendToGoogleScript(email, deviceName, location, timestamp) {
-            fetch("https://script.google.com/macros/s/AKfycbydAreBMKYkuyEyMjgzz1tXr8jqrnfE2buvuPcegZUJPr9EaG8uJNzSXNa_B8qeu_1C/exec", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, deviceName, location, timestamp })
-            })
-            .then(response => response.text())
-            .then(data => console.log("Notifica inviata:", data))
-            .catch(error => console.error("Errore invio notifica:", error));
-        }
-
         // LOGIN
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -181,47 +148,38 @@
             const password = document.getElementById('login-password').value;
 
             auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const user = userCredential.user;
+                .then(async (userCredential) => {
+                    const user = userCredential.user;
 
-        if (!user.emailVerified) {
-            showLoginMessage("Conferma l'email prima di accedere.");
-            return;
-        }
-
-        // NOTIFICA LOGIN
-        notifyLogin(user.email);
-
-        // Controllo sPassword in Firestore
-        db.collection("users").doc(user.uid).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-
-                    if (userData.sPassword) {
-                        // sPassword esiste → vai su spassword.html
-                        window.location.href = "spassword.html";
-                    } else {
-                        // sPassword non esiste → login normale
-                        window.location.href = "user_dashboard.html";
+                    if (!user.emailVerified) {
+                        showLoginMessage("Conferma l'email prima di accedere.");
+                        return;
                     }
-                } else {
-                    // utente non trovato in Firestore (caso raro)
-                    showLoginMessage("Errore: utente non trovato.");
-                }
-            })
-            .catch((error) => {
-                showLoginMessage("Errore lettura dati: " + error.message);
-            });
 
-    })
-    .catch((error) => {
-        if (error.code === 'auth/user-disabled') {
-            window.location.href = "account_disabled.html";
-        } else {
-            showLoginMessage("Errore: " + error.message);
-        }
-    });
+                    try {
+                        const doc = await db.collection("users").doc(user.uid).get();
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            if (userData.sPassword) {
+                                window.location.href = "spassword.html";
+                            } else {
+                                window.location.href = "user_dashboard.html";
+                            }
+                        } else {
+                            showLoginMessage("Errore: utente non trovato.");
+                        }
+                    } catch (err) {
+                        showLoginMessage("Errore lettura dati: " + err.message);
+                    }
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/user-disabled') {
+                        window.location.href = "account_disabled.html";
+                    } else {
+                        showLoginMessage("Errore: " + error.message);
+                    }
+                });
+        });
 
         // SIGNUP
         document.getElementById('signup-form').addEventListener('submit', function(event) {
@@ -232,22 +190,21 @@
             const password = document.getElementById('signup-password').value;
 
             auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
+                .then(async (userCredential) => {
                     const user = userCredential.user;
 
                     // Invia email di verifica
-                    user.sendEmailVerification()
+                    await user.sendEmailVerification()
                         .then(() => showSignupMessage("Email di verifica inviata. Controlla la tua casella di posta, poi, vai su Login e accedi."))
                         .catch((error) => console.error("Errore invio email verifica:", error.message));
 
                     // Salva dati utente su Firestore
-                    db.collection("users").doc(user.uid).set({
+                    await db.collection("users").doc(user.uid).set({
                         nome: nome,
                         cognome: cognome,
                         email: email,
                         saldo: 15
-                    }).then(() => notifyLogin(email));
-
+                    });
                 })
                 .catch((error) => {
                     showSignupMessage("Errore: " + error.message);
@@ -267,10 +224,22 @@
                 .catch((error) => showLoginMessage("Errore: " + error.message));
         });
 
-        // Mantieni login utente dopo refresh
-        auth.onAuthStateChanged((user) => {
+        // Mantieni login utente dopo refresh con controllo sPassword
+        auth.onAuthStateChanged(async (user) => {
             if (user && user.emailVerified) {
-                window.location.href = "user_dashboard.html";
+                try {
+                    const doc = await db.collection("users").doc(user.uid).get();
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        if (userData.sPassword) {
+                            window.location.href = "spassword.html";
+                        } else {
+                            window.location.href = "user_dashboard.html";
+                        }
+                    }
+                } catch (err) {
+                    console.error("Errore lettura dati Firestore:", err);
+                }
             }
         });
     </script>
