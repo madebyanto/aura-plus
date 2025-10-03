@@ -53,6 +53,7 @@
         .widget:hover:not(.disabled)::after { left: 100%; }
         .widget h2 { font-size: 1.5em; margin-bottom: 5px; font-weight: 600; }
         .widget p { font-size: 1em; font-weight: 300; }
+        .widget a { color: #e008f6; text-decoration: underline; cursor: pointer; margin-top: 5px; display: inline-block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -113,8 +114,23 @@
                 if (doc.exists) {
                     const userData = doc.data();
                     if (userData.sPassword) {
-                        sPasswordStatus.textContent = "✅️ sPassword attiva";
+                        sPasswordStatus.innerHTML = `✅️ sPassword attiva <br><a id="deleteSPass">Elimina sPassword</a>`;
                         sPasswordWidget.classList.add('disabled');
+
+                        document.getElementById('deleteSPass').onclick = async (e) => {
+                            e.stopPropagation();
+                            if (confirm("Sei sicuro di voler eliminare la sPassword?")) {
+                                try {
+                                    await db.collection("users").doc(user.uid).update({ sPassword: firebase.firestore.FieldValue.delete() });
+                                    sPasswordStatus.textContent = "❌️ sPassword non attiva";
+                                    sPasswordWidget.classList.remove('disabled');
+                                    sPasswordWidget.onclick = () => { window.location.href = "set_spassword.html"; };
+                                } catch (err) {
+                                    alert("Errore durante l'eliminazione della sPassword.");
+                                    console.error(err);
+                                }
+                            }
+                        };
                     } else {
                         sPasswordStatus.textContent = "❌️ sPassword non attiva";
                         sPasswordWidget.classList.remove('disabled');
