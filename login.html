@@ -181,23 +181,47 @@
             const password = document.getElementById('login-password').value;
 
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    if (!user.emailVerified) {
-                        showLoginMessage("Conferma l'email prima di accedere.");
-                        return;
-                    }
-                    notifyLogin(user.email);
-                    window.location.href = "user_dashboard.html";
-                })
-                .catch((error) => {
-                    if (error.code === 'auth/user-disabled') {
-                        window.location.href = "account_disabled.html";
+    .then((userCredential) => {
+        const user = userCredential.user;
+
+        if (!user.emailVerified) {
+            showLoginMessage("Conferma l'email prima di accedere.");
+            return;
+        }
+
+        // NOTIFICA LOGIN
+        notifyLogin(user.email);
+
+        // Controllo sPassword in Firestore
+        db.collection("users").doc(user.uid).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+
+                    if (userData.sPassword) {
+                        // sPassword esiste → vai su spassword.html
+                        window.location.href = "spassword.html";
                     } else {
-                        showLoginMessage("Errore: " + error.message);
+                        // sPassword non esiste → login normale
+                        window.location.href = "user_dashboard.html";
                     }
-                });
-        });
+                } else {
+                    // utente non trovato in Firestore (caso raro)
+                    showLoginMessage("Errore: utente non trovato.");
+                }
+            })
+            .catch((error) => {
+                showLoginMessage("Errore lettura dati: " + error.message);
+            });
+
+    })
+    .catch((error) => {
+        if (error.code === 'auth/user-disabled') {
+            window.location.href = "account_disabled.html";
+        } else {
+            showLoginMessage("Errore: " + error.message);
+        }
+    });
 
         // SIGNUP
         document.getElementById('signup-form').addEventListener('submit', function(event) {
