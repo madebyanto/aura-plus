@@ -35,6 +35,25 @@
             display: flex; justify-content: center; align-items: center;
             height: 100vh; text-align: center;
         }
+
+<!-- SPLASH INIZIALE -->
+<div id="splash" style="
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: linear-gradient(135deg, #E30AF5, #F174FF);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5em;
+    z-index: 9999;
+">
+    <div class="spinner"></div>
+    Connessione al server...
+</div>
+
         .container {
             background-color: rgba(255, 255, 255, 0.1);
             padding: 30px; border-radius: 15px;
@@ -242,6 +261,14 @@
                 }
             }
         });
+
+// Nasconde splash dopo 3 secondi
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const splash = document.getElementById('splash');
+        if (splash) splash.style.display = 'none';
+    }, 3000);
+});
     </script>
 
 </body>
