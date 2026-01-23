@@ -93,6 +93,19 @@
       border: 4px solid #fff;
       object-fit: cover;
     }
+    .back-arrow {
+  width: 16px;
+  height: 16px;
+  border-left: 3px solid #000;
+  border-bottom: 3px solid #000;
+  transform: rotate(45deg);
+  cursor: pointer;
+  margin: 20px;
+}
+
+.back-arrow:hover {
+  border-color: #007bff;
+}
   </style>
 
   <!-- Firebase SDK -->
@@ -114,6 +127,7 @@
   </script>
 </head>
 <body>
+  <div class="back-arrow" onclick="history.back()"></div>
   <div class="container">
     <h1>Personalizza il tuo profilo</h1>
 
